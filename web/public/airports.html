@@ -279,8 +279,8 @@ async function load(){
     const lng = window.GPS?.lng || -87.6298;
 
     const r = await fetch(
-      `${API}/api/airports?lat=${lat}&lng=${lng}&t=${Date.now()}`
-    );
+  `${API}/api/airports?lat=41.8781&lng=-87.6298&t=${Date.now()}`
+);
 
     const d = await r.json();
 
