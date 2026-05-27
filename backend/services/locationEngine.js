@@ -184,28 +184,6 @@ export async function discoverZones(lat, lng, radiusMiles = 25) {
   return deduped.sort((a, b) => a.distMiles - b.distMiles).slice(0, 15);
 }
 
-// ── FETCH FLIGHTS FOR ANY AIRPORT ──────────────────────────
-export async function fetchFlightsForAirport(iataCode) {
-  if (!iataCode) return [];
-  try {
-    const key = process.env.RAPIDAPI_KEY;
-    if (!key) return [];
-    const { data } = await axios.get(
-      `https://aerodatabox.p.rapidapi.com/flights/airports/iata/${iataCode}/arrivals`,
-      {
-        headers: { 'x-rapidapi-key': key, 'x-rapidapi-host': 'aerodatabox.p.rapidapi.com' },
-        params:  { offsetMinutes: -30, durationMinutes: 90 },
-        timeout: 5000,
-      }
-    );
-    return (data.arrivals || []).slice(0, 15).map(f => ({
-      flightNumber:  f.number || f.callSign,
-      origin:        f.departure?.airport?.iata || f.departure?.airport?.name || '--',
-      status:        f.status || 'Scheduled',
-      scheduledTime: f.scheduledTimeLocal?.split('T')[1]?.slice(0, 5) || '--',
-    }));
-  } catch { return []; }
-}
 
 // ── LOCAL EVENTS via Ticketmaster ───────────────────────────
 export async function fetchLocalEvents(lat, lng, radiusMiles = 30) {
