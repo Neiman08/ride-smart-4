@@ -1,0 +1,21 @@
+{
+  "name": "ride-smart-4",
+  "version": "4.0.0",
+  "type": "module",
+  "description": "Ride Smart 4.0 — Full Intelligence Platform for Uber/Lyft drivers",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.3.4",
+    "@capacitor/cli": "^8.3.4",
+    "@capacitor/core": "^8.3.4",
+    "@capacitor/preferences": "^8.0.1",
+    "axios": "^1.16.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  }
+}

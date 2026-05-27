@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>Ride Smart 3.0 · Miles</title>
+<link rel="stylesheet" href="styles/theme.css"/>
+<style>
+.miles-hero{
+  background:linear-gradient(135deg,rgba(0,230,118,.1),rgba(68,138,255,.07));
+  border:1px solid rgba(0,230,118,.22);border-radius:var(--radius);
+  padding:26px 20px;margin-bottom:16px;text-align:center;
+}
+.big-miles{font-family:var(--mono);font-size:62px;font-weight:600;color:var(--green);line-height:1}
+.ctrl{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.ctrl .btn{padding:16px;font-size:14px;border-radius:16px}
+.add-row{display:flex;gap:8px;margin-bottom:10px}
+.add-row input{flex:1}
+.qe{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:0}
+.qe .btn{padding:10px 6px;font-size:13px;border-radius:12px}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+<div class="page-header">
+  <a class="back-btn" href="/">← Home</a>
+  <span class="badge-chip">📍 MILES</span>
+</div>
+
+<h1 style="margin-bottom:6px">Miles<br><span style="color:var(--green)">Tracker</span></h1>
+<p style="margin-bottom:18px">GPS mileage for IRS deductions ($0.67/mi · 2025 rate).</p>
+
+<div class="miles-hero">
+  <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:6px">STATUS · <span id="statusEl" style="color:var(--green)">OFF</span></div>
+  <div class="big-miles" id="milesEl">0.0</div>
+  <div style="font-family:var(--mono);font-size:13px;color:var(--muted);margin-top:4px">miles today</div>
+  <div style="font-family:var(--mono);font-size:20px;color:var(--yellow);margin-top:10px" id="irsEl">IRS: $0.00</div>
+</div>
+
+<div class="stats" style="margin-bottom:14px">
+  <div class="stat"><div class="stat-label">ACTIVE</div><div class="stat-value" id="activeEl">00:00</div></div>
+  <div class="stat"><div class="stat-label">BREAK</div><div class="stat-value" id="breakEl">00:00</div></div>
+  <div class="stat"><div class="stat-label">EARNED</div><div class="stat-value" id="earnEl" style="color:var(--green)">$0.00</div></div>
+  <div class="stat"><div class="stat-label">$/MI</div><div class="stat-value" id="ppmEl">$0.00</div></div>
+</div>
+
+<div class="ctrl">
+  <button class="btn btn-primary" onclick="startShift()">🟢 START</button>
+  <button class="btn btn-warning" id="breakBtn" onclick="toggleBreak()">⏸ BREAK</button>
+  <button class="btn btn-danger" onclick="endShift()">🔴 END</button>
+  <button class="btn btn-ghost" onclick="resetDay()">♻️ RESET</button>
+</div>
+
+<div class="card" style="margin-bottom:14px">
+  <h2 style="margin-bottom:12px">💵 Log Earnings</h2>
+  <div class="add-row">
+    <input id="earnInput" type="number" placeholder="$0.00" min="0" step="0.01"/>
+    <button class="btn btn-primary" onclick="logEarn()" style="width:auto;padding:13px 16px;border-radius:12px;flex-shrink:0">Add</button>
+  </div>
+  <div class="qe">
+    <button class="btn btn-ghost" onclick="qe(5)">+$5</button>
+    <button class="btn btn-ghost" onclick="qe(10)">+$10</button>
+    <button class="btn btn-ghost" onclick="qe(15)">+$15</button>
+    <button class="btn btn-ghost" onclick="qe(20)">+$20</button>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom:14px">
+  <h2 style="margin-bottom:10px">📊 IRS Deduction</h2>
+  <p style="margin-bottom:12px">2025 rate: <b style="color:var(--green)">$0.67/mi</b></p>
+  <div class="stats">
+    <div class="stat"><div class="stat-label">TOTAL MILES</div><div class="stat-value" id="irsMiEl">0.0 mi</div></div>
+    <div class="stat"><div class="stat-label">DEDUCTION</div><div class="stat-value" id="irsDeductEl" style="color:var(--yellow)">$0.00</div></div>
+  </div>
+</div>
+
+<nav class="nav nav-5">
+  <a href="/">Home</a><a href="airports.html">✈️</a>
+  <a href="filters.html">⚙️</a>
+  <a class="active" href="miles.html">📍</a>
+  <a href="brain.html">🧠</a>
+</nav>
+
+<script src="config.js"></script>
+<script>
+const KEY='ridesmart_miles';
+let tracking=false,onBreak=false,watchId=null,lastPos=null,tick=null;
+let data=JSON.parse(localStorage.getItem(KEY)||'null')||{totalMiles:0,activeSeconds:0,breakSeconds:0,earnings:0,status:'OFF'};
+
+function save(){localStorage.setItem(KEY,JSON.stringify(data))}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show';setTimeout(()=>t.classList.remove('show'),2000)}
+
+function render(){
+  const s=document.getElementById('statusEl');
+  s.textContent=data.status;
+  s.style.color=data.status==='ACTIVE'?'var(--green)':data.status==='BREAK'?'var(--yellow)':data.status==='ENDED'?'var(--red)':'var(--muted)';
+  document.getElementById('milesEl').textContent=data.totalMiles.toFixed(1);
+  document.getElementById('irsEl').textContent='IRS: $'+(data.totalMiles*0.67).toFixed(2);
+  document.getElementById('activeEl').textContent=fmt(data.activeSeconds);
+  document.getElementById('breakEl').textContent=fmt(data.breakSeconds);
+  document.getElementById('earnEl').textContent='$'+(data.earnings||0).toFixed(2);
+  const ppm=data.totalMiles>0?(data.earnings||0)/data.totalMiles:0;
+  document.getElementById('ppmEl').textContent='$'+ppm.toFixed(2);
+  document.getElementById('irsMiEl').textContent=data.totalMiles.toFixed(1)+' mi';
+  document.getElementById('irsDeductEl').textContent='$'+(data.totalMiles*0.67).toFixed(2);
+  document.getElementById('breakBtn').textContent=onBreak?'▶️ RESUME':'⏸ BREAK';
+}
+
+function fmt(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60);return`${p(h)}:${p(m)}`}
+function p(n){return String(n).padStart(2,'0')}
+
+function startShift(){tracking=true;onBreak=false;lastPos=null;data.status='ACTIVE';save();render();startGPS();startTick();toast('🟢 Shift started')}
+function toggleBreak(){if(!tracking)return;onBreak=!onBreak;data.status=onBreak?'BREAK':'ACTIVE';save();render();toast(onBreak?'⏸ Break':'▶️ Resumed')}
+function endShift(){tracking=false;onBreak=false;data.status='ENDED';clearInterval(tick);if(watchId)navigator.geolocation.clearWatch(watchId);save();render();toast('🔴 Ended')}
+function resetDay(){tracking=false;onBreak=false;lastPos=null;clearInterval(tick);if(watchId)navigator.geolocation.clearWatch(watchId);data={totalMiles:0,activeSeconds:0,breakSeconds:0,earnings:0,status:'OFF'};save();render();toast('♻️ Reset')}
+
+function startTick(){clearInterval(tick);tick=setInterval(()=>{if(!tracking)return;if(onBreak)data.breakSeconds++;else data.activeSeconds++;save();render();},1000)}
+
+function startGPS(){
+  if(!navigator.geolocation)return;
+  if(watchId)navigator.geolocation.clearWatch(watchId);
+  watchId=navigator.geolocation.watchPosition(pos=>{
+    if(!tracking||onBreak)return;
+    const cur={lat:pos.coords.latitude,lng:pos.coords.longitude};
+    if(lastPos){const mi=distMi(lastPos,cur);if(mi>0&&mi<2){data.totalMiles+=mi;save();render();}}
+    lastPos=cur;
+  },()=>{},{enableHighAccuracy:true,maximumAge:2000,timeout:10000});
+}
+
+function distMi(a,b){const R=3958.8,dLat=toRad(b.lat-a.lat),dLng=toRad(b.lng-a.lng),x=Math.sin(dLat/2)**2+Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*Math.sin(dLng/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
+function toRad(v){return v*Math.PI/180}
+
+function addEarn(amount){
+  data.earnings=(data.earnings||0)+amount;save();render();
+  const today=new Date().toISOString().slice(0,10);
+  const curr=parseFloat(localStorage.getItem(`rs3_earn_${today}`)||'0');
+  localStorage.setItem(`rs3_earn_${today}`,(curr+amount).toFixed(2));
+  const log=JSON.parse(localStorage.getItem('rs3_shift_log')||'[]');
+  log.unshift({amount,type:'Trip',time:Date.now()});
+  localStorage.setItem('rs3_shift_log',JSON.stringify(log.slice(0,100)));
+  toast('✅ +$'+amount.toFixed(2));
+}
+function logEarn(){const v=parseFloat(document.getElementById('earnInput').value);if(!v||v<=0)return;addEarn(v);document.getElementById('earnInput').value=''}
+function qe(n){addEarn(n)}
+
+if(data.status==='ACTIVE'||data.status==='BREAK'){tracking=true;onBreak=data.status==='BREAK';startTick();startGPS();}
+render();
+</script>
+</body>
+</html>

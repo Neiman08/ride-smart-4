@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>Ride Smart 4.0 · Airport Intelligence</title>
+
+<link rel="stylesheet" href="styles/theme.css"/>
+
+<style>
+.airport-hero{
+  border-radius:var(--r);
+  padding:18px;
+  margin-bottom:10px;
+  border:1px solid;
+}
+
+.airport-hero.ohare{
+  background:linear-gradient(135deg,rgba(0,245,144,.08),rgba(68,138,255,.05));
+  border-color:rgba(0,245,144,.2);
+}
+
+.airport-hero.midway{
+  background:linear-gradient(135deg,rgba(255,184,0,.08),rgba(255,145,0,.05));
+  border-color:rgba(255,184,0,.2);
+}
+
+.a-code{
+  font-family:var(--mono);
+  font-size:28px;
+  font-weight:700;
+  color:var(--white);
+  letter-spacing:2px;
+}
+
+.a-name{
+  font-size:14px;
+  color:var(--fog);
+  margin-bottom:12px;
+}
+
+.a-stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:6px;
+}
+
+.a-stat{
+  background:rgba(0,0,0,.2);
+  border-radius:10px;
+  padding:10px;
+  text-align:center;
+}
+
+.a-stat .l{
+  font-size:8px;
+  color:var(--fog);
+  letter-spacing:.8px;
+  font-family:var(--mono);
+}
+
+.a-stat .v{
+  font-family:var(--mono);
+  font-size:16px;
+  font-weight:600;
+  color:var(--white);
+  margin-top:3px;
+}
+
+.flight-card{
+  background:var(--ink3);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:12px;
+  margin-bottom:6px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.flight-num{
+  font-family:var(--mono);
+  font-size:15px;
+  font-weight:700;
+  color:var(--white);
+  width:70px;
+  flex-shrink:0;
+}
+
+.flight-status{
+  font-family:var(--mono);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:1px;
+}
+
+.fs-landed{color:var(--mint)}
+.fs-arriving{color:var(--amber)}
+.fs-scheduled{color:var(--fog)}
+
+.flight-time{
+  font-family:var(--mono);
+  font-size:13px;
+  color:var(--mist);
+  margin-left:auto;
+}
+
+.queue-meter{
+  background:rgba(255,255,255,.06);
+  border-radius:999px;
+  height:8px;
+  margin:6px 0;
+  overflow:hidden;
+}
+
+.queue-fill{
+  height:100%;
+  border-radius:999px;
+  transition:width .6s;
+}
+</style>
+</head>
+
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div class="page-header">
+  <a class="back-btn" href="/">← Home</a>
+  <span class="badge-chip">✈️ AIRPORTS</span>
+</div>
+
+<div class="hero-eyebrow">AIRPORT INTELLIGENCE</div>
+
+<h1 style="margin-bottom:6px">
+  Live<br>
+  <em style="color:var(--mint);font-style:normal">Flight Data</em>
+</h1>
+
+<p style="margin-bottom:16px">
+  Arrivals, queues, and demand at ORD and MDW.
+</p>
+
+<div class="airport-hero ohare">
+
+  <div class="a-code">ORD</div>
+
+  <div class="a-name">
+    O'Hare International Airport
+  </div>
+
+  <div class="a-stats">
+
+    <div class="a-stat">
+      <div class="l">ARRIVALS/HR</div>
+      <div class="v" id="ordArrivals">--</div>
+    </div>
+
+    <div class="a-stat">
+      <div class="l">QUEUE</div>
+      <div class="v" id="ordQueue">--</div>
+    </div>
+
+    <div class="a-stat">
+      <div class="l">DEMAND</div>
+      <div class="v" id="ordDemand">--</div>
+    </div>
+
+    <div class="a-stat">
+      <div class="l">EST $/HR</div>
+      <div class="v" id="ordHrly" style="color:var(--mint)">--</div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:12px">
+
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--fog);margin-bottom:4px">
+      <span>Driver Queue</span>
+      <span id="ordQueuePct">--</span>
+    </div>
+
+    <div class="queue-meter">
+      <div class="queue-fill" id="ordQueueBar"></div>
+    </div>
+
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px">
+
+    <button class="btn btn-mint btn-sm"
+      onclick="nav(41.9742,-87.9073)">
+      🧭 Navigate ORD
+    </button>
+
+    <button class="btn btn-ghost btn-sm" id="ordAction">
+      Loading...
+    </button>
+
+  </div>
+
+</div>
+
+<div class="airport-hero midway">
+
+  <div class="a-code" style="color:var(--amber)">MDW</div>
+
+  <div class="a-name">
+    Chicago Midway International Airport
+  </div>
+
+  <div class="a-stats">
+
+    <div class="a-stat">
+      <div class="l">ARRIVALS/HR</div>
+      <div class="v" id="mdwArrivals">--</div>
+    </div>
+
+    <div class="a-stat">
+      <div class="l">QUEUE</div>
+      <div class="v" id="mdwQueue">--</div>
+    </div>
+
+    <div class="a-stat">
+      <div class="l">DEMAND</div>
+      <div class="v" id="mdwDemand">--</div>
+    </div>
+
+    <div class="a-stat">
+      <div class="l">EST $/HR</div>
+      <div class="v" id="mdwHrly" style="color:var(--amber)">--</div>
+    </div>
+
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px">
+
+    <button class="btn btn-amber btn-sm"
+      onclick="nav(41.7868,-87.7522)">
+      🧭 Navigate MDW
+    </button>
+
+    <button class="btn btn-ghost btn-sm">
+      📊 Zone Score
+    </button>
+
+  </div>
+
+</div>
+
+<div id="flightsList">
+  <p>Loading flights...</p>
+</div>
+
+<nav class="nav nav-5">
+  <a href="/">Home</a>
+  <a href="events.html">🎵</a>
+  <a href="heatmap.html">🗺️</a>
+  <a href="ev.html">⚡</a>
+  <a href="brain.html">🧠</a>
+</nav>
+
+<script src="config.js"></script>
+<script src="gps.js"></script>
+
+<script>
+const API = 'https://ride-smart-ai.onrender.com';
+
+function nav(lat,lng){
+  window.location.href =
+    `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
+}
+
+async function load(){
+
+  try{
+
+    const lat = window.GPS?.lat || 41.8781;
+    const lng = window.GPS?.lng || -87.6298;
+
+    const r = await fetch(
+      `${API}/api/airports?lat=${lat}&lng=${lng}&t=${Date.now()}`
+    );
+
+    const d = await r.json();
+
+    console.log('AIRPORT DATA:', d);
+
+    if(!d.success){
+      throw new Error(d.error || 'API error');
+    }
+
+    const airports = d.airports || [];
+
+    if(!airports.length){
+
+      document.getElementById('flightsList').innerHTML =
+        '<p>No airports found near your location.</p>';
+
+      return;
+    }
+
+    airports.slice(0,2).forEach((a, i) => {
+
+      const q = a.queueLevel || 50;
+
+      const arEl = document.getElementById(
+        i===0 ? 'ordArrivals' : 'mdwArrivals'
+      );
+
+      if(arEl){
+
+        arEl.textContent = a.arrivalsPerHour ?? '--';
+
+        const qEl = document.getElementById(
+          i===0 ? 'ordQueue' : 'mdwQueue'
+        );
+
+        if(qEl){
+          qEl.textContent = q + '%';
+        }
+
+        const dEl = document.getElementById(
+          i===0 ? 'ordDemand' : 'mdwDemand'
+        );
+
+        if(dEl){
+          dEl.textContent = (a.demandScore || 70) + '%';
+        }
+
+        const hEl = document.getElementById(
+          i===0 ? 'ordHrly' : 'mdwHrly'
+        );
+
+        if(hEl){
+          hEl.textContent = '$' + (a.estimatedHourly || '--');
+        }
+
+        if(i===0){
+
+          const qBar = document.getElementById('ordQueueBar');
+          const qPct = document.getElementById('ordQueuePct');
+          const qAct = document.getElementById('ordAction');
+
+          if(qBar){
+            qBar.style.width = q + '%';
+            qBar.style.background =
+              q > 70 ? 'var(--red)'
+              : q > 40 ? 'var(--amber)'
+              : 'var(--mint)';
+          }
+
+          if(qPct){
+            qPct.textContent = q + '%';
+          }
+
+          if(qAct){
+            qAct.textContent = a.action || 'Monitor';
+          }
+        }
+      }
+    });
+
+function renderFlights(containerId, flights=[]){
+  const el = document.getElementById(containerId);
+
+  if(!flights.length){
+    el.innerHTML =
+      '<p style="color:var(--mist);font-size:13px">No recent arrivals.</p>';
+    return;
+  }
+
+  el.innerHTML = flights.slice(0,15).map(f => {
+    const s = (f.status || '').toLowerCase();
+
+    const cls =
+      s.includes('land') ? 'fs-landed'
+      : s.includes('arr') ? 'fs-arriving'
+      : 'fs-scheduled';
+
+    const label =
+      s.includes('land') ? 'LANDED'
+      : s.includes('arr') ? 'ARRIVING'
+      : 'SCHEDULED';
+
+    const origin =
+      f.originCity ||
+      f.origin ||
+      f.airline ||
+      '--';
+
+    return `
+      <div class="flight-card">
+        <div class="flight-num">${f.flightNumber || '--'}</div>
+
+        <div style="flex:1">
+          <div style="font-size:12px;font-weight:700;color:var(--white)">
+            ${origin}
+          </div>
+
+          <div class="flight-status ${cls}">
+            ${label}
+          </div>
+
+          <div style="font-size:11px;color:var(--mist);margin-top:3px">
+            👥 Estimated passengers: ${f.passengerCount || f.passengers || '--'}
+          </div>
+        </div>
+
+        <div class="flight-time">
+          ${f.scheduledTime || '--'}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+const ord =
+  airports.find(a => a.code === 'ORD') ||
+  airports.find(a => a.name && a.name.includes("O'Hare"));
+
+const mdw =
+  airports.find(a => a.code === 'MDW') ||
+  airports.find(a => a.name && a.name.includes("Midway"));
+
+const oldList = document.getElementById('flightsList');
+
+if(oldList){
+  oldList.outerHTML = `
+    <div class="sec-label">LIVE ARRIVALS — ORD</div>
+    <div id="ordFlightsList"></div>
+
+    <div class="sec-label">LIVE ARRIVALS — MDW</div>
+    <div id="mdwFlightsList"></div>
+  `;
+}
+
+renderFlights('ordFlightsList', ord?.flights || []);
+renderFlights('mdwFlightsList', mdw?.flights || []);
+
+  }catch(e){
+
+    console.error('AIRPORT PAGE ERROR:', e);
+
+    const el = document.getElementById('flightsList') || document.getElementById('ordFlightsList');
+    if(el){
+      el.innerHTML =
+        `<p style="color:var(--mist);font-size:13px">
+          ⚠️ ${e.message}. Check backend connection.
+        </p>`;
+    }
+  }
+}
+
+load();
+</script>
+
+</body>
+</html>

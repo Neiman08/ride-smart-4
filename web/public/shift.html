@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>Ride Smart 3.0 · Shift</title>
+<link rel="stylesheet" href="styles/theme.css"/>
+<style>
+.shift-hero{
+  background:linear-gradient(135deg,rgba(0,230,118,.1),rgba(68,138,255,.07));
+  border:1px solid rgba(0,230,118,.22);border-radius:var(--radius);
+  padding:26px 20px;margin-bottom:16px;text-align:center;
+}
+.big-timer{font-family:var(--mono);font-size:60px;font-weight:500;color:var(--green);line-height:1;letter-spacing:-2px}
+.shift-status{font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--muted);margin-bottom:10px}
+.hourly-live{font-family:var(--mono);font-size:26px;font-weight:600;color:var(--yellow);margin-top:12px}
+.hourly-live span{font-size:12px;color:var(--muted)}
+
+.ctrl{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.ctrl .btn{padding:17px;font-size:14px;border-radius:16px}
+
+.dropoff-btn{
+  width:100%;padding:18px;border:none;border-radius:var(--radius);
+  background:linear-gradient(135deg,var(--orange),#ff6d00);color:#fff;
+  font-family:var(--font);font-size:15px;font-weight:700;cursor:pointer;
+  margin-bottom:12px;transition:opacity .15s;
+}
+.dropoff-btn:active{opacity:.8}
+
+.add-row{display:flex;gap:8px;margin-bottom:10px}
+.add-row input{flex:1}
+.add-row .btn{width:auto;padding:13px 18px;border-radius:12px;flex-shrink:0}
+
+.quick-earn{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px}
+.quick-earn .btn{padding:11px 6px;font-size:13px;border-radius:12px}
+
+.goal-bar-wrap{margin:10px 0 6px}
+.goal-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:4px}
+
+.log-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:11px 14px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:14px;margin-bottom:7px;
+}
+.log-amt{font-family:var(--mono);font-size:16px;font-weight:600;color:var(--green)}
+.log-meta{font-size:11px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+<div class="page-header">
+  <a class="back-btn" href="/">← Home</a>
+  <span class="badge-chip">⏱ SHIFT</span>
+</div>
+
+<h1 style="margin-bottom:6px">Active<br><span style="color:var(--green)">Shift</span></h1>
+<p style="margin-bottom:18px">Real-time earnings tracker. Hit "Trip Done" after every dropoff to unlock your next AI hint.</p>
+
+<!-- HERO -->
+<div class="shift-hero">
+  <div class="shift-status" id="statusLabel">STATUS · <span id="statusVal" style="color:var(--green)">OFF</span></div>
+  <div class="big-timer" id="bigTimer">00:00:00</div>
+  <div class="hourly-live"><span>$/hr</span> <span id="hourlyVal">--</span></div>
+  <div class="goal-bar-wrap">
+    <div class="progress-wrap"><div class="progress-bar" id="goalBar" style="width:0%"></div></div>
+    <div class="goal-labels"><span id="earnedLabel">$0.00 earned</span><span id="goalLabel">Goal: $200</span></div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats" style="margin-bottom:16px">
+  <div class="stat"><div class="stat-label">ACTIVE</div><div class="stat-value" id="activeTime">00:00</div></div>
+  <div class="stat"><div class="stat-label">BREAK</div><div class="stat-value" id="breakTime">00:00</div></div>
+  <div class="stat"><div class="stat-label">EARNED</div><div class="stat-value" id="earnedStat" style="color:var(--green)">$0.00</div></div>
+  <div class="stat"><div class="stat-label">MILES</div><div class="stat-value" id="milesStat">0.0</div></div>
+</div>
+
+<!-- CONTROLS -->
+<div class="ctrl">
+  <button class="btn btn-primary" id="startBtn" onclick="startShift()">🟢 START</button>
+  <button class="btn btn-warning" id="breakBtn" onclick="toggleBreak()" disabled>⏸ BREAK</button>
+  <button class="btn btn-danger" id="endBtn" onclick="endShift()" disabled>🔴 END</button>
+  <button class="btn btn-ghost" onclick="resetDay()">♻️ RESET</button>
+</div>
+
+<!-- DROPOFF BUTTON -->
+<button class="dropoff-btn" onclick="recordDropoff()">
+  📍 Trip Completed — Get Next Zone
+</button>
+
+<!-- ADD EARNINGS -->
+<div class="card" style="margin-bottom:14px">
+  <h2 style="margin-bottom:12px">➕ Add Earnings</h2>
+  <div class="add-row">
+    <input id="earnInput" type="number" placeholder="$0.00" min="0" step="0.01"/>
+    <button class="btn btn-primary add-row" onclick="addManual()" style="width:auto;padding:13px 20px;border-radius:12px">Add</button>
+  </div>
+  <div class="quick-earn">
+    <button class="btn btn-ghost" onclick="quickAdd(5)">+$5</button>
+    <button class="btn btn-ghost" onclick="quickAdd(10)">+$10</button>
+    <button class="btn btn-ghost" onclick="quickAdd(15)">+$15</button>
+    <button class="btn btn-ghost" onclick="quickAdd(20)">+$20</button>
+  </div>
+</div>
+
+<!-- GOAL -->
+<div class="card" style="margin-bottom:14px">
+  <h2 style="margin-bottom:12px">🎯 Daily Goal</h2>
+  <div class="add-row">
+    <input id="goalInput" type="number" placeholder="200" min="0" step="10"/>
+    <button class="btn btn-secondary" onclick="setGoal()" style="width:auto;padding:13px 18px;border-radius:12px">Set Goal</button>
+  </div>
+</div>
+
+<!-- LOG -->
+<div class="card" style="margin-bottom:14px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <h2>📋 Today's Log</h2>
+    <button class="btn btn-ghost" onclick="clearLog()" style="width:auto;padding:7px 12px;font-size:11px;border-radius:10px">Clear</button>
+  </div>
+  <div id="logEl"><p>No entries yet.</p></div>
+</div>
+
+<nav class="nav nav-5">
+  <a href="/">Home</a><a href="airports.html">✈️</a>
+  <a class="active" href="shift.html">⏱</a>
+  <a href="miles.html">📍</a><a href="brain.html">🧠</a>
+</nav>
+
+<script src="config.js"></script>
+<script>
+const KEY='ridesmart_miles',KEY_LOG='rs3_shift_log',KEY_GOAL='rs3_daily_goal';
+let tracking=false,onBreak=false,watchId=null,lastPos=null,tick=null;
+let shift=JSON.parse(localStorage.getItem(KEY)||'null')||{totalMiles:0,activeSeconds:0,breakSeconds:0,earnings:0,status:'OFF'};
+
+function save(){localStorage.setItem(KEY,JSON.stringify(shift))}
+function toast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+(type||'');setTimeout(()=>t.classList.remove('show'),2200)}
+
+function render(){
+  const goal=parseFloat(localStorage.getItem(KEY_GOAL)||'200');
+  const pct=Math.min(100,(shift.earnings/goal)*100);
+  document.getElementById('goalBar').style.width=pct+'%';
+  document.getElementById('earnedLabel').textContent=`$${shift.earnings.toFixed(2)} earned`;
+  document.getElementById('goalLabel').textContent=`Goal: $${goal}`;
+  const sv=document.getElementById('statusVal');
+  sv.textContent=shift.status;
+  sv.style.color=shift.status==='ACTIVE'?'var(--green)':shift.status==='BREAK'?'var(--yellow)':shift.status==='ENDED'?'var(--red)':'var(--muted)';
+  document.getElementById('bigTimer').textContent=fmtHMS(shift.activeSeconds);
+  document.getElementById('activeTime').textContent=fmtHM(shift.activeSeconds);
+  document.getElementById('breakTime').textContent=fmtHM(shift.breakSeconds);
+  document.getElementById('earnedStat').textContent='$'+shift.earnings.toFixed(2);
+  document.getElementById('milesStat').textContent=shift.totalMiles.toFixed(1);
+  const hrs=shift.activeSeconds/3600;
+  const hrly=hrs>0?shift.earnings/hrs:0;
+  document.getElementById('hourlyVal').textContent=hrs>0?'$'+hrly.toFixed(2):'--';
+  const isActive=shift.status==='ACTIVE'||shift.status==='BREAK';
+  document.getElementById('startBtn').disabled=isActive;
+  document.getElementById('breakBtn').disabled=!isActive||shift.status==='ENDED';
+  document.getElementById('endBtn').disabled=!isActive;
+  document.getElementById('breakBtn').textContent=shift.status==='BREAK'?'▶️ RESUME':'⏸ BREAK';
+  renderLog();
+}
+
+function fmtHMS(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;return`${p(h)}:${p(m)}:${p(sec)}`}
+function fmtHM(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60);return`${p(h)}:${p(m)}`}
+function p(n){return String(n).padStart(2,'0')}
+
+function startShift(){tracking=true;onBreak=false;lastPos=null;shift.status='ACTIVE';save();render();startGPS();startTick();toast('🟢 Shift started!')}
+function toggleBreak(){if(!tracking)return;onBreak=!onBreak;shift.status=onBreak?'BREAK':'ACTIVE';save();render();toast(onBreak?'⏸ Break':'▶️ Back to work')}
+function endShift(){tracking=false;onBreak=false;shift.status='ENDED';clearInterval(tick);if(watchId)navigator.geolocation.clearWatch(watchId);save();render();toast('🔴 Shift ended')}
+function resetDay(){tracking=false;onBreak=false;lastPos=null;clearInterval(tick);if(watchId)navigator.geolocation.clearWatch(watchId);shift={totalMiles:0,activeSeconds:0,breakSeconds:0,earnings:0,status:'OFF'};save();render();toast('♻️ Reset')}
+
+function startTick(){clearInterval(tick);tick=setInterval(()=>{if(!tracking)return;if(onBreak)shift.breakSeconds++;else shift.activeSeconds++;save();render();},1000)}
+
+function startGPS(){
+  if(!navigator.geolocation)return;
+  if(watchId)navigator.geolocation.clearWatch(watchId);
+  watchId=navigator.geolocation.watchPosition(pos=>{
+    if(!tracking||onBreak)return;
+    const cur={lat:pos.coords.latitude,lng:pos.coords.longitude};
+    if(lastPos){const mi=distMi(lastPos,cur);if(mi>0&&mi<2){shift.totalMiles+=mi;save();render();}}
+    lastPos=cur;
+  },()=>{},{enableHighAccuracy:true,maximumAge:2000,timeout:10000});
+}
+
+function distMi(a,b){const R=3958.8,dLat=toRad(b.lat-a.lat),dLng=toRad(b.lng-a.lng),x=Math.sin(dLat/2)**2+Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*Math.sin(dLng/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
+function toRad(v){return v*Math.PI/180}
+
+function addEarning(amount,type='Trip'){
+  shift.earnings+=amount;save();render();
+  const log=JSON.parse(localStorage.getItem(KEY_LOG)||'[]');
+  log.unshift({amount,type,time:Date.now()});
+  localStorage.setItem(KEY_LOG,JSON.stringify(log.slice(0,100)));
+  const today=new Date().toISOString().slice(0,10);
+  const curr=parseFloat(localStorage.getItem(`rs3_earn_${today}`)||'0');
+  localStorage.setItem(`rs3_earn_${today}`,(curr+amount).toFixed(2));
+  renderLog();toast(`✅ +$${amount.toFixed(2)}`);
+}
+function addManual(){const v=parseFloat(document.getElementById('earnInput').value);if(!v||v<=0)return;addEarning(v);document.getElementById('earnInput').value=''}
+function quickAdd(n){addEarning(n,'Quick')}
+
+function renderLog(){
+  const log=JSON.parse(localStorage.getItem(KEY_LOG)||'[]');
+  const el=document.getElementById('logEl');
+  if(!log.length){el.innerHTML='<p>No entries yet.</p>';return}
+  el.innerHTML=log.slice(0,15).map(e=>`<div class="log-item"><div><div style="font-size:13px;font-weight:700">${e.type||'Trip'}</div><div class="log-meta">${new Date(e.time).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}</div></div><div class="log-amt">+$${parseFloat(e.amount).toFixed(2)}</div></div>`).join('');
+}
+
+function setGoal(){const v=parseFloat(document.getElementById('goalInput').value);if(!v||v<=0)return;localStorage.setItem(KEY_GOAL,v.toString());render();toast(`🎯 Goal: $${v}`)}
+function clearLog(){if(!confirm('Clear log?'))return;localStorage.removeItem(KEY_LOG);renderLog();toast('Log cleared')}
+
+function recordDropoff(){
+  localStorage.setItem('rs3_dropoff',Date.now().toString());
+  toast('📍 Recorded — heading home for AI hint...');
+  setTimeout(()=>window.location.href='/',1600);
+}
+
+if(shift.status==='ACTIVE'||shift.status==='BREAK'){tracking=true;onBreak=shift.status==='BREAK';startTick();startGPS();}
+render();
+</script>
+</body>
+</html>

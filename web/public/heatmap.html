@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>Ride Smart 4.0 · Heatmap</title>
+
+<link rel="stylesheet" href="styles/theme.css"/>
+
+<style>
+.zone-selector{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.zs-btn{padding:7px 13px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid var(--line2);background:var(--ink3);color:var(--fog);cursor:pointer;transition:.15s;white-space:nowrap}
+.zs-btn.on{background:var(--mint);color:#001a0d;border-color:var(--mint)}
+
+.heatmap-wrap{overflow-x:auto;margin-bottom:16px}
+.heatmap-grid{display:grid;grid-template-columns:80px repeat(24,1fr);gap:2px;min-width:600px}
+.hm-cell{height:38px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;font-weight:600;position:relative;cursor:default}
+.hm-label{background:transparent!important;font-size:10px;color:var(--fog);font-family:var(--mono);justify-content:flex-end;padding-right:6px;height:auto}
+.hm-hour-label{background:transparent!important;font-size:8px;color:var(--fog);font-family:var(--mono);justify-content:center;height:20px}
+.hm-now-marker{outline:2px solid var(--mint);outline-offset:1px}
+.hm-now-marker::after{content:'NOW';position:absolute;top:-14px;font-size:7px;color:var(--mint);letter-spacing:1px}
+
+.pred-card{background:var(--ink3);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:10px}
+.pred-zone-name{font-size:20px;font-weight:700;color:var(--white);margin-bottom:4px}
+.pred-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.pg-item{background:var(--ink4);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+.pg-item .l{font-size:9px;color:var(--fog);letter-spacing:1px;font-family:var(--mono)}
+.pg-item .v{font-family:var(--mono);font-size:18px;font-weight:600;color:var(--white);margin-top:4px}
+
+.bar-chart{display:flex;gap:3px;height:80px;align-items:flex-end;margin:12px 0}
+.bar{flex:1;border-radius:3px 3px 0 0;min-height:4px;position:relative;cursor:default;transition:opacity .15s}
+.bar:hover{opacity:.8}
+.bar-now{outline:1.5px solid var(--mint)}
+.bar-label{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);font-size:7px;color:var(--fog);font-family:var(--mono);white-space:nowrap}
+
+.best-hour-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,245,144,.1);border:1px solid rgba(0,245,144,.2);border-radius:999px;padding:6px 14px;font-family:var(--mono);font-size:12px;font-weight:600;color:var(--mint);margin-top:8px}
+</style>
+</head>
+
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div class="page-header">
+  <a class="back-btn" href="/">← Home</a>
+  <span class="badge-chip">🗺️ HEATMAP</span>
+</div>
+
+<div class="hero-eyebrow">AI PREDICTIONS</div>
+
+<h1 style="margin-bottom:6px">
+  Heat Map &<br>
+  <span style="color:var(--mint)">Predictions</span>
+</h1>
+
+<p style="margin-bottom:18px">
+  Best zones by hour — AI-predicted $/hr based on historic + live signals.
+</p>
+
+<div class="zone-selector" id="zoneSel"></div>
+
+<div class="pred-card" id="predCard">
+  <div style="font-family:var(--mono);font-size:9px;color:var(--blue);letter-spacing:2px;margin-bottom:8px">
+    AI PREDICTION · SELECTED ZONE
+  </div>
+
+  <div class="pred-zone-name" id="predZoneName">Loading...</div>
+  <div id="predTrend" style="font-size:12px;color:var(--fog)"></div>
+
+  <div class="pred-grid">
+    <div class="pg-item"><div class="l">NOW</div><div class="v" id="predNow">--</div></div>
+    <div class="pg-item"><div class="l">+30 MIN</div><div class="v" id="pred30" style="color:var(--mint)">--</div></div>
+    <div class="pg-item"><div class="l">+60 MIN</div><div class="v" id="pred60">--</div></div>
+  </div>
+
+  <div id="bestHourBadge"></div>
+</div>
+
+<div class="card" style="margin-bottom:10px">
+  <h2 style="margin-bottom:14px">24h $/hr Forecast</h2>
+  <div class="bar-chart" id="barChart"></div>
+
+  <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--fog);margin-top:20px;padding:0 2px">
+    <span>12am</span><span>6am</span><span>12pm</span><span>6pm</span><span>11pm</span>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom:10px">
+  <h2 style="margin-bottom:14px">Zone Rankings · Next 30 Min</h2>
+  <div id="zoneTable"></div>
+</div>
+
+<div class="card" style="margin-bottom:10px">
+  <h2 style="margin-bottom:4px">All Zones · All Hours</h2>
+  <p style="margin-bottom:12px">Color = predicted $/hr intensity</p>
+
+  <div class="heatmap-wrap">
+    <div class="heatmap-grid" id="heatmapGrid"></div>
+  </div>
+</div>
+
+<nav class="nav nav-5">
+  <a href="/">Home</a>
+  <a href="events.html">🎵</a>
+  <a class="on">🗺️</a>
+  <a href="ev.html">⚡</a>
+  <a href="brain.html">🧠</a>
+</nav>
+
+<script src="config.js"></script>
+<script src="gps.js"></script>
+
+<script>
+const API = 'https://ride-smart-ai.onrender.com';
+
+let predictions = [];
+let selectedZone = '';
+let currentHour = new Date().getHours();
+
+function colorForHourly(v){
+  if(v >= 40) return '#00f590';
+  if(v >= 35) return '#39e07a';
+  if(v >= 30) return '#80cc55';
+  if(v >= 26) return '#ffb800';
+  if(v >= 22) return '#ff7a00';
+  return '#ff2d55';
+}
+
+function getLatLng(){
+  return {
+    lat: window.GPS?.lat || 41.8781,
+    lng: window.GPS?.lng || -87.6298
+  };
+}
+
+async function load(){
+  try{
+    const { lat, lng } = getLatLng();
+
+    const r = await fetch(
+      `${API}/api/predict?lat=${lat}&lng=${lng}&t=${Date.now()}`
+    );
+
+    const d = await r.json();
+
+    console.log('PREDICTIONS DATA:', d);
+
+    if(!d.success){
+      throw new Error(d.error || 'Predict API error');
+    }
+
+    predictions = d.predictions || [];
+    currentHour = d.currentHour || new Date().getHours();
+
+    if(!predictions.length){
+      document.getElementById('predCard').innerHTML =
+        '<p style="color:var(--mist)">No predictions found.</p>';
+      return;
+    }
+
+    renderZoneSelector();
+    selectZone(predictions[0].zone);
+    renderHeatmap();
+    renderZoneTable();
+
+  }catch(e){
+    console.error('HEATMAP ERROR:', e);
+
+    document.getElementById('predCard').innerHTML =
+      `<p style="color:var(--mist)">Could not load predictions: ${e.message}</p>`;
+  }
+}
+
+function renderZoneSelector(){
+  const el = document.getElementById('zoneSel');
+
+  el.innerHTML = predictions.slice(0,8).map((p,i) => {
+    const label = (p.zone || 'Zone')
+      .replace(' Airport',' ✈️')
+      .replace('Downtown Chicago','Downtown');
+
+    return `
+      <div class="zs-btn ${i===0?'on':''}" onclick="selectZoneBtn('${p.zone}',this)">
+        ${label}
+      </div>
+    `;
+  }).join('');
+}
+
+function selectZoneBtn(zone, el){
+  document.querySelectorAll('.zs-btn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  selectZone(zone);
+}
+
+function selectZone(zone){
+  selectedZone = zone;
+
+  const p = predictions.find(x => x.zone === zone);
+
+  if(!p) return;
+
+  document.getElementById('predZoneName').textContent = zone;
+  document.getElementById('predNow').textContent = '$' + (p.now ?? '--');
+  document.getElementById('pred30').textContent = '$' + (p.in30min ?? '--');
+  document.getElementById('pred60').textContent = '$' + (p.in60min ?? '--');
+
+  const delta = Number(p.in30min || 0) - Number(p.now || 0);
+
+  document.getElementById('predTrend').textContent =
+    delta > 0
+      ? `📈 Trending up $${delta.toFixed(0)}/hr in next 30 min`
+      : delta < 0
+        ? `📉 Trending down $${Math.abs(delta).toFixed(0)}/hr`
+        : '→ Stable demand';
+
+  document.getElementById('predTrend').style.color =
+    delta > 1
+      ? 'var(--mint)'
+      : delta < -1
+        ? 'var(--red)'
+        : 'var(--fog)';
+
+  document.getElementById('bestHourBadge').innerHTML =
+    `<div class="best-hour-badge">
+      ⭐ Best hour: ${p.bestHour?.label || '--'} · $${p.bestHour?.hourly || '--'}/hr
+    </div>`;
+
+  renderBarChart(p);
+}
+
+function renderBarChart(p){
+  if(!p.heatmap) return;
+
+  const max = Math.max(...p.heatmap.map(h => h.hourly || 0), 1);
+  const el = document.getElementById('barChart');
+
+  el.innerHTML = p.heatmap.map(h => {
+    const hourly = h.hourly || 0;
+    const pct = Math.max(8, Math.round((hourly / max) * 100));
+    const isNow = h.hour === currentHour;
+
+    return `
+      <div class="bar ${isNow?'bar-now':''}"
+        style="height:${pct}%;background:${colorForHourly(hourly)}"
+        title="${h.label}: $${hourly}/hr">
+        ${isNow?'<div class="bar-label">NOW</div>':''}
+      </div>
+    `;
+  }).join('');
+}
+
+function renderHeatmap(){
+  const el = document.getElementById('heatmapGrid');
+  const hours = Array.from({ length: 24 }, (_, i) => i);
+
+  el.innerHTML = '<div class="hm-cell hm-label"></div>';
+
+  hours.forEach(h => {
+    el.innerHTML += `
+      <div class="hm-cell hm-hour-label">
+        ${h===0?'12a':h<12?h+'a':h===12?'12p':(h-12)+'p'}
+      </div>
+    `;
+  });
+
+  predictions.slice(0,8).forEach(p => {
+    el.innerHTML += `
+      <div class="hm-cell hm-label" style="font-size:9px;color:var(--smoke)">
+        ${(p.zone || 'Zone').split(' ')[0]}
+      </div>
+    `;
+
+    const hm = p.heatmap || [];
+
+    hours.forEach(h => {
+      const data = hm.find(x => x.hour === h) || { hourly:25 };
+      const hourly = data.hourly || 25;
+      const isNow = h === currentHour;
+      const col = colorForHourly(hourly);
+
+      el.innerHTML += `
+        <div class="hm-cell ${isNow?'hm-now-marker':''}"
+          style="background:${col}22;color:${col};border:1px solid ${col}33"
+          title="${p.zone} ${h}:00 — $${hourly}/hr">
+          ${hourly}
+        </div>
+      `;
+    });
+  });
+}
+
+function renderZoneTable(){
+  const el = document.getElementById('zoneTable');
+
+  el.innerHTML = predictions.slice(0,8).map((p,i) => {
+    const trend =
+      p.trend === 'UP'
+        ? '↑ UP'
+        : p.trend === 'DOWN'
+          ? '↓ DOWN'
+          : '→ FLAT';
+
+    const tc =
+      p.trend === 'UP'
+        ? 'var(--mint)'
+        : p.trend === 'DOWN'
+          ? 'var(--red)'
+          : 'var(--fog)';
+
+    return `
+      <div style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)">
+        <div style="font-family:var(--mono);font-size:14px;color:var(--fog);width:20px">
+          #${i+1}
+        </div>
+
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;color:var(--white)">
+            ${p.zone}
+          </div>
+          <div style="font-size:11px;color:var(--fog)">
+            Now: $${p.now} · Best: ${p.bestHour?.label || '--'}
+          </div>
+        </div>
+
+        <div style="text-align:right">
+          <div style="font-family:var(--mono);font-size:16px;font-weight:600;color:var(--mint)">
+            $${p.in30min}
+          </div>
+          <div style="font-family:var(--mono);font-size:10px;color:${tc}">
+            ${trend}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+load();
+</script>
+
+</body>
+</html>

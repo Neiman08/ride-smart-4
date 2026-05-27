@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>Ride Smart 4.0 · Brain</title>
+<link rel="stylesheet" href="styles/theme.css"/>
+<style>
+.brain-hero{background:linear-gradient(145deg,rgba(68,138,255,.1),rgba(0,245,144,.05));border:1px solid rgba(68,138,255,.18);border-radius:var(--r);padding:20px;margin-bottom:10px;text-align:center}
+.brain-num{font-family:var(--mono);font-size:54px;font-weight:600;color:var(--blue);line-height:1}
+.zone-rank{display:flex;align-items:center;gap:12px;padding:11px;background:var(--ink4);border:1px solid var(--line);border-radius:12px;margin-bottom:6px}
+.ai-row{display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid var(--line);font-size:12px;font-weight:600;color:var(--smoke)}
+.ai-row:last-child{border:none}
+.ai-dot{width:6px;height:6px;border-radius:50%}
+.ai-dot.on{background:var(--mint);box-shadow:0 0 6px var(--mint)}.ai-dot.off{background:var(--red)}
+.ai-val{margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:1px}
+.ord-item{padding:11px;background:var(--surface);border:1px solid var(--line);border-radius:13px;margin-bottom:6px}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+<div class="page-header">
+  <a class="back-btn" href="/">← Home</a>
+  <span class="badge-chip" style="background:var(--blue);color:#fff">🧠 BRAIN</span>
+</div>
+
+<h1 style="margin-bottom:6px">AI<br><em style="color:var(--blue);font-style:normal">Brain 4.0</em></h1>
+<p style="margin-bottom:16px">Live analytics — all 15 signals, order history, AI predictions.</p>
+
+<div class="brain-hero">
+  <div style="font-family:var(--mono);font-size:9px;color:var(--fog);letter-spacing:2px;margin-bottom:8px">ORDERS ANALYZED TODAY</div>
+  <div class="brain-num" id="totalOrders">0</div>
+  <div class="stats2 stats4" style="margin-top:14px;grid-template-columns:repeat(4,1fr)">
+    <div class="stat-box"><div class="stat-l">BEST $/HR</div><div class="stat-v" style="font-size:16px;color:var(--mint)" id="bestHr">--</div></div>
+    <div class="stat-box"><div class="stat-l">BEST $/MI</div><div class="stat-v" style="font-size:16px;color:var(--amber)" id="bestMi">--</div></div>
+    <div class="stat-box"><div class="stat-l">ACCEPT</div><div class="stat-v" style="font-size:16px;color:var(--mint)" id="acceptCt">0</div></div>
+    <div class="stat-box"><div class="stat-l">REJECT</div><div class="stat-v" style="font-size:16px;color:var(--red)" id="rejectCt">0</div></div>
+  </div>
+</div>
+
+<!-- TODAY -->
+<div class="card card-glow" style="margin-bottom:10px">
+  <h2 style="margin-bottom:12px">💰 Today</h2>
+  <div class="stats2">
+    <div class="stat-box"><div class="stat-l">EARNED</div><div class="stat-v" id="todayEarn" style="color:var(--mint)">$0.00</div></div>
+    <div class="stat-box"><div class="stat-l">MILES</div><div class="stat-v" id="todayMi">0.0</div></div>
+    <div class="stat-box"><div class="stat-l">HOURS</div><div class="stat-v" id="todayHrs">0h</div></div>
+    <div class="stat-box"><div class="stat-l">NET $/HR</div><div class="stat-v" id="todayEff" style="color:var(--amber)">--</div></div>
+  </div>
+</div>
+
+<!-- ZONE RANKINGS -->
+<div class="card" style="margin-bottom:10px">
+  <h2 style="margin-bottom:12px">🔥 Best Zones Now</h2>
+  <div id="zoneRanks"><p>Loading...</p></div>
+</div>
+
+<!-- ALL 15 AI SIGNALS -->
+<div class="card" style="margin-bottom:10px">
+  <h2 style="margin-bottom:12px">📡 Live Signals (15)</h2>
+  <div id="signalsAll"></div>
+</div>
+
+<!-- ORDER HISTORY -->
+<div class="card" style="margin-bottom:10px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <h2>📋 Order History</h2>
+    <button class="btn btn-ghost" onclick="clearHist()" style="width:auto;padding:6px 12px;font-size:11px;border-radius:10px">Clear</button>
+  </div>
+  <div id="orderHist"><p>No orders yet.</p></div>
+</div>
+
+<nav class="nav nav-5">
+  <a href="/">Home</a>
+  <a href="events.html">🎵</a>
+  <a href="heatmap.html">🗺️</a>
+  <a href="ev.html">⚡</a>
+  <a class="on">🧠</a>
+</nav>
+
+<script src="config.js"></script>
+<script>
+const API = window.RS4_API || 'https://ride-smart-ai.onrender.com';
+
+function renderStats(){
+  const hist=JSON.parse(localStorage.getItem('rs4_order_history')||'[]');
+  document.getElementById('totalOrders').textContent=hist.length;
+  const today=new Date().toISOString().slice(0,10);
+  const earn=parseFloat(localStorage.getItem(`rs4_earn_${today}`)||'0');
+  const miles=JSON.parse(localStorage.getItem('ridesmart_miles')||'{}');
+  const hrs=(miles.activeSeconds||0)/3600;
+  document.getElementById('todayEarn').textContent='$'+earn.toFixed(2);
+  document.getElementById('todayMi').textContent=(miles.totalMiles||0).toFixed(1);
+  document.getElementById('todayHrs').textContent=Math.floor(hrs)+'h '+Math.round((hrs%1)*60)+'m';
+  document.getElementById('todayEff').textContent=hrs>0?'$'+(earn/hrs).toFixed(2):'--';
+  const acc=hist.filter(o=>o.verdict==='green').length;
+  const rej=hist.filter(o=>o.verdict==='red').length;
+  document.getElementById('acceptCt').textContent=acc;
+  document.getElementById('rejectCt').textContent=rej;
+  const hrlys=hist.filter(o=>o.hrly).map(o=>o.hrly);
+  const mis=hist.filter(o=>o.dpm).map(o=>o.dpm);
+  document.getElementById('bestHr').textContent=hrlys.length?'$'+Math.max(...hrlys).toFixed(0):'--';
+  document.getElementById('bestMi').textContent=mis.length?'$'+Math.max(...mis).toFixed(2):'--';
+  const el=document.getElementById('orderHist');
+  if(!hist.length){el.innerHTML='<p>No orders analyzed yet.</p>';return;}
+  el.innerHTML=hist.slice(0,12).map(o=>`
+    <div class="ord-item">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <div style="font-size:11px;font-weight:700;font-family:var(--mono);color:${o.verdict==='green'?'var(--mint)':o.verdict==='amber'?'var(--amber)':'var(--red)'}">${o.verdict==='green'?'ACCEPT':o.verdict==='amber'?'WAIT':'REJECT'}</div>
+        <div style="font-family:var(--mono);font-size:15px;font-weight:600">$${parseFloat(o.pay||0).toFixed(2)}</div>
+      </div>
+      <div style="font-size:11px;color:var(--fog)">${o.dpm?'$'+parseFloat(o.dpm).toFixed(2)+'/mi':''} ${o.hrly?'· $'+parseFloat(o.hrly).toFixed(0)+'/hr':''} · ${new Date(o.time).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}</div>
+    </div>`).join('');
+}
+
+async function loadSignals(){
+  try{
+    const [zonesR, eventsR, surgeR] = await Promise.allSettled([
+      fetch(GPS.url(`${API}/api/zones`)).then(r=>r.json()),
+      fetch(GPS.url(`${API}/api/events`)).then(r=>r.json()),
+      fetch(`${API}/api/surge?t=${Date.now()}`).then(r=>r.json()),
+    ]);
+    const zones  = zonesR.status  === 'fulfilled' ? zonesR.value   : null;
+    const events = eventsR.status === 'fulfilled' ? eventsR.value  : null;
+    const surge  = surgeR.status  === 'fulfilled' ? surgeR.value   : null;
+    const z = zones?.bestZones?.[0] || {};
+    const f = JSON.parse(localStorage.getItem('ridesmart_filters')||'{}');
+
+    const signals=[
+      {l:'✈️ Flights (O\'Hare)',    on:z.flights>50,  val:z.flights?Math.round(z.flights)+'%':'--'},
+      {l:'🎵 Concerts',             on:events?.total>0, val:events?.total?events.total+' events':'--'},
+      {l:'🏈 Sports Events',        on:events?.total>0, val:'Active scan'},
+      {l:'🚦 Traffic Intelligence', on:z.traffic<70,  val:z.traffic?z.traffic+'% congestion':'--'},
+      {l:'📈 Demand Index',         on:z.estimatedDemand>60, val:z.estimatedDemand?Math.round(z.estimatedDemand)+'%':'--'},
+      {l:'⚡ EV Charging Strategy', on:true,           val:'Active'},
+      {l:'🛬 Airport Queue',        on:z.airportQueue>30, val:z.airportQueue?Math.round(z.airportQueue)+'%':'--'},
+      {l:'🌤 Weather Boost',        on:zones?.weatherData?.rain>0, val:zones?.weatherData?.desc||'--'},
+      {l:'🔥 Surge Multiplier',     on:surge?.isSurgeActive, val:surge?.current?.multiplier?surge.current.multiplier+'x':'1.0x'},
+      {l:'💰 AI $/hr Prediction',   on:true,           val:'Active'},
+      {l:'🗺️ Heat Map Active',      on:true,           val:'24h forecast'},
+      {l:'📡 Radar Detection',      on:true,           val:'Scanning'},
+      {l:'🎯 Auto Accept Engine',   on:f.enableAI!==false, val:f.testMode?'Test Mode':'LIVE'},
+      {l:'👥 Driver Saturation',    on:true,           val:z.driverSaturation?Math.round(z.driverSaturation)+'%':'--'},
+      {l:'📊 Tax Tracking',         on:true,           val:'Active'},
+    ];
+
+    document.getElementById('signalsAll').innerHTML=signals.map(s=>`
+      <div class="ai-row">
+        <div class="ai-dot ${s.on?'on':'off'}"></div>
+        <div>${s.l}</div>
+        <div class="ai-val" style="color:${s.on?'var(--mint)':'var(--red)'}">${s.val}</div>
+      </div>`).join('');
+
+    // Zone rankings
+    if(zones?.bestZones){
+      document.getElementById('zoneRanks').innerHTML=
+        zones.bestZones.slice(0,6).map((z,i)=>`
+          <div class="zone-rank">
+            <div style="font-family:var(--mono);font-size:15px;color:var(--fog);width:22px">#${i+1}</div>
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:700;color:var(--white)">${z.name}</div>
+              <div style="font-size:10px;color:var(--fog)">$${z.estimatedHourly}/hr · AI: $${z.predictedHourly}/hr · ${z.driveTime}</div>
+            </div>
+            <div style="font-family:var(--mono);font-size:20px;font-weight:600;color:${z.score>=70?'var(--mint)':z.score>=55?'var(--amber)':'var(--red)'}">${z.score}</div>
+          </div>`).join('');
+    }
+  }catch(e){
+    document.getElementById('signalsAll').innerHTML='<p>Could not load signals.</p>';
+  }
+}
+
+function clearHist(){if(!confirm('Clear order history?'))return;localStorage.removeItem('rs4_order_history');renderStats()}
+
+renderStats();
+loadSignals();
+</script>
+</body>
+</html>
