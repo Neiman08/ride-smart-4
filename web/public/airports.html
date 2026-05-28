@@ -4,30 +4,14 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
 <title>Ride Smart 4.0 · Airport Intelligence</title>
-<link rel="stylesheet" href="styles/theme.css"/>
 
-<style>
-.airport-hero{border-radius:var(--r);padding:18px;margin-bottom:10px;border:1px solid}
-.airport-hero.ohare{background:linear-gradient(135deg,rgba(0,245,144,.08),rgba(68,138,255,.05));border-color:rgba(0,245,144,.2)}
-.airport-hero.midway{background:linear-gradient(135deg,rgba(255,184,0,.08),rgba(255,145,0,.05));border-color:rgba(255,184,0,.2)}
-.a-code{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--white);letter-spacing:2px}
-.a-name{font-size:14px;color:var(--fog);margin-bottom:12px}
-.a-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.a-stat{background:rgba(0,0,0,.2);border-radius:10px;padding:10px;text-align:center}
-.a-stat .l{font-size:8px;color:var(--fog);letter-spacing:.8px;font-family:var(--mono)}
-.a-stat .v{font-family:var(--mono);font-size:16px;font-weight:600;color:var(--white);margin-top:3px}
-.flight-card{background:var(--ink3);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:6px;display:flex;align-items:center;gap:12px}
-.flight-num{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--white);width:72px;flex-shrink:0}
-.flight-status{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:1px}
-.fs-landed{color:var(--mint)}.fs-arriving{color:var(--amber)}.fs-scheduled{color:var(--fog)}
-.flight-time{font-family:var(--mono);font-size:13px;color:var(--mist);margin-left:auto}
-.queue-meter{background:rgba(255,255,255,.06);border-radius:999px;height:8px;margin:6px 0;overflow:hidden}
-.queue-fill{height:100%;border-radius:999px;transition:width .6s}
-.sec-label{margin-top:18px;margin-bottom:8px}
-</style>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="styles/rs4-pro.css"/>
 </head>
 
-<body>
+<body class="day">
 
 <div class="toast" id="toast"></div>
 
@@ -109,6 +93,8 @@
 
 <script>
 const API = 'https://ride-smart-4.onrender.com';
+const hour = new Date().getHours();
+// document.body.classList.toggle('day'
 
 function nav(lat,lng){
   window.location.href =

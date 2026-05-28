@@ -4,555 +4,206 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
 <title>Ride Smart 4.0</title>
-<link rel="stylesheet" href="styles/theme.css"/>
-<style>
-.hero-eyebrow{font-family:var(--mono);font-size:10px;color:var(--indigo);letter-spacing:3px;margin-bottom:5px;opacity:.7}
-.hero-h1{font-size:32px;font-weight:700;line-height:1.05;letter-spacing:-.5px;margin-bottom:16px}
-.hero-h1 em{color:var(--indigo);font-style:normal}
 
-/* Intelligence strip */
-.intel-strip{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;
-}
-.intel-chip{
-  background:var(--ink3);border:1px solid var(--line);border-radius:12px;
-  padding:10px 8px;text-align:center;
-}
-.intel-chip .ic{font-size:16px;display:block;margin-bottom:3px}
-.intel-chip .lbl{font-size:8px;color:var(--fog);letter-spacing:.5px;font-family:var(--mono)}
-.intel-chip .val{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--white);margin-top:2px}
-.intel-chip.hot{border-color:rgba(255,45,85,.3);background:rgba(255,45,85,.06)}
-.intel-chip.hot .val{color:var(--red)}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
-/* Surge alert */
-.surge-alert{
-  display:none;
-  background:linear-gradient(135deg,rgba(255,45,85,.12),rgba(255,45,85,.06));
-  border:1px solid rgba(255,45,85,.3);border-radius:var(--r);
-  padding:14px 16px;margin-bottom:10px;
-}
-.surge-alert.on{display:flex;align-items:center;gap:12px}
-.surge-alert-icon{font-size:24px;flex-shrink:0}
-.surge-alert-text strong{display:block;font-size:15px;font-weight:700;color:var(--red)}
-.surge-alert-text span{font-size:12px;color:var(--mist)}
-.surge-mul{font-family:var(--mono);font-size:24px;font-weight:700;color:var(--red);margin-left:auto}
-
-/* Events strip */
-.events-strip{margin-bottom:10px}
-.event-card{
-  background:var(--ink3);border:1px solid var(--line);border-radius:14px;
-  padding:12px 14px;display:flex;align-items:center;gap:12px;margin-bottom:6px;
-}
-.event-icon{font-size:20px;flex-shrink:0}
-.event-name{font-size:13px;font-weight:700;color:var(--white)}
-.event-detail{font-size:11px;color:var(--fog);margin-top:2px}
-.event-zone{font-family:var(--mono);font-size:10px;color:var(--indigo);margin-left:auto;white-space:nowrap}
-.event-card.surge-win{border-color:rgba(255,184,0,.25);background:rgba(255,184,0,.05)}
-
-/* Heatmap preview */
-.heatmap-bar{
-  display:flex;gap:2px;height:32px;align-items:flex-end;margin-bottom:10px;
-}
-.hm-col{flex:1;border-radius:3px 3px 0 0;min-height:4px;transition:height .3s}
-.hm-now{outline:2px solid var(--mint);outline-offset:1px;border-radius:3px}
-
-/* AI prediction card */
-.predict-card{
-  background:linear-gradient(135deg,rgba(68,138,255,.1),rgba(0,245,144,.06));
-  border:1px solid rgba(68,138,255,.2);border-radius:var(--r);
-  padding:16px;margin-bottom:10px;
-}
-.predict-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.predict-zone{font-size:18px;font-weight:700;color:var(--white)}
-.predict-vals{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
-.pv{text-align:center}
-.pv .l{font-size:9px;color:var(--fog);letter-spacing:1px;font-family:var(--mono)}
-.pv .v{font-family:var(--mono);font-size:16px;font-weight:600;color:var(--white);margin-top:2px}
-.trend-up{color:var(--indigo)}.trend-down{color:var(--red)}.trend-flat{color:var(--fog)}
-
-/* Map */
-#map{width:100%;height:280px;border-radius:var(--r);margin-bottom:10px;border:1px solid var(--line);overflow:hidden}
-
-/* Signal row */
-.signal-row{
-  display:flex;align-items:center;gap:8px;padding:10px 0;
-  border-bottom:1px solid var(--line);font-size:13px;font-weight:600;color:var(--smoke);
-}
-.signal-row:last-child{border:none}
-.sig-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.sig-dot.on{background:var(--mint);box-shadow:0 0 6px var(--mint)}
-.sig-dot.warn{background:var(--amber)}
-.sig-dot.off{background:var(--red)}
-.sig-val{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--mist)}
-</style>
+<link rel="stylesheet" href="styles/rs4-pro.css"/>
 </head>
+
 <body>
+<div class="app">
 
-<div class="toast" id="toast"></div>
+<header class="topbar">
+  <div class="brand"><div class="logo"></div><div><h1>RIDE SMART</h1><span>AI 4.0</span></div></div>
+  <div class="livebar"><div class="live"><b>●</b> LIVE</div><div class="live" id="clock">--:--</div><div class="bell">⌁</div></div>
+</header>
 
-<!-- HEADER -->
-<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
-  <div>
-    <div class="hero-eyebrow">AI INTELLIGENCE ENGINE</div>
-    <div class="hero-h1">Ride Smart<br><em>4.0</em></div>
+<section class="hero">
+  <div class="hero-content">
+    <div class="eyebrow">AI SHIFT INTELLIGENCE</div>
+    <h2>HIGH DEMAND <em>CHICAGO AREA</em></h2>
+    <div class="conf">AI CONFIDENCE <b id="aiConfidence">91%</b></div>
+    <p id="heroReason">Strong airport activity + events driving high earnings potential.</p>
+    <a href="airports.html" class="cta">VIEW FULL ANALYSIS ›</a>
   </div>
-  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding-top:4px">
-    <div class="badge-chip"><span class="live-dot"></span> LIVE</div>
-    <div class="badge-chip badge-dark mono" id="clock">--:--</div>
-    <span style="font-family:var(--mono);font-size:9px;color:var(--fog);background:var(--ink3);border:1px solid var(--line);padding:3px 8px;border-radius:999px">v4.0</span>
-  </div>
+  <div class="radar"><div class="mapline"></div><div class="node ord">ORD<br>✈</div><div class="city">Chicago ○</div><div class="node mdw">MDW<br>✈</div></div>
+  <div class="side-metric"><div><small>EST. EARNINGS<br>THIS SHIFT</small><b id="heroEarn">$186+</b></div><div><small>SURGE MULTIPLIER</small><b class="purple" id="heroSurge">1.6x</b></div></div>
+</section>
+
+<div class="section-head">
+  <h3>AI COMMAND CENTER</h3>
+  <span>8 Modules</span>
 </div>
 
-<!-- SHIFT STRIP -->
-<div class="shift-strip on" id="shiftStrip">
-  <div><div class="strip-l">TURNO</div><div class="strip-v" id="stripTime">00:00</div></div>
-  <div><div class="strip-l">EARNED</div><div class="strip-v" id="stripEarn">$0.00</div></div>
-  <div><div class="strip-l">$/HR</div><div class="strip-v" id="stripHr" style="color:var(--amber)">--</div></div>
-  <a href="shift.html" style="background:var(--ink4);border:1px solid var(--line2);padding:7px 12px;font-size:11px;border-radius:10px;color:var(--smoke);text-decoration:none;font-weight:700">▶</a>
+<section class="ai-grid">
+
+  <a class="ai-btn" href="airports.html">
+    <i>✈️</i>
+    <span>Airports</span>
+  </a>
+
+  <a class="ai-btn" href="events.html">
+    <i>🎵</i>
+    <span>Events</span>
+  </a>
+
+  <a class="ai-btn" href="heatmap.html">
+    <i>🗺️</i>
+    <span>Heatmap</span>
+  </a>
+
+  <a class="ai-btn" href="ev.html">
+    <i>⚡</i>
+    <span>EV/Fuel</span>
+  </a>
+
+  <a class="ai-btn" href="filters.html">
+    <i>⚙️</i>
+    <span>Filters</span>
+  </a>
+
+  <a class="ai-btn" href="shift.html">
+    <i>⏱️</i>
+    <span>Shift</span>
+  </a>
+
+  <a class="ai-btn" href="brain.html">
+    <i>🧠</i>
+    <span>Brain</span>
+  </a>
+
+  <a class="ai-btn" href="tax.html">
+    <i>📊</i>
+    <span>Tax</span>
+  </a>
+
+</section>
+
+<div class="section-head"><h3>LIVE AIRPORT INTELLIGENCE <span class="dot-live">LIVE</span></h3><span>View All Airports ›</span></div>
+
+<section class="airports">
+  <article class="air-card ord">
+    <div class="air-top"><div class="air-icon">✈</div><span class="tag">HIGH ACTIVITY</span></div>
+    <div class="air-code">ORD</div><div class="air-sub">O'HARE INTL.</div>
+    <div class="air-metrics"><div class="metric"><small>ARRIVALS (3H)</small><b id="ordArrivals">--<em>↑</em></b></div><div class="metric"><small>QUEUE LEVEL</small><b id="ordQueue">--</b><div class="bar"><i id="ordBar"></i></div></div></div>
+    <div class="arrivals-title">TOP ARRIVALS</div><div id="ordFlights"></div>
+    <a href="airports.html" class="details">VIEW ORD DETAILS ›</a>
+  </article>
+
+  <article class="air-card mdw">
+    <div class="air-top"><div class="air-icon">✈</div><span class="tag">MODERATE</span></div>
+    <div class="air-code">MDW</div><div class="air-sub">MIDWAY INTL.</div>
+    <div class="air-metrics"><div class="metric"><small>ARRIVALS (3H)</small><b id="mdwArrivals">--<em>↑</em></b></div><div class="metric"><small>QUEUE LEVEL</small><b id="mdwQueue">--</b><div class="bar"><i id="mdwBar"></i></div></div></div>
+    <div class="arrivals-title">TOP ARRIVALS</div><div id="mdwFlights"></div>
+    <a href="airports.html" class="details">VIEW MDW DETAILS ›</a>
+  </article>
+</section>
+
+<div class="section-head"><h3>AI POWER MODULES</h3></div>
+<section class="modules">
+  <div class="mod"><div class="mi">▱</div><small>TRAFFIC</small><b id="mTraffic">Moderate</b><span>23 min delay</span><svg class="spark" viewBox="0 0 100 30"><path d="M0 25 C20 20,20 8,40 16 S70 28,100 8" fill="none" stroke="var(--amber)" stroke-width="3"/></svg></div>
+  <div class="mod"><div class="mi">▣</div><small>EVENTS</small><b id="mEvents">-- Active</b><span>High impact</span><svg class="spark" viewBox="0 0 100 30"><path d="M5 28 V20 M25 28 V10 M45 28 V18 M65 28 V6 M85 28 V14" stroke="var(--cyan)" stroke-width="5"/></svg></div>
+  <div class="mod"><div class="mi">☁</div><small>WEATHER</small><b id="mWeather">Clear</b><span>Light rain</span><svg class="spark" viewBox="0 0 100 30"><path d="M0 24 C15 15,25 20,35 10 S60 26,75 12 S90 18,100 8" fill="none" stroke="var(--cyan)" stroke-width="3"/></svg></div>
+  <div class="mod"><div class="mi">ϟ</div><small>SURGE</small><b id="mSurge">1.6x</b><span>High Surge</span><svg class="spark" viewBox="0 0 100 30"><path d="M0 22 C15 12,25 25,38 14 S64 20,75 8 S90 22,100 12" fill="none" stroke="var(--purple)" stroke-width="3"/></svg></div>
+</section>
+
+<section class="chart-card">
+  <div class="chart"><div class="chart-title">AI EARNINGS PREDICTION</div><svg viewBox="0 0 260 155"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop stop-color="var(--green)" stop-opacity=".45"/><stop offset="1" stop-color="var(--green)" stop-opacity="0"/></linearGradient></defs><path d="M0 135 L0 105 L20 85 L40 102 L62 70 L82 78 L105 55 L128 62 L150 35 L172 72 L195 84 L215 112 L238 95 L260 110 L260 135 Z" fill="url(#g)"/><path d="M0 105 L20 85 L40 102 L62 70 L82 78 L105 55 L128 62 L150 35 L172 72 L195 84 L215 112 L238 95 L260 110" fill="none" stroke="var(--green)" stroke-width="4"/><text x="152" y="24" fill="var(--text)" font-size="15" font-weight="800">$186</text></svg></div>
+  <div class="drivebox"><small>BEST TIME TO DRIVE</small><b id="bestTime">11 PM - 2 AM</b><small>CONFIDENCE</small><div class="ring"><div id="ringVal">91%</div></div></div>
+</section>
+
+<section class="insight">
+  <div class="bot">🤖</div><div><h4>AI INSIGHTS FOR YOU</h4><p id="aiInsight">High demand expected at O'Hare between 11 PM - 2 AM. Focus on airport rides to maximize earnings.</p></div><div class="orbit"><b>✈</b></div>
+</section>
+
+<div class="section-head"><h3><span class="dot-live">LIVE UPDATES</span></h3></div>
+<section class="live-updates"><div class="update"><b>ORD</b><span id="uOrd">High Activity</span></div><div class="update"><b>MDW</b><span id="uMdw">Moderate</span></div><div class="update"><b>Traffic</b><span id="uTraffic">Moderate</span></div></section>
+
 </div>
 
-<!-- QUICK NAV -->
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px">
-  <a class="qbtn" href="airports.html"><span class="ic">✈️</span>Airports</a>
-  <a class="qbtn" href="events.html"><span class="ic">🎵</span>Events</a>
-  <a class="qbtn" href="heatmap.html"><span class="ic">🗺️</span>Heatmap</a>
-  <a class="qbtn" href="ev.html"><span class="ic">⚡</span>EV/Fuel</a>
-  <a class="qbtn" href="filters.html"><span class="ic">⚙️</span>Filters</a>
-  <a class="qbtn" href="shift.html"><span class="ic">⏱</span>Shift</a>
-  <a class="qbtn" href="brain.html"><span class="ic">🧠</span>Brain</a>
-  <a class="qbtn" href="tax.html"><span class="ic">📊</span>Tax</a>
-</div>
-
-<!-- INTELLIGENCE STRIP -->
-<div class="intel-strip" id="intelStrip">
-  <div class="intel-chip"><span class="ic">✈️</span><div class="lbl">FLIGHTS</div><div class="val" id="sigFlights">--</div></div>
-  <div class="intel-chip"><span class="ic">🎵</span><div class="lbl">EVENTS</div><div class="val" id="sigEvents">--</div></div>
-  <div class="intel-chip"><span class="ic">🚦</span><div class="lbl">TRAFFIC</div><div class="val" id="sigTraffic">--</div></div>
-  <div class="intel-chip"><span class="ic">🌤</span><div class="lbl">WEATHER</div><div class="val" id="sigWeather">--</div></div>
-</div>
-
-<!-- SURGE ALERT -->
-<div class="surge-alert" id="surgeAlert">
-  <div class="surge-alert-icon">🔥</div>
-  <div class="surge-alert-text">
-    <strong id="surgeTitle">Surge Active</strong>
-    <span id="surgeReason">High demand detected</span>
-  </div>
-  <div class="surge-mul" id="surgeMul">--x</div>
-</div>
-
-<!-- AI PREDICTION -->
-<div class="predict-card" id="predictCard" style="display:none">
-  <div style="font-family:var(--mono);font-size:9px;color:var(--blue);letter-spacing:2px;margin-bottom:6px">AI PREDICTION · NEXT 30 MIN</div>
-  <div class="predict-row">
-    <div class="predict-zone" id="predictZone">--</div>
-    <div id="predictTrend" class="trend-up" style="font-size:20px">↑</div>
-  </div>
-  <div class="predict-vals">
-    <div class="pv"><div class="l">NOW</div><div class="v" id="predictNow">--</div></div>
-    <div class="pv"><div class="l">+30 MIN</div><div class="v" id="predict30" style="color:var(--indigo)">--</div></div>
-    <div class="pv"><div class="l">+60 MIN</div><div class="v" id="predict60">--</div></div>
-  </div>
-</div>
-
-<!-- EVENTS STRIP -->
-<div class="sec-label">EVENTS & SURGE WINDOWS</div>
-<div class="events-strip" id="eventsStrip">
-  <div style="color:var(--fog);font-size:13px">Loading events...</div>
-</div>
-
-<!-- POST DROPOFF HINT -->
-<div class="hint-card" id="hintCard">
-  <div class="hint-label">POST-DROPOFF · NEXT MOVE</div>
-  <div class="hint-zone" id="hintZone">--</div>
-  <div class="hint-why" id="hintWhy"></div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
-    <button class="btn btn-primary btn-sm" onclick="navHint()">🧭 Navigate</button>
-    <button class="btn btn-ghost btn-sm" onclick="dismissHint()">Dismiss</button>
-  </div>
-</div>
-
-<!-- BEST MOVE -->
-<div class="bm-card" id="bestMove" style="display:none">
-  <div class="bm-label">BEST AREA RIGHT NOW</div>
-  <div class="bm-name" id="bmName">--</div>
-  <div class="bm-row">
-    <div class="bm-stat"><div class="l">$/HR</div><div class="v" id="bmHr">--</div></div>
-    <div class="bm-stat"><div class="l">AI +30m</div><div class="v" id="bmPred" style="color:var(--blue)">--</div></div>
-    <div class="bm-stat"><div class="l">DRIVE</div><div class="v" id="bmDrive">--</div></div>
-    <div class="bm-stat"><div class="l">SCORE</div><div class="v" id="bmScore" style="color:var(--indigo)">--</div></div>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
-    <button class="btn btn-sec btn-sm" onclick="focusBM()">📍 Map</button>
-    <button class="btn btn-primary btn-sm" onclick="navBM()">🧭 Go Now</button>
-  </div>
-</div>
-
-<!-- SIGNALS STATUS -->
-<div class="sec-label">LIVE SIGNALS</div>
-<div class="card" style="margin-bottom:10px">
-  <div id="signalsList"><p>Loading signals...</p></div>
-</div>
-
-<!-- MAP -->
-<div id="map"></div>
-
-<!-- ZONES -->
-<div class="sec-label">ZONE INTELLIGENCE</div>
-<div id="zones"></div>
-
-<!-- ORDER CHECKER -->
-<div class="card" style="margin-bottom:10px">
-  <h2 style="margin-bottom:4px">📦 Order Checker</h2>
-  <p style="margin-bottom:12px">Screenshot → AI verdict in 1 second.</p>
-  <input id="ss" type="file" accept="image/*" hidden/>
-  <div style="border:1.5px dashed var(--line2);border-radius:var(--r);padding:20px;text-align:center;cursor:pointer" onclick="document.getElementById('ss').click()">
-    <div style="font-size:26px;margin-bottom:6px">📸</div>
-    <div style="font-size:13px;font-weight:700;color:var(--smoke)">Tap to upload screenshot</div>
-    <div class="mono" style="font-size:10px;color:var(--fog);margin-top:4px;letter-spacing:1px" id="ocrStatus">UBER · LYFT · PRIORITY · EXCLUSIVE</div>
-  </div>
-  <div class="result" id="resultCard" style="display:none;margin-top:12px"></div>
-</div>
-
-<nav class="nav nav-5">
-  <a class="on">Home</a>
-  <a href="events.html">🎵</a>
-  <a href="heatmap.html">🗺️</a>
-  <a href="ev.html">⚡</a>
-  <a href="brain.html">🧠</a>
+<nav class="nav">
+  <a class="on" href="index.html"><i>⌂</i>Home</a>
+  <a href="airports.html"><i>✈</i>Airports</a>
+  <a href="heatmap.html"><i>🗺</i>Map</a>
+  <a href="ev.html"><i>ϟ</i>EV/Fuel</a>
+  <a href="brain.html"><i>🧠</i>Brain</a>
 </nav>
 
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script src="config.js"></script>
 <script src="gps.js"></script>
 <script>
-const API = window.RS4_API || 'https://ride-smart-ai.onrender.com';
-let map, markers=[], markerMap={}, infoMap={}, lastResult=null, bmName='', hintPos=null;
+const API = window.RS4_API || 'http://localhost:3000';
+const hour = new Date().getHours();
+// document.body.classList.toggle('day', hour >= 7 && hour < 19);
 
-const COORDS = {
-  "O'Hare Airport":{lat:41.9742,lng:-87.9073},
-  "Midway Airport":{lat:41.7868,lng:-87.7522},
-  "Downtown Chicago":{lat:41.8781,lng:-87.6298},
-  "Rosemont":{lat:41.9953,lng:-87.8847},
-  "Evanston":{lat:42.0451,lng:-87.6877},
-  "Oak Park":{lat:41.8850,lng:-87.7845},
-  "Naperville":{lat:41.7508,lng:-88.1535},
-  "Schaumburg":{lat:42.0334,lng:-88.0834},
-  "Arlington Heights":{lat:42.0884,lng:-87.9806},
-  "Glenview":{lat:42.0698,lng:-87.7878},
-  "Elmhurst":{lat:41.8995,lng:-87.9403},
-  "Northbrook":{lat:42.1275,lng:-87.8290},
-};
+setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});},1000);
 
-// Clock
-setInterval(()=>{ document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false}); },1000);
-
-function toast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+(type||'');setTimeout(()=>t.classList.remove('show'),2400)}
-
-// MAP
-function initMap(){
-  const el=document.getElementById('map');if(!el)return;
-  map=new google.maps.Map(el,{
-    center:{lat:41.8781,lng:-87.6298},zoom:10,
-    styles:[
-      {elementType:'geometry',stylers:[{color:'#0d1117'}]},
-      {elementType:'labels.text.fill',stylers:[{color:'#8a95a8'}]},
-      {elementType:'labels.text.stroke',stylers:[{color:'#0d1117'}]},
-      {featureType:'road',elementType:'geometry',stylers:[{color:'#1a2030'}]},
-      {featureType:'water',elementType:'geometry',stylers:[{color:'#060c18'}]},
-      {featureType:'poi',stylers:[{visibility:'off'}]},
-    ],
-    disableDefaultUI:true,zoomControl:true
-  });
+function renderFlightList(id, flights){
+  const el=document.getElementById(id);
+  const list=(flights||[]).slice(0,3);
+  if(!list.length){el.innerHTML='<div class="flight"><b>--</b><span>No live arrivals</span><span>--</span></div>';return;}
+  el.innerHTML=list.map(f=>`<div class="flight"><b>${f.flightNumber||'--'}</b><span>${f.originCity||f.origin||'--'}</span><span>${f.scheduledTime||'--'}</span></div>`).join('');
 }
 
-function scoreColor(s){return s>=70?'#00f590':s>=55?'#ffb800':'#ff2d55'}
-
-function updateMarkers(zones){
-  if(!map)return;
-  markers.forEach(m=>m.setMap(null));
-  markers=[];markerMap={};infoMap={};
-  zones.forEach(z=>{
-    const pos=COORDS[z.name];if(!pos)return;
-    const m=new google.maps.Marker({
-      position:pos,map,title:z.name,
-      label:{text:String(z.score),color:'#000',fontWeight:'900',fontSize:'11px'},
-      icon:{path:google.maps.SymbolPath.CIRCLE,fillColor:scoreColor(z.score),fillOpacity:1,strokeColor:'#fff',strokeWeight:2,scale:14}
-    });
-    const content=`<div style="font-family:'Geist',sans-serif;color:#111;min-width:180px;padding:2px">
-      <b style="font-size:14px">${z.name}</b><br>
-      Score: ${z.score} · ${z.action}<br>
-      Est $/hr: $${z.estimatedHourly} · Predicted: $${z.predictedHourly}<br>
-      ${z.driveTime} · ${z.distance}
-      ${z.surgeMultiplier>1.1?`<br>🔥 ${z.surgeMultiplier.toFixed(1)}x surge`:''}
-    </div>`;
-    const iw=new google.maps.InfoWindow({content});
-    m.addListener('click',()=>iw.open(map,m));
-    markerMap[z.name]=m;infoMap[z.name]=iw;markers.push(m);
-  });
-}
-
-function focusZone(name){const pos=COORDS[name];if(!pos||!map)return;map.setCenter(pos);map.setZoom(13);infoMap[name]?.open(map,markerMap[name]);document.getElementById('map').scrollIntoView({behavior:'smooth',block:'center'})}
-function navZone(name){const pos=COORDS[name];if(!pos)return;window.location.href=`https://www.google.com/maps/dir/?api=1&destination=${pos.lat},${pos.lng}&travelmode=driving`}
-function focusBM(){focusZone(bmName)}
-function navBM(){navZone(bmName)}
-function navHint(){if(hintPos)window.location.href=`https://www.google.com/maps/dir/?api=1&destination=${hintPos.lat},${hintPos.lng}&travelmode=driving`}
-function dismissHint(){document.getElementById('hintCard').classList.remove('on');localStorage.removeItem('rs4_dropoff')}
-
-// LOAD ALL
-async function loadAll(){
+async function loadAirports(){
   try{
-    const [zonesRes, eventsRes, surgeRes, predictRes] = await Promise.allSettled([
-      fetch(GPS.url(`${API}/api/zones`)).then(r=>r.json()),
-      fetch(GPS.url(`${API}/api/events`)).then(r=>r.json()),
-      fetch(GPS.url(`${API}/api/surge`)).then(r=>r.json()),
-      fetch(GPS.url(`${API}/api/predict`)).then(r=>r.json()),
+    let lat=41.8781,lng=-87.6298;
+    if(window.GPS && GPS.getOnce){
+      await new Promise(resolve=>{
+        GPS.getOnce((a,b)=>{lat=a;lng=b;resolve();});
+        setTimeout(resolve,1200);
+      });
+    }
+
+    const r=await fetch(`${API}/api/airports?lat=${lat}&lng=${lng}&t=${Date.now()}`);
+    const d=await r.json();
+    const airports=d.airports||[];
+    const ord=airports.find(a=>a.code==='ORD')||{};
+    const mdw=airports.find(a=>a.code==='MDW')||{};
+
+    document.getElementById('ordArrivals').innerHTML=`${ord.arrivalsPerHour??'--'}<em>↑</em>`;
+    document.getElementById('mdwArrivals').innerHTML=`${mdw.arrivalsPerHour??'--'}<em>↑</em>`;
+
+    const oq=Math.round(ord.queueLevel||72), mq=Math.round(mdw.queueLevel||48);
+    document.getElementById('ordQueue').textContent=oq+'%';
+    document.getElementById('mdwQueue').textContent=mq+'%';
+    document.getElementById('ordBar').style.width=oq+'%';
+    document.getElementById('mdwBar').style.width=mq+'%';
+
+    renderFlightList('ordFlights',ord.flights);
+    renderFlightList('mdwFlights',mdw.flights);
+
+    const totalPax=(ord.passengerLoad||0)+(mdw.passengerLoad||0);
+    const riders=(ord.expectedRiders||0)+(mdw.expectedRiders||0);
+
+    document.getElementById('heroReason').textContent =
+      totalPax ? `~${totalPax} passengers arriving · ~${riders} possible riders near Chicago airports.` :
+      'Strong airport activity + events driving high earnings potential.';
+
+    document.getElementById('uOrd').textContent=ord.arrivalsPerHour>10?'High Activity':'Moderate';
+    document.getElementById('uMdw').textContent=mdw.arrivalsPerHour>8?'High Activity':'Moderate';
+  }catch(e){console.error('Airport load error',e);}
+}
+
+async function loadExtras(){
+  try{
+    const [events,surge]=await Promise.allSettled([
+      fetch(`${API}/api/events`).then(r=>r.json()),
+      fetch(`${API}/api/surge`).then(r=>r.json())
     ]);
-
-    const zones   = zonesRes.status   === 'fulfilled' ? zonesRes.value   : null;
-    const events  = eventsRes.status  === 'fulfilled' ? eventsRes.value  : null;
-    const surge   = surgeRes.status   === 'fulfilled' ? surgeRes.value   : null;
-    const predict = predictRes.status === 'fulfilled' ? predictRes.value : null;
-
-    if(zones?.success)   renderZones(zones, predict);
-    if(events?.success)  renderEvents(events);
-    if(surge?.success)   renderSurge(surge);
-    if(predict?.success) renderPredict(predict);
-    renderSignals(zones, events, surge);
-  }catch(e){
-    console.error('Load error:', e);
-  }
+    const ev=events.status==='fulfilled'?events.value:null;
+    const su=surge.status==='fulfilled'?surge.value:null;
+    if(ev?.total) document.getElementById('mEvents').textContent=ev.total+' Active';
+    if(su?.current?.multiplier){
+      document.getElementById('heroSurge').textContent=su.current.multiplier+'x';
+      document.getElementById('mSurge').textContent=su.current.multiplier+'x';
+    }
+  }catch(e){}
 }
 
-function renderZones(data, predict){
-  const zones=(data.bestZones||[]).sort((a,b)=>b.score-a.score);
-  if(!zones.length) return;
-
-  // Show city name
-  if(data.city) {
-    const eyebrow=document.querySelector('.hero-eyebrow');
-    if(eyebrow) eyebrow.textContent=`📍 ${data.location||data.city} · AI INTELLIGENCE`;
-    GPS.city = data.city;
-  }
-
-  // Center map on driver location
-  if(map && GPS.lat && GPS.lng) {
-    map.setCenter({lat:GPS.lat, lng:GPS.lng});
-  }
-
-  // Intelligence strip
-  const topZ=zones[0];
-  const flightVal=topZ.flights>70?'🔴 High':topZ.flights>40?'🟡 Mod':'🟢 Low';
-  document.getElementById('sigFlights').textContent=flightVal;
-  document.getElementById('sigTraffic').textContent=topZ.traffic>80?'🔴 Heavy':topZ.traffic>50?'🟡 Mod':'🟢 Clear';
-  document.getElementById('sigWeather').textContent=data.weatherData?.rain>0?'🌧️ Rain':'🌤 Clear';
-
-  // Best move
-  bmName=topZ.name;
-  const p=predict?.predictions?.find(p=>p.zone===topZ.name);
-  document.getElementById('bmName').textContent=topZ.name;
-  document.getElementById('bmHr').textContent='$'+topZ.estimatedHourly;
-  document.getElementById('bmPred').textContent=p?'$'+p.in30min:'--';
-  document.getElementById('bmDrive').textContent=topZ.driveTime;
-  document.getElementById('bmScore').textContent=topZ.score;
-  document.getElementById('bestMove').classList.add('on');
-
-  // Post dropoff hint
-  const ts=localStorage.getItem('rs4_dropoff');
-  if(ts&&(Date.now()-parseInt(ts))/60000<10){
-    hintPos=COORDS[topZ.name];
-    document.getElementById('hintZone').textContent=topZ.name;
-    document.getElementById('hintWhy').textContent=`Score ${topZ.score} · $${topZ.estimatedHourly}/hr · ${topZ.driveTime} away`;
-    document.getElementById('hintCard').classList.add('on');
-    speak(`Head to ${topZ.name}. Score ${topZ.score}.`);
-  }
-
-  // Zone cards
-  const c=document.getElementById('zones');c.innerHTML='';
-  zones.slice(0,8).forEach((z,i)=>{
-    const pos=COORDS[z.name];
-    const riskCls=z.risk?.toLowerCase()||'low';
-    const sc_col=z.score>=70?'var(--mint)':z.score>=55?'var(--amber)':'var(--red)';
-    const chipCls=z.action==='GO NOW'?'chip-mint':z.action==='WATCH'?'chip-amber':z.action==='AVOID'?'chip-red':'chip-fog';
-    const extras=[];
-    if(z.surgeMultiplier>1.1)extras.push(`🔥 ${z.surgeMultiplier.toFixed(1)}x`);
-    if(z.airportQueue>60)extras.push(`🛬 Queue`);
-    if(z.evChargingNear)extras.push(`⚡ EV`);
-    if(z.rainIntensity>40)extras.push(`🌧️ Rain`);
-    const el=document.createElement('div');
-    el.className=`zcard ${riskCls}`;
-    el.innerHTML=`
-      ${i===0?'<div class="chip chip-mint" style="margin-bottom:8px;display:inline-flex">BEST NOW</div>':''}
-      <div class="zcard-top">
-        <div>
-          <div class="zcard-name">${z.name}</div>
-          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:5px">
-            <div class="chip chip-${riskCls==='low'?'mint':riskCls==='medium'?'amber':'red'}" style="font-size:9px">${z.risk} RISK</div>
-            ${extras.map(e=>`<div class="chip chip-fog" style="font-size:9px">${e}</div>`).join('')}
-          </div>
-        </div>
-        <div class="zcard-score" style="color:${sc_col}">${z.score}</div>
-      </div>
-      <div class="chip ${chipCls}" style="margin:8px 0">${z.action}</div>
-      <div class="zcard-meta">
-        $/hr: <b style="color:var(--white)">$${z.estimatedHourly}</b> ·
-        AI +30m: <b style="color:var(--blue)">$${z.predictedHourly}</b> ·
-        ${z.driveTime} · ${z.distance}
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px">
-        ${(z.insights||[]).slice(0,3).map(s=>`<div class="chip chip-fog" style="font-size:10px">${s}</div>`).join('')}
-      </div>
-      <div class="zcard-btns">
-        <button class="btn btn-ghost btn-sm" onclick="focusZone('${z.name.replace(/'/g,"\\'")}')">📍 Map</button>
-        ${pos?`<button class="btn btn-sec btn-sm" onclick="navZone('${z.name.replace(/'/g,"\\'")}')">🧭 Go</button>`:''}
-      </div>`;
-    c.appendChild(el);
-  });
-  updateMarkers(zones);
-}
-
-function renderEvents(data){
-  document.getElementById('sigEvents').textContent=data.surgeActive?`🔴 ${data.surgeZones?.length} zones`:`🟢 ${data.total} events`;
-  const strip=document.getElementById('eventsStrip');
-  const events=(data.events||[]).filter(e=>e.hoursAway>-2&&e.hoursAway<6).slice(0,4);
-  if(!events.length){strip.innerHTML='<div style="color:var(--fog);font-size:12px">No events in next 6 hours</div>';return;}
-  strip.innerHTML=events.map(e=>{
-    const hrs=e.hoursAway;
-    const timing=hrs<0?`Ended ${Math.abs(hrs).toFixed(0)}h ago`:hrs<1?'Starting now!':hrs<3?`In ${hrs.toFixed(0)}h`:`In ${hrs.toFixed(0)}h`;
-    const ico=e.type==='Sports'?'🏈':e.type?.toLowerCase().includes('music')?'🎵':'🎭';
-    return `<div class="event-card ${e.surgeWindow?'surge-win':''}">
-      <div class="event-icon">${ico}</div>
-      <div style="flex:1;min-width:0">
-        <div class="event-name">${e.name||e.team||'Event'}</div>
-        <div class="event-detail">${e.venue||''} · ${timing}</div>
-      </div>
-      <div class="event-zone">${e.zone||''}</div>
-    </div>`;
-  }).join('');
-}
-
-function renderSurge(data){
-  const el=document.getElementById('surgeAlert');
-  if(data.isSurgeActive){
-    el.classList.add('on');
-    document.getElementById('surgeTitle').textContent=`Surge Active — ${data.current?.reason||''}`;
-    document.getElementById('surgeReason').textContent=`Next peaks: ${(data.surgeWindows||[]).slice(0,2).map(w=>w.label).join(', ')||'--'}`;
-    document.getElementById('surgeMul').textContent=`${data.current?.multiplier}x`;
-  }
-}
-
-function renderPredict(data){
-  const top=(data.predictions||[])[0];
-  if(!top)return;
-  const card=document.getElementById('predictCard');
-  card.style.display='block';
-  document.getElementById('predictZone').textContent=top.zone;
-  document.getElementById('predictNow').textContent='$'+top.now;
-  document.getElementById('predict30').textContent='$'+top.in30min;
-  document.getElementById('predict60').textContent='$'+top.in60min;
-  const tEl=document.getElementById('predictTrend');
-  tEl.textContent=top.trend==='UP'?'↑':top.trend==='DOWN'?'↓'?'→':'→':'→';
-  tEl.className=top.trend==='UP'?'trend-up':top.trend==='DOWN'?'trend-down':'trend-flat';
-}
-
-function renderSignals(zones, events, surge){
-  const list=document.getElementById('signalsList');
-  const z=zones?.bestZones?.[0]||{};
-  const signals=[
-    {l:'Flights (O\'Hare)',  on:z.flights>50,   warn:z.flights>80,  val:z.flights?Math.round(z.flights)+'%':'--'},
-    {l:'Traffic',            on:z.traffic<70,   warn:z.traffic>70,  val:z.traffic?z.traffic+'%':'--'},
-    {l:'Events / Concerts',  on:events?.surgeActive, warn:false,    val:events?.total?events.total+' events':'--'},
-    {l:'Surge Multiplier',   on:surge?.isSurgeActive, warn:false,   val:surge?.current?.multiplier?surge.current.multiplier+'x':'1.0x'},
-    {l:'Weather',            on:zones?.weatherData?.rain>0, warn:false, val:zones?.weatherData?.desc||'--'},
-    {l:'AI Prediction',      on:true, warn:false,                   val:'Active'},
-    {l:'EV Strategy',        on:true, warn:false,                   val:'Active'},
-    {l:'Airport Intelligence',on:z.airportQueue>30, warn:false,     val:z.airportQueue?Math.round(z.airportQueue)+'%':'--'},
-  ];
-  list.innerHTML=signals.map(s=>`
-    <div class="signal-row">
-      <div class="sig-dot ${s.warn?'warn':s.on?'on':'off'}"></div>
-      <div>${s.l}</div>
-      <div class="sig-val">${s.val}</div>
-    </div>`).join('');
-}
-
-// OCR
-document.getElementById('ss').addEventListener('change',async function(e){
-  const file=e.target.files[0];if(!file)return;
-  document.getElementById('ocrStatus').textContent='⏳ Analyzing...';
-  try{
-    const r=await Tesseract.recognize(file,'eng');
-    const text=r.data.text;
-    const pays=[...text.matchAll(/\$\s?(\d+(\.\d{1,2})?)/g)].map(m=>parseFloat(m[1]));
-    const pay=pays.length?Math.max(...pays):null;
-    if(!pay){document.getElementById('ocrStatus').textContent='⚠️ Could not detect pay';return;}
-    const totMi=parseFloat(([...text.matchAll(/(\d+(\.\d+)?)\s*mi/gi)].map(m=>m[1]).slice(-1)[0])||'5');
-    const totMin=parseFloat(([...text.matchAll(/(\d+)\s*min/gi)].map(m=>m[1]).slice(-1)[0])||'20');
-    const dpm=totMi>0?pay/totMi:0;
-    const hrly=totMin>0?pay/(totMin/60):0;
-    const f=JSON.parse(localStorage.getItem('ridesmart_filters')||'{}');
-    const verdict=hrly>=(f.minHourly||26)&&dpm>=(f.minDpm||1.4)?'green':hrly>=20&&dpm>=1.0?'amber':'red';
-    const labels={green:'ACCEPT',amber:'WAIT',red:'REJECT'};
-    const icons={green:'✓',amber:'!',red:'×'};
-    const card=document.getElementById('resultCard');
-    card.style.display='block';
-    card.innerHTML=`
-      <div style="background:rgba(${verdict==='green'?'0,245,144':verdict==='amber'?'255,184,0':'255,45,85'},.08);padding:14px;border-radius:14px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:38px;height:38px;border-radius:50%;background:${verdict==='green'?'var(--mint)':verdict==='amber'?'var(--amber)':'var(--red)'};color:${verdict==='red'?'#fff':'#000'};display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700">${icons[verdict]}</div>
-            <div style="font-size:20px;font-weight:700;color:${verdict==='green'?'var(--mint)':verdict==='amber'?'var(--amber)':'var(--red)'}">${labels[verdict]}</div>
-          </div>
-          <div class="mono" style="font-size:22px;font-weight:700">$${pay.toFixed(2)}</div>
-        </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
-          <div class="pill">$${dpm.toFixed(2)} <em>/mi</em></div>
-          <div class="pill">$${hrly.toFixed(0)} <em>/hr</em></div>
-          <div class="pill">${totMin.toFixed(0)} <em>min</em></div>
-          <div class="pill">${totMi.toFixed(1)} <em>mi</em></div>
-        </div>
-        <button class="btn btn-primary btn-sm" onclick="addEarnings(${pay})" style="width:100%">+ Add to Earnings</button>
-      </div>`;
-    document.getElementById('ocrStatus').textContent='✅ Analyzed';
-    speak({green:'Good order. Take it.',amber:'Borderline. Be careful.',red:'Bad order. Reject.'}[verdict]);
-    lastResult={pay,verdict};
-  }catch(e){document.getElementById('ocrStatus').textContent='❌ Error'}
-});
-
-function addEarnings(amount){
-  const d=JSON.parse(localStorage.getItem('ridesmart_miles')||'{}');
-  d.earnings=(d.earnings||0)+amount;localStorage.setItem('ridesmart_miles',JSON.stringify(d));
-  const today=new Date().toISOString().slice(0,10);
-  const curr=parseFloat(localStorage.getItem(`rs4_earn_${today}`)||'0');
-  localStorage.setItem(`rs4_earn_${today}`,(curr+amount).toFixed(2));
-  toast(`✅ $${amount.toFixed(2)} added`);
-}
-
-function speak(txt){if(!('speechSynthesis' in window))return;const m=new SpeechSynthesisUtterance(txt);m.lang='en-US';window.speechSynthesis.cancel();window.speechSynthesis.speak(m);}
-
-function updateStrip(){
-  const d=JSON.parse(localStorage.getItem('ridesmart_miles')||'{}');
-  const strip=document.getElementById('shiftStrip');
-  if(!d.status||d.status==='OFF'||d.status==='ENDED'){strip.classList.remove('on');return;}
-  strip.classList.add('on');
-  const h=Math.floor((d.activeSeconds||0)/3600),m=Math.floor(((d.activeSeconds||0)%3600)/60);
-  document.getElementById('stripTime').textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-  document.getElementById('stripEarn').textContent=`$${(d.earnings||0).toFixed(2)}`;
-  const hrs=(d.activeSeconds||0)/3600;
-  document.getElementById('stripHr').textContent=hrs>0?`$${((d.earnings||0)/hrs).toFixed(0)}`:'-';
-}
-setInterval(updateStrip,5000);updateStrip();
-
-window.initRS4=async function(){
-  initMap();
-  // Get GPS position first, then load data
-  GPS.getOnce(async (lat, lng) => {
-    if(map) map.setCenter({lat, lng});
-    await loadAll();
-    setInterval(loadAll, 120000);
-  });
-};
+loadAirports();
+loadExtras();
+setInterval(loadAirports,120000);
 </script>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBGO9iy_h7wAu_mS-nEY4wGNPD01wsAS-A&callback=initRS4"></script>
 </body>
 </html>
