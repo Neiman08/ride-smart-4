@@ -8,7 +8,8 @@
  *    npx cap sync android
  *    ./gradlew assembleDebug
  */
-window.RS4_API = 'https://ride-smart-ai.onrender.com';
+
+window.RS4_API = 'https://ride-smart-4.onrender.com';
 
 // DO NOT EDIT BELOW THIS LINE
 console.log('[RS4] Backend:', window.RS4_API);
