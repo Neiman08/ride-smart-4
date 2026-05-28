@@ -33,7 +33,8 @@ router.get('/', async (req, res) => {
           expectedRiders: 0,
           delayedCount: 0,
           isReal: false,
-          dataNote: '📊 Estimated flight pattern'
+          provider: 'No data',
+          dataNote: 'Sin vuelos reales en la ventana seleccionada'
         };
 
         try {
@@ -44,8 +45,9 @@ router.get('/', async (req, res) => {
           console.error(`Flight fetch error for ${iata}:`, e.message);
         }
 
-        const flights = fd.flights || [];
-        const arrPhr = fd.arrivalsPerHour || (peakHour ? 10 : 6);
+        const hasReal = !!fd.isReal;
+        const flights = hasReal ? (fd.flights || []) : [];
+        const arrPhr = hasReal ? Number(fd.arrivalsPerHour || 0) : 0;
 
         const queueLevel = Math.min(
           90,
@@ -57,8 +59,7 @@ router.get('/', async (req, res) => {
           50 + (arrPhr * 1.5) + (peakHour ? 20 : 0)
         );
 
-        const estimatedHourly =
-          (airport.distMiles || 999) < 15 ? 38 : 34;
+        const estimatedHourly = (airport.distMiles || 999) < 15 ? 38 : 34;
 
         const safeFlights = flights.slice(0, 8).map(f => ({
           flightNumber: f.flightNumber || '--',
@@ -71,11 +72,13 @@ router.get('/', async (req, res) => {
           delayMinutes: Number(f.delayMinutes || 0),
           aircraftType: f.aircraftType || '',
           passengerCount: Number(f.passengerCount || 0),
-          passengerLabel: f.passengerLabel || 'Estimated capacity',
+          passengerLabel: f.passengerLabel || 'Estimated passengers',
           terminal: f.terminal || '',
+          gate: f.gate || '',
+          baggageBelt: f.baggageBelt || '',
           isReal: !!f.isReal,
           isEstimate: !!f.isEstimate,
-          provider: f.provider || fd.provider || 'Smart Estimate'
+          provider: f.provider || fd.provider || 'No data'
         }));
 
         return {
@@ -91,11 +94,17 @@ router.get('/', async (req, res) => {
           demandScore,
           estimatedHourly,
 
-          passengerLoad: Number(fd.passengerLoad || 0),
-          expectedRiders: Number(fd.expectedRiders || 0),
-          delayedCount: Number(fd.delayedCount || 0),
-          dataNote: fd.dataNote || '📊 Estimated flight pattern',
-          provider: fd.provider || 'Smart Estimate',
+          passengerLoad: hasReal ? Number(fd.passengerLoad || 0) : 0,
+          expectedRiders: hasReal ? Number(fd.expectedRiders || 0) : 0,
+          delayedCount: hasReal ? Number(fd.delayedCount || 0) : 0,
+
+          dataNote: hasReal
+            ? (fd.dataNote || '📡 Live flight data')
+            : 'Sin vuelos reales en la ventana seleccionada',
+
+          provider: hasReal
+            ? (fd.provider || 'AeroDataBox')
+            : 'No data',
 
           action:
             queueLevel > 70 ? '⚠️ Queue Full'
@@ -113,7 +122,7 @@ router.get('/', async (req, res) => {
     res.json({
       success: true,
       airports: enriched,
-      arrivals: (enriched[0]?.flights || []).slice(0, 8),
+      arrivals: (enriched.find(a => a.hasRealData)?.flights || []).slice(0, 8),
       hasRealFlightData: enriched.some(a => a.hasRealData)
     });
 

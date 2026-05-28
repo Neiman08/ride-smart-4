@@ -228,6 +228,8 @@ async function fromAviationStack(iata) {
       f.minutesToArrival >= 0 &&
       f.minutesToArrival <= 180 &&
       f.status !== 'Cancelled'
+      && f.origin !== '—' &&
+      f.originCity !== 'Unknown'
     )
     .sort((a, b) => a.minutesToArrival - b.minutesToArrival)
     .slice(0, 20);
@@ -401,7 +403,7 @@ export async function fetchFlightsForAirport(iata, airportLat, airportLng) {
   // Try real providers first, fall back to estimate
   let flights = await fromAeroDataBox(iata);
   if (!flights || !flights.length) flights = await fromAviationStack(iata);
-  if (!flights || !flights.length) flights = buildEstimate(iata);
+  if (!flights || !flights.length) flights = [];
 
   const isReal         = flights.some(f => f.isReal && !f.isEstimate);
   const passengerLoad  = flights.reduce((s, f) => s + Number(f.passengerCount || 0), 0);
@@ -410,16 +412,16 @@ export async function fetchFlightsForAirport(iata, airportLat, airportLng) {
   const delayedCount   = flights.filter(f => f.delayMinutes > 15).length;
 
   return {
-    flights,
-    arrivalsPerHour:  flights.length,
-    arrivingNext30:   arrivingSoon.length,
-    passengerLoad,
-    expectedRiders,
-    isReal,
-    provider:   flights[0]?.provider || 'Smart Estimate',
+  flights,
+  arrivalsPerHour:  flights.length,
+  arrivingNext30:   arrivingSoon.length,
+  passengerLoad,
+  expectedRiders,
+  isReal,
+  provider:   flights[0]?.provider || 'No data',
     dataNote:   isReal
       ? `📡 Live: ${flights.length} vuelos próx. 3h · ~${passengerLoad} pasajeros · ~${expectedRiders} riders`
-      : `📊 Estimado · Agrega AVIATIONSTACK_KEY o RAPIDAPI_KEY para datos reales`,
+      : `Sin vuelos reales en la ventana seleccionada`,
     delayedCount,
   };
 }
