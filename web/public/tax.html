@@ -3,44 +3,42 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
-<title>Ride Smart 3.0 · Tax Report</title>
-<link rel="stylesheet" href="styles/theme.css"/>
+<title>Ride Smart 4.0 · Tax Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles/rs4-pro.css"/>
 <style>
 .period{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
-.period-btn{padding:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg3);color:var(--muted2);font-size:12px;font-weight:700;cursor:pointer;text-align:center;transition:.18s}
-.period-btn.active{background:var(--green);color:#00120a;border-color:var(--green)}
-
-.big-earn{font-family:var(--mono);font-size:50px;font-weight:600;color:var(--green);line-height:1}
-
-.report-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
+.period-btn{padding:11px;border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;text-align:center;transition:.18s}
+.period-btn.active{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;border-color:transparent}
+.big-earn{font-family:var(--mono);font-size:48px;font-weight:400;color:var(--green);line-height:1}
+.report-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
 .report-row:last-child{border:none}
-.report-row .rlabel{font-size:13px;color:var(--muted2);font-weight:600}
-.report-row .rval{font-family:var(--mono);font-size:15px;font-weight:600}
-
-.day-row{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:14px;margin-bottom:7px}
-.day-date{font-size:13px;font-weight:700}
-.day-earn{font-family:var(--mono);color:var(--green);font-size:15px;font-weight:600}
+.rlabel{font-size:13px;color:var(--muted);font-weight:600}
+.rval{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--text)}
+.day-row{display:flex;justify-content:space-between;align-items:center;padding:11px 13px;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:14px;margin-bottom:7px}
+.day-date{font-size:13px;font-weight:700;color:var(--text)}
+.day-earn{font-family:var(--mono);color:var(--green);font-size:15px;font-weight:700}
 .day-meta{font-size:11px;color:var(--muted);margin-top:1px}
-
-/* EXPENSE SCANNER */
-.exp-row{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.exp-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
 .exp-row select{flex:1;min-width:120px}
 .exp-row input{width:90px}
-.exp-row .btn{width:auto;padding:11px 16px;border-radius:12px;flex-shrink:0}
-.exp-item{display:flex;justify-content:space-between;padding:10px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;margin-bottom:6px;font-size:13px}
-.exp-item .exp-cat{font-weight:700;color:var(--muted2)}
-.exp-item .exp-amt{font-family:var(--mono);color:var(--red)}
+.exp-row .btn{width:auto;padding:11px 14px;border-radius:12px;flex-shrink:0}
+.exp-item{display:flex;justify-content:space-between;padding:10px 13px;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;margin-bottom:6px}
+.exp-cat{font-weight:700;color:var(--muted)}
+.exp-amt{font-family:var(--mono);color:var(--red)}
 </style>
 </head>
 <body>
-
+<div class="app">
 <div class="toast" id="toast"></div>
+
 <div class="page-header">
-  <a class="back-btn" href="/">← Home</a>
+  <a class="back-btn" href="index.html">← Home</a>
   <span class="badge-chip">📊 TAX</span>
 </div>
 
-<h1 style="margin-bottom:6px">Fiscal<br><span style="color:var(--green)">Report</span></h1>
+<div class="hero-eyebrow">FISCAL REPORT</div>
+<h1 style="margin-bottom:6px">Tax &<br><em>Earnings</em></h1>
 <p style="margin-bottom:18px">IRS-ready mileage & earnings with real expense tracking.</p>
 
 <div class="period">
@@ -49,22 +47,20 @@
   <div class="period-btn" onclick="setPeriod('all')">All Time</div>
 </div>
 
-<!-- SUMMARY -->
-<div class="card card-glow" style="margin-bottom:14px">
-  <div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:8px">GROSS EARNINGS</div>
+<div class="air-card card-glow" style="margin-bottom:14px">
+  <div class="sec-label" style="margin-top:0">GROSS EARNINGS</div>
   <div class="big-earn" id="grossEarn">$0.00</div>
-  <div style="margin-top:18px">
+  <div style="margin-top:16px">
     <div class="report-row"><span class="rlabel">Total Miles</span><span class="rval" id="totalMiles">0.0 mi</span></div>
     <div class="report-row"><span class="rlabel">Active Hours</span><span class="rval" id="totalHrs">0h 0m</span></div>
     <div class="report-row"><span class="rlabel">Avg $/hr</span><span class="rval" id="avgHr">--</span></div>
     <div class="report-row"><span class="rlabel">Total Expenses</span><span class="rval" id="totalExp" style="color:var(--red)">$0.00</span></div>
-    <div class="report-row"><span class="rlabel">IRS Deduction <span style="font-size:10px;color:var(--muted)">@$0.67/mi</span></span><span class="rval" id="irsDeduct" style="color:var(--yellow)">$0.00</span></div>
+    <div class="report-row"><span class="rlabel">IRS Deduction <span style="font-size:10px;color:var(--muted)">@$0.67/mi</span></span><span class="rval" id="irsDeduct" style="color:var(--amber)">$0.00</span></div>
     <div class="report-row"><span class="rlabel">NET TAXABLE <span style="font-size:10px;color:var(--muted)">(est.)</span></span><span class="rval" id="netTax" style="color:var(--green);font-size:18px">$0.00</span></div>
   </div>
 </div>
 
-<!-- EXPENSE TRACKER (GigReal style) -->
-<div class="card" style="margin-bottom:14px">
+<div class="air-card" style="margin-bottom:14px">
   <h2 style="margin-bottom:12px">🧾 Expense Tracker</h2>
   <div class="exp-row">
     <select id="expCat">
@@ -76,93 +72,56 @@
       <option value="Food">🍔 Food</option>
       <option value="Other">📦 Other</option>
     </select>
-    <input id="expAmt" type="number" placeholder="$0.00" min="0" step="0.01" style="width:90px"/>
-    <button class="btn btn-danger" onclick="addExpense()" style="width:auto;padding:11px 14px;border-radius:12px;font-size:13px">Add</button>
+    <input id="expAmt" type="number" placeholder="$0.00" min="0" step="0.01"/>
+    <button class="btn btn-red" onclick="addExpense()">Add</button>
   </div>
-  <div id="expList"><p>No expenses logged.</p></div>
+  <div id="expList"><p style="color:var(--muted)">No expenses logged.</p></div>
 </div>
 
-<!-- DAILY -->
-<div class="card" style="margin-bottom:14px">
+<div class="air-card" style="margin-bottom:14px">
   <h2 style="margin-bottom:14px">📅 Daily Breakdown</h2>
-  <div id="dailyBreakdown"><p>No data for this period.</p></div>
+  <div id="dailyBreakdown"><p style="color:var(--muted)">No data for this period.</p></div>
 </div>
 
-<!-- EXPORT -->
-<div class="card" style="margin-bottom:14px">
+<div class="air-card" style="margin-bottom:14px">
   <h2 style="margin-bottom:12px">⬇️ Export</h2>
   <div style="display:grid;gap:8px">
-    <button class="btn btn-primary" onclick="exportCSV()">📄 Download CSV</button>
-    <button class="btn btn-secondary" onclick="copyReport()">📋 Copy Report</button>
+    <button class="btn btn-mint" onclick="exportCSV()">📄 Download CSV</button>
+    <button class="btn btn-ghost" onclick="copyReport()">📋 Copy Report</button>
     <button class="btn btn-ghost" onclick="clearAll()">🗑 Clear All Data</button>
   </div>
 </div>
 
-<nav class="nav nav-5">
-  <a href="/">Home</a><a href="airports.html">✈️</a>
-  <a href="filters.html">⚙️</a><a href="shift.html">⏱</a>
-  <a class="active" href="tax.html">📊</a>
+</div><!-- /app -->
+
+<nav class="nav">
+  <a href="index.html"><i>⌂</i>Home</a>
+  <a href="airports.html"><i>✈</i>Airports</a>
+  <a href="heatmap.html"><i>🗺</i>Map</a>
+  <a href="ev.html"><i>ϟ</i>EV/Fuel</a>
+  <a class="on" href="tax.html"><i>📊</i>Tax</a>
 </nav>
 
 <script src="config.js"></script>
 <script>
 let period='week';
 function toast(msg,err=false){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(err?' error':'');setTimeout(()=>t.classList.remove('show'),2200)}
-
-function setPeriod(p){
-  period=p;
-  document.querySelectorAll('.period-btn').forEach((el,i)=>el.classList.toggle('active',['week','month','all'][i]===p));
-  render();
-}
-
-function getAllEarnDays(){
-  const days=[];
-  for(let i=0;i<localStorage.length;i++){
-    const k=localStorage.key(i);
-    if(k&&k.startsWith('rs3_earn_'))days.push({date:k.replace('rs3_earn_',''),earnings:parseFloat(localStorage.getItem(k)||'0')});
-  }
-  return days.sort((a,b)=>b.date.localeCompare(a.date));
-}
-
-function filterDays(days){
-  const now=new Date();
-  if(period==='week'){const s=new Date(now);s.setDate(s.getDate()-6);const ss=s.toISOString().slice(0,10);return days.filter(d=>d.date>=ss);}
-  if(period==='month')return days.filter(d=>d.date.startsWith(now.toISOString().slice(0,7)));
-  return days;
-}
-
+function setPeriod(p){period=p;document.querySelectorAll('.period-btn').forEach((el,i)=>el.classList.toggle('active',['week','month','all'][i]===p));render();}
+function getAllEarnDays(){const days=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('rs3_earn_'))days.push({date:k.replace('rs3_earn_',''),earnings:parseFloat(localStorage.getItem(k)||'0')});}return days.sort((a,b)=>b.date.localeCompare(a.date));}
+function filterDays(days){const now=new Date();if(period==='week'){const s=new Date(now);s.setDate(s.getDate()-6);const ss=s.toISOString().slice(0,10);return days.filter(d=>d.date>=ss);}if(period==='month')return days.filter(d=>d.date.startsWith(now.toISOString().slice(0,7)));return days;}
 function getExpenses(){return JSON.parse(localStorage.getItem('rs3_expenses')||'[]')}
 function saveExpenses(arr){localStorage.setItem('rs3_expenses',JSON.stringify(arr))}
-
-function addExpense(){
-  const cat=document.getElementById('expCat').value;
-  const amt=parseFloat(document.getElementById('expAmt').value);
-  if(!amt||amt<=0)return;
-  const exps=getExpenses();
-  exps.unshift({cat,amt,date:new Date().toISOString().slice(0,10),time:Date.now()});
-  saveExpenses(exps.slice(0,200));
-  document.getElementById('expAmt').value='';
-  render();toast(`🧾 -$${amt.toFixed(2)} logged`);
-}
-
+function addExpense(){const cat=document.getElementById('expCat').value;const amt=parseFloat(document.getElementById('expAmt').value);if(!amt||amt<=0)return;const exps=getExpenses();exps.unshift({cat,amt,date:new Date().toISOString().slice(0,10),time:Date.now()});saveExpenses(exps.slice(0,200));document.getElementById('expAmt').value='';render();toast(`🧾 -$${amt.toFixed(2)} logged`);}
 function render(){
   const allDays=getAllEarnDays(),filtered=filterDays(allDays);
   const gross=filtered.reduce((s,d)=>s+d.earnings,0);
   const miles=JSON.parse(localStorage.getItem('ridesmart_miles')||'{}');
-  const totalMi=miles.totalMiles||0,totalSec=miles.activeSeconds||0;
-  const hrs=totalSec/3600;
+  const totalMi=miles.totalMiles||0,totalSec=miles.activeSeconds||0,hrs=totalSec/3600;
   const irsDeduct=totalMi*0.67;
-  // Expenses (filter by period)
-  const allExp=getExpenses();
   const today=new Date();
-  const expFiltered=allExp.filter(e=>{
-    if(period==='all')return true;
-    if(period==='week'){const s=new Date(today);s.setDate(s.getDate()-6);return e.date>=s.toISOString().slice(0,10);}
-    return e.date.startsWith(today.toISOString().slice(0,7));
-  });
+  const expFiltered=getExpenses().filter(e=>{if(period==='all')return true;if(period==='week'){const s=new Date(today);s.setDate(s.getDate()-6);return e.date>=s.toISOString().slice(0,10);}return e.date.startsWith(today.toISOString().slice(0,7));});
   const totalExp=expFiltered.reduce((s,e)=>s+e.amt,0);
   const netTax=Math.max(0,gross-irsDeduct-totalExp);
-
   document.getElementById('grossEarn').textContent='$'+gross.toFixed(2);
   document.getElementById('totalMiles').textContent=totalMi.toFixed(1)+' mi';
   document.getElementById('totalHrs').textContent=Math.floor(hrs)+'h '+Math.round((hrs%1)*60)+'m';
@@ -170,51 +129,15 @@ function render(){
   document.getElementById('totalExp').textContent='-$'+totalExp.toFixed(2);
   document.getElementById('irsDeduct').textContent='$'+irsDeduct.toFixed(2);
   document.getElementById('netTax').textContent='$'+netTax.toFixed(2);
-
-  // Expense list
   const expEl=document.getElementById('expList');
-  if(!expFiltered.length){expEl.innerHTML='<p>No expenses for this period.</p>';}
-  else{expEl.innerHTML=expFiltered.slice(0,15).map(e=>`<div class="exp-item"><div><div class="exp-cat">${e.cat}</div><div style="font-size:11px;color:var(--muted)">${e.date}</div></div><div class="exp-amt">-$${e.amt.toFixed(2)}</div></div>`).join('');}
-
-  // Daily
+  expEl.innerHTML=!expFiltered.length?'<p style="color:var(--muted)">No expenses for this period.</p>':expFiltered.slice(0,15).map(e=>`<div class="exp-item"><div><div class="exp-cat">${e.cat}</div><div style="font-size:11px;color:var(--muted)">${e.date}</div></div><div class="exp-amt">-$${e.amt.toFixed(2)}</div></div>`).join('');
   const bd=document.getElementById('dailyBreakdown');
-  if(!filtered.length){bd.innerHTML='<p>No data for this period.</p>';}
-  else bd.innerHTML=filtered.map(d=>`<div class="day-row"><div><div class="day-date">${fmtDate(d.date)}</div><div class="day-meta">0.0 mi logged</div></div><div class="day-earn">$${d.earnings.toFixed(2)}</div></div>`).join('');
+  bd.innerHTML=!filtered.length?'<p style="color:var(--muted)">No data for this period.</p>':filtered.map(d=>`<div class="day-row"><div><div class="day-date">${fmtDate(d.date)}</div><div class="day-meta">0.0 mi logged</div></div><div class="day-earn">$${d.earnings.toFixed(2)}</div></div>`).join('');
 }
-
 function fmtDate(s){return new Date(s+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}
-
-function exportCSV(){
-  const days=filterDays(getAllEarnDays());
-  const miles=JSON.parse(localStorage.getItem('ridesmart_miles')||'{}');
-  const lines=[['Date','Earnings','Miles','Hours','IRS Deduction','Net Taxable']];
-  days.forEach(d=>{
-    const mi=(miles.totalMiles||0).toFixed(1);
-    const hrs=((miles.activeSeconds||0)/3600).toFixed(2);
-    const irs=(parseFloat(mi)*0.67).toFixed(2);
-    const net=Math.max(0,d.earnings-parseFloat(irs)).toFixed(2);
-    lines.push([d.date,'$'+d.earnings.toFixed(2),mi+' mi',hrs+' hr','$'+irs,'$'+net]);
-  });
-  const csv=lines.map(r=>r.join(',')).join('\n');
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download=`ride-smart-3-report-${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();toast('📄 CSV downloaded!');
-}
-
-function copyReport(){
-  const days=filterDays(getAllEarnDays());
-  const gross=days.reduce((s,d)=>s+d.earnings,0);
-  const miles=JSON.parse(localStorage.getItem('ridesmart_miles')||'{}');
-  const hrs=(miles.activeSeconds||0)/3600;
-  const exps=getExpenses().reduce((s,e)=>s+e.amt,0);
-  const irs=(miles.totalMiles||0)*0.67;
-  const txt=`RIDE SMART 3.0 — TAX REPORT\nPeriod: ${period}\n${new Date().toLocaleDateString()}\n\nGross Earnings:  $${gross.toFixed(2)}\nTotal Miles:     ${(miles.totalMiles||0).toFixed(1)} mi\nActive Hours:    ${hrs.toFixed(1)} hr\nExpenses:       -$${exps.toFixed(2)}\nIRS Deduction:  $${irs.toFixed(2)}\nNet Taxable:     $${Math.max(0,gross-irs-exps).toFixed(2)}\n\n--- DAILY ---\n${days.map(d=>`${d.date}: $${d.earnings.toFixed(2)}`).join('\n')}`;
-  navigator.clipboard.writeText(txt).then(()=>toast('📋 Copied!')).catch(()=>toast('Could not copy',true));
-}
-
+function exportCSV(){const days=filterDays(getAllEarnDays());const miles=JSON.parse(localStorage.getItem('ridesmart_miles')||'{}');const lines=[['Date','Earnings','Miles','Hours','IRS Deduction','Net Taxable']];days.forEach(d=>{const mi=(miles.totalMiles||0).toFixed(1);const hrs=((miles.activeSeconds||0)/3600).toFixed(2);const irs=(parseFloat(mi)*0.67).toFixed(2);const net=Math.max(0,d.earnings-parseFloat(irs)).toFixed(2);lines.push([d.date,'$'+d.earnings.toFixed(2),mi+' mi',hrs+' hr','$'+irs,'$'+net]);});const csv=lines.map(r=>r.join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=`ride-smart-4-report-${new Date().toISOString().slice(0,10)}.csv`;a.click();toast('📄 CSV downloaded!');}
+function copyReport(){const days=filterDays(getAllEarnDays());const gross=days.reduce((s,d)=>s+d.earnings,0);const miles=JSON.parse(localStorage.getItem('ridesmart_miles')||'{}');const hrs=(miles.activeSeconds||0)/3600;const exps=getExpenses().reduce((s,e)=>s+e.amt,0);const irs=(miles.totalMiles||0)*0.67;const txt=`RIDE SMART 4.0 — TAX REPORT\nPeriod: ${period}\n${new Date().toLocaleDateString()}\n\nGross Earnings:  $${gross.toFixed(2)}\nTotal Miles:     ${(miles.totalMiles||0).toFixed(1)} mi\nActive Hours:    ${hrs.toFixed(1)} hr\nExpenses:       -$${exps.toFixed(2)}\nIRS Deduction:  $${irs.toFixed(2)}\nNet Taxable:     $${Math.max(0,gross-irs-exps).toFixed(2)}\n\n--- DAILY ---\n${days.map(d=>`${d.date}: $${d.earnings.toFixed(2)}`).join('\n')}`;navigator.clipboard.writeText(txt).then(()=>toast('📋 Copied!')).catch(()=>toast('Could not copy',true));}
 function clearAll(){if(!confirm('Clear all data?'))return;for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k&&(k.startsWith('rs3_earn_')||k==='ridesmart_miles'||k==='rs3_shift_log'||k==='rs3_expenses'))localStorage.removeItem(k);}render();toast('🗑 Cleared')}
-
 render();
 </script>
 </body>

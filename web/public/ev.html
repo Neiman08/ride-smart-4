@@ -4,58 +4,43 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
 <title>Ride Smart 4.0 · EV & Fuel</title>
-
-<link rel="stylesheet" href="styles/theme.css"/>
-
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles/rs4-pro.css"/>
 <style>
-.vehicle-tabs{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:16px}
-.vt{padding:14px;border:1px solid var(--line2);border-radius:14px;text-align:center;cursor:pointer;transition:.15s}
-.vt.on{border-color:rgba(0,245,144,.3);background:rgba(0,245,144,.07)}
-.vt .ic{font-size:24px;display:block;margin-bottom:4px}
-.vt .name{font-size:13px;font-weight:700;color:var(--white)}
-.vt .sub{font-size:11px;color:var(--fog)}
-
-.fuel-result{background:var(--ink3);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:10px}
-.fuel-big{font-family:var(--mono);font-size:40px;font-weight:700;color:var(--mint);line-height:1;margin:8px 0}
-.fuel-warn{background:rgba(255,45,85,.08);border:1px solid rgba(255,45,85,.2);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--red);font-weight:700;margin-top:10px}
-.fuel-warn.ok{background:rgba(0,245,144,.06);border-color:rgba(0,245,144,.15);color:var(--mint)}
-
-.station-card{background:var(--ink3);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:7px}
-.station-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
-.station-icon{font-size:22px;flex-shrink:0}
-.station-name{font-size:14px;font-weight:700;color:var(--white)}
-.station-addr{font-size:11px;color:var(--fog);margin-top:2px}
-.station-net{font-family:var(--mono);font-size:10px;color:var(--mint)}
-.strategy-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;font-size:11px;font-weight:700;margin-top:8px}
-.sb-green{background:rgba(0,245,144,.1);color:var(--mint);border:1px solid rgba(0,245,144,.2)}
-.sb-amber{background:rgba(255,184,0,.1);color:var(--amber);border:1px solid rgba(255,184,0,.18)}
-.sb-red{background:rgba(255,45,85,.1);color:var(--red);border:1px solid rgba(255,45,85,.18)}
-
-.input-label{font-size:12px;font-weight:700;color:var(--smoke);margin-bottom:6px;display:block}
-.input-row{display:flex;gap:8px;margin-bottom:12px}
-.input-row input{flex:1}
+.vehicle-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.vt{padding:14px;border:1px solid var(--line);border-radius:16px;text-align:center;cursor:pointer;transition:.15s;background:var(--panel)}
+.vt.on{border-color:rgba(124,92,255,.4);background:rgba(124,92,255,.1)}
+.vt .ic{font-size:26px;display:block;margin-bottom:5px}
+.vt .name{font-size:13px;font-weight:700;color:var(--text)}
+.vt .sub{font-size:11px;color:var(--muted)}
+.fuel-big{font-family:var(--mono);font-size:44px;font-weight:700;color:var(--green);line-height:1;margin:8px 0}
+.fuel-warn{border-radius:12px;padding:11px 14px;font-size:13px;font-weight:700;margin-top:10px}
+.fuel-warn.ok{background:rgba(25,246,162,.07);border:1px solid rgba(25,246,162,.2);color:var(--green)}
+.fuel-warn.bad{background:rgba(255,77,115,.07);border:1px solid rgba(255,77,115,.2);color:var(--red)}
+.station-card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:8px}
+.station-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.station-name{font-size:14px;font-weight:700;color:var(--text)}
+.station-addr{font-size:11px;color:var(--muted);margin-top:2px}
+.station-net{font-family:var(--mono);font-size:10px;color:var(--purple);margin-top:3px}
+.sb{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;font-size:11px;font-weight:700;margin-top:8px}
+.sb-green{background:rgba(25,246,162,.1);color:var(--green);border:1px solid rgba(25,246,162,.2)}
+.sb-amber{background:rgba(255,184,46,.1);color:var(--amber);border:1px solid rgba(255,184,46,.2)}
+.sb-red{background:rgba(255,77,115,.1);color:var(--red);border:1px solid rgba(255,77,115,.2)}
+.input-lbl{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px;display:block}
 </style>
 </head>
-
 <body>
-
+<div class="app">
 <div class="toast" id="toast"></div>
 
 <div class="page-header">
-  <a class="back-btn" href="/">← Home</a>
+  <a class="back-btn" href="index.html">← Home</a>
   <span class="badge-chip">⚡ EV & FUEL</span>
 </div>
 
 <div class="hero-eyebrow">ENERGY OPTIMIZER</div>
-
-<h1 style="margin-bottom:6px">
-  EV & Fuel<br>
-  <span style="color:var(--mint)">Strategy</span>
-</h1>
-
-<p style="margin-bottom:18px">
-  Optimize charging, refueling, and real profit after energy costs.
-</p>
+<h1 style="margin-bottom:6px">EV & Fuel<br><em>Strategy</em></h1>
+<p style="margin-bottom:20px">Optimize charging, refueling, and real profit after energy costs.</p>
 
 <div class="vehicle-tabs">
   <div class="vt on" id="vtGas" onclick="setVehicle('gas')">
@@ -63,7 +48,6 @@
     <div class="name">Gas Vehicle</div>
     <div class="sub">Fuel optimizer</div>
   </div>
-
   <div class="vt" id="vtEV" onclick="setVehicle('ev')">
     <span class="ic">⚡</span>
     <div class="name">Electric Vehicle</div>
@@ -71,286 +55,123 @@
   </div>
 </div>
 
+<!-- GAS PANEL -->
 <div id="gasPanel">
-
-  <div class="card" style="margin-bottom:10px">
-    <h2 style="margin-bottom:14px">⛽ Fuel Calculator</h2>
-
-    <label class="input-label">Miles per gallon (MPG)</label>
-    <input id="mpg" type="number" value="30" placeholder="30" style="margin-bottom:12px"/>
-
-    <label class="input-label">Gallons left in tank</label>
-    <input id="gallons" type="number" value="5" placeholder="5" step="0.5" style="margin-bottom:12px"/>
-
-    <label class="input-label">Gas price per gallon ($)</label>
-    <input id="gasPrice" type="number" value="3.80" placeholder="3.80" step="0.01" style="margin-bottom:14px"/>
-
-    <button class="btn btn-mint" onclick="calcFuel()">
-      Calculate Net Profit
-    </button>
+  <div class="air-card" style="margin-bottom:10px">
+    <h2 style="margin-bottom:16px">⛽ Fuel Calculator</h2>
+    <label class="input-lbl">Miles per gallon (MPG)</label>
+    <input id="mpg" type="number" value="30" style="margin-bottom:12px"/>
+    <label class="input-lbl">Gallons left in tank</label>
+    <input id="gallons" type="number" value="5" step="0.5" style="margin-bottom:12px"/>
+    <label class="input-lbl">Gas price per gallon ($)</label>
+    <input id="gasPrice" type="number" value="3.80" step="0.01" style="margin-bottom:16px"/>
+    <button class="btn btn-mint" onclick="calcFuel()">Calculate Net Profit</button>
   </div>
 
-  <div class="fuel-result" id="fuelResult" style="display:none">
-
-    <div style="font-family:var(--mono);font-size:10px;color:var(--fog);letter-spacing:2px;margin-bottom:4px">
-      NET EARNINGS AFTER FUEL
-    </div>
-
+  <div id="fuelResult" style="display:none" class="air-card">
+    <div class="sec-label" style="margin-top:0">NET EARNINGS AFTER FUEL</div>
     <div class="fuel-big" id="fuelNet">$0.00</div>
-
-    <div class="stats2" style="margin-top:12px">
-      <div class="stat-box"><div class="stat-l">COST/MI</div><div class="stat-v" style="font-size:16px;color:var(--red)" id="fuelCostMi">--</div></div>
-      <div class="stat-box"><div class="stat-l">FUEL COST</div><div class="stat-v" style="font-size:16px;color:var(--red)" id="fuelTotal">--</div></div>
-      <div class="stat-box"><div class="stat-l">MILES LEFT</div><div class="stat-v" style="font-size:16px" id="fuelMiLeft">--</div></div>
-      <div class="stat-box"><div class="stat-l">STATUS</div><div class="stat-v" style="font-size:13px" id="fuelStatus">--</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+      <div class="mod"><small>COST/MI</small><b id="fuelCostMi" style="color:var(--red)">--</b></div>
+      <div class="mod"><small>FUEL COST</small><b id="fuelTotal" style="color:var(--red)">--</b></div>
+      <div class="mod"><small>MILES LEFT</small><b id="fuelMiLeft">--</b></div>
+      <div class="mod"><small>STATUS</small><b id="fuelStatus">--</b></div>
     </div>
-
     <div id="fuelAdvice" class="fuel-warn ok"></div>
-
   </div>
-
 </div>
 
+<!-- EV PANEL -->
 <div id="evPanel" style="display:none">
-
   <div class="sec-label">CHARGING STATIONS NEAR YOU</div>
-
-  <div id="stationsList">
-    <div style="color:var(--fog);font-size:13px">Loading stations...</div>
-  </div>
-
+  <div id="stationsList"><p style="color:var(--muted)">Loading stations...</p></div>
 </div>
 
-<nav class="nav nav-5">
-  <a href="/">Home</a>
-  <a href="events.html">🎵</a>
-  <a href="heatmap.html">🗺️</a>
-  <a class="on">⚡</a>
-  <a href="brain.html">🧠</a>
+</div><!-- /app -->
+
+<nav class="nav">
+  <a href="index.html"><i>⌂</i>Home</a>
+  <a href="airports.html"><i>✈</i>Airports</a>
+  <a href="heatmap.html"><i>🗺</i>Map</a>
+  <a class="on" href="ev.html"><i>ϟ</i>EV/Fuel</a>
+  <a href="brain.html"><i>🧠</i>Brain</a>
 </nav>
 
 <script src="config.js"></script>
 <script src="gps.js"></script>
-
 <script>
-const API = 'https://ride-smart-ai.onrender.com';
-
+const API = window.RS4_API || 'https://ride-smart-ai.onrender.com';
 let vehicleType = 'gas';
 
-function toast(msg){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show';
-
-  setTimeout(() => {
-    t.classList.remove('show');
-  }, 2200);
-}
-
-function getLatLng(){
-  return {
-    lat: window.GPS?.lat || 41.8781,
-    lng: window.GPS?.lng || -87.6298
-  };
-}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show';setTimeout(()=>t.classList.remove('show'),2200)}
 
 function setVehicle(type){
   vehicleType = type;
-
-  document.getElementById('vtGas').classList.toggle('on', type === 'gas');
-  document.getElementById('vtEV').classList.toggle('on', type === 'ev');
-
-  document.getElementById('gasPanel').style.display =
-    type === 'gas' ? 'block' : 'none';
-
-  document.getElementById('evPanel').style.display =
-    type === 'ev' ? 'block' : 'none';
-
-  if(type === 'ev'){
-    loadStations();
-  }
+  document.getElementById('vtGas').classList.toggle('on', type==='gas');
+  document.getElementById('vtEV').classList.toggle('on', type==='ev');
+  document.getElementById('gasPanel').style.display = type==='gas'?'block':'none';
+  document.getElementById('evPanel').style.display = type==='ev'?'block':'none';
+  if(type==='ev') loadStations();
 }
 
 function calcFuel(){
-  const mpg = parseFloat(document.getElementById('mpg').value) || 30;
-  const gal = parseFloat(document.getElementById('gallons').value) || 5;
-  const price = parseFloat(document.getElementById('gasPrice').value) || 3.80;
-
-  const miles = JSON.parse(localStorage.getItem('ridesmart_miles') || '{}');
-
-  const totalMiles =
-    miles.totalMiles ||
-    miles.miles ||
-    0;
-
-  const earnings =
-    miles.earnings ||
-    miles.totalEarnings ||
-    0;
-
-  const costPerMile = price / mpg;
-  const totalCost = totalMiles * costPerMile;
-  const net = earnings - totalCost;
-  const milesLeft = gal * mpg;
-
-  document.getElementById('fuelResult').style.display = 'block';
-
-  document.getElementById('fuelNet').textContent =
-    '$' + net.toFixed(2);
-
-  document.getElementById('fuelNet').style.color =
-    net >= 0 ? 'var(--mint)' : 'var(--red)';
-
-  document.getElementById('fuelCostMi').textContent =
-    '$' + costPerMile.toFixed(3);
-
-  document.getElementById('fuelTotal').textContent =
-    '$' + totalCost.toFixed(2);
-
-  document.getElementById('fuelMiLeft').textContent =
-    Math.round(milesLeft) + ' mi';
-
-  document.getElementById('fuelStatus').textContent =
-    milesLeft < 30
-      ? '⛽ LOW'
-      : milesLeft < 60
-        ? '⚠️ OK'
-        : '✅ GOOD';
-
-  const adv = document.getElementById('fuelAdvice');
-
-  if(milesLeft < 30){
-    adv.className = 'fuel-warn';
-    adv.textContent = '⛽ Refuel soon — less than 30 miles left';
-  }else if(milesLeft < 60){
-    adv.className = 'fuel-warn';
-    adv.textContent = '⚠️ Consider refueling after next trip';
-  }else{
-    adv.className = 'fuel-warn ok';
-    adv.textContent = '✅ Fuel level good — keep driving';
-  }
-
+  const mpg=parseFloat(document.getElementById('mpg').value)||30;
+  const gal=parseFloat(document.getElementById('gallons').value)||5;
+  const price=parseFloat(document.getElementById('gasPrice').value)||3.80;
+  const miles=JSON.parse(localStorage.getItem('ridesmart_miles')||'{}');
+  const totalMiles=miles.totalMiles||0;
+  const earnings=miles.earnings||0;
+  const costPerMile=price/mpg;
+  const totalCost=totalMiles*costPerMile;
+  const net=earnings-totalCost;
+  const milesLeft=gal*mpg;
+  document.getElementById('fuelResult').style.display='block';
+  const netEl=document.getElementById('fuelNet');
+  netEl.textContent='$'+net.toFixed(2);
+  netEl.style.color=net>=0?'var(--green)':'var(--red)';
+  document.getElementById('fuelCostMi').textContent='$'+costPerMile.toFixed(3);
+  document.getElementById('fuelTotal').textContent='$'+totalCost.toFixed(2);
+  document.getElementById('fuelMiLeft').textContent=Math.round(milesLeft)+' mi';
+  document.getElementById('fuelStatus').textContent=milesLeft<30?'⛽ LOW':milesLeft<60?'⚠️ OK':'✅ GOOD';
+  const adv=document.getElementById('fuelAdvice');
+  if(milesLeft<30){adv.className='fuel-warn bad';adv.textContent='⛽ Refuel soon — less than 30 miles left'}
+  else if(milesLeft<60){adv.className='fuel-warn bad';adv.textContent='⚠️ Consider refueling after next trip'}
+  else{adv.className='fuel-warn ok';adv.textContent='✅ Fuel level good — keep driving'}
   toast('✅ Net profit calculated');
 }
 
 async function loadStations(){
   try{
-    const { lat, lng } = getLatLng();
-
-    const r = await fetch(
-      `${API}/api/ev?lat=${lat}&lng=${lng}&t=${Date.now()}`
-    );
-
-    const d = await r.json();
-
-    console.log('EV DATA:', d);
-
-    if(!d.success){
-      throw new Error(d.error || 'EV API error');
-    }
-
-    const stations = d.stations || [];
-
-    const el = document.getElementById('stationsList');
-
-    if(!stations.length){
-      el.innerHTML =
-        '<p style="color:var(--mist);font-size:13px">No EV stations found near your location.</p>';
-      return;
-    }
-
-    el.innerHTML = stations.map(s => {
-
-      const strategy = s.strategy || {};
-      const color = strategy.color || 'green';
-
-      const sc =
-        color === 'green'
-          ? 'sb-green'
-          : color === 'amber'
-            ? 'sb-amber'
-            : 'sb-red';
-
-      const lat =
-        s.lat ||
-        s.latitude ||
-        41.8781;
-
-      const lng =
-        s.lng ||
-        s.longitude ||
-        -87.6298;
-
-      return `
-        <div class="station-card">
-
-          <div class="station-top">
-
-            <div class="station-icon">
-              ${s.dcFast ? '⚡' : '🔌'}
-            </div>
-
-            <div style="flex:1">
-              <div class="station-name">
-                ${s.name || 'Charging Station'}
-              </div>
-
-              <div class="station-addr">
-                ${s.address || s.streetAddress || 'Address unavailable'}
-              </div>
-
-              <div class="station-net">
-                ${s.network || 'Network'} · Level ${s.level || '--'} · ${s.ports || '--'} ports
-              </div>
-            </div>
-
-            <div style="text-align:right">
-              <div style="font-family:var(--mono);font-size:11px;color:var(--fog)">
-                ${s.estimatedWait || '--'}
-              </div>
-              <div style="font-size:10px;color:var(--fog)">
-                wait
-              </div>
-            </div>
-
+    const url = typeof GPS!=='undefined' ? GPS.url(`${API}/api/ev`) : `${API}/api/ev`;
+    const r=await fetch(url);
+    const d=await r.json();
+    if(!d.success) throw new Error('API error');
+    const el=document.getElementById('stationsList');
+    el.innerHTML=d.stations.map(s=>{
+      const sc=s.strategy?.color==='green'?'sb-green':s.strategy?.color==='amber'?'sb-amber':'sb-red';
+      return `<div class="station-card">
+        <div class="station-top">
+          <div style="font-size:22px;flex-shrink:0">${s.dcFast?'⚡':'🔌'}</div>
+          <div style="flex:1">
+            <div class="station-name">${s.name}</div>
+            <div class="station-addr">${s.address}</div>
+            <div class="station-net">${s.network} · Level ${s.level} · ${s.ports} ports</div>
           </div>
-
-          <div class="strategy-badge ${sc}">
-            ${strategy.advice || 'Available'} — ${strategy.reason || 'Good charging option nearby'}
-          </div>
-
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px">
-
-            <button class="btn btn-ghost btn-sm" onclick="nav(${lat},${lng})">
-              🧭 Navigate
-            </button>
-
-            <button class="btn btn-sec btn-sm">
-              📍 Zone: ${s.zone?.split(' ')[0] || 'Nearby'}
-            </button>
-
-          </div>
-
+          <div style="text-align:right;font-family:var(--mono);font-size:11px;color:var(--muted)">${s.estimatedWait}<br><span style="font-size:10px">wait</span></div>
         </div>
-      `;
+        <div class="sb ${sc}">${s.strategy?.advice} — ${s.strategy?.reason}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px">
+          <button class="btn btn-ghost btn-sm" onclick="nav(${s.lat},${s.lng})">🧭 Navigate</button>
+          <button class="btn btn-mint btn-sm">📍 ${s.zone?.split(' ')[0]||'Zone'}</button>
+        </div>
+      </div>`;
     }).join('');
-
   }catch(e){
-
-    console.error('EV PAGE ERROR:', e);
-
-    document.getElementById('stationsList').innerHTML =
-      `<p style="color:var(--mist);font-size:13px">
-        Could not load EV stations: ${e.message}
-      </p>`;
+    document.getElementById('stationsList').innerHTML='<p style="color:var(--muted)">Could not load EV stations.</p>';
   }
 }
 
-function nav(lat,lng){
-  window.location.href =
-    `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
-}
+function nav(lat,lng){window.location.href=`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`}
 </script>
-
 </body>
 </html>

@@ -4,163 +4,42 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
 <title>Ride Smart 4.0 · Events</title>
-
-<link rel="stylesheet" href="styles/theme.css"/>
-
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles/rs4-pro.css"/>
 <style>
-.event-full{
-  background:var(--ink3);
-  border:1px solid var(--line);
-  border-radius:var(--r);
-  padding:16px;
-  margin-bottom:8px;
-  position:relative;
-  overflow:hidden;
-}
-
-.event-full::before{
-  content:'';
-  position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  height:1px;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);
-}
-
-.event-full.surge{
-  border-color:rgba(255,184,0,.25);
-  background:rgba(255,184,0,.04);
-}
-
-.event-full.hot{
-  border-color:rgba(255,45,85,.25);
-  background:rgba(255,45,85,.04);
-}
-
-.ev-header{
-  display:flex;
-  align-items:flex-start;
-  gap:12px;
-  margin-bottom:12px;
-}
-
-.ev-icon{
-  font-size:28px;
-  flex-shrink:0;
-}
-
-.ev-title{
-  font-size:16px;
-  font-weight:700;
-  color:var(--white);
-  line-height:1.2;
-}
-
-.ev-venue{
-  font-size:12px;
-  color:var(--fog);
-  margin-top:3px;
-}
-
-.ev-time{
-  font-family:var(--mono);
-  font-size:11px;
-  color:var(--mint);
-  margin-top:3px;
-}
-
-.ev-chips{
-  display:flex;
-  flex-wrap:wrap;
-  gap:5px;
-  margin-bottom:10px;
-}
-
-.ev-actions{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:7px;
-}
-
-.surge-window{
-  background:linear-gradient(135deg,rgba(255,184,0,.1),rgba(255,45,85,.06));
-  border:1px solid rgba(255,184,0,.25);
-  border-radius:14px;
-  padding:12px 14px;
-  margin-bottom:8px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.sw-time{
-  font-family:var(--mono);
-  font-size:20px;
-  font-weight:700;
-  color:var(--amber);
-  flex-shrink:0;
-}
-
-.sw-mul{
-  font-family:var(--mono);
-  font-size:14px;
-  font-weight:700;
-  color:var(--red);
-  margin-left:auto;
-}
-
-.type-filter{
-  display:flex;
-  gap:6px;
-  flex-wrap:wrap;
-  margin-bottom:14px;
-}
-
-.tf{
-  padding:7px 14px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:700;
-  border:1px solid var(--line2);
-  background:var(--ink3);
-  color:var(--fog);
-  cursor:pointer;
-  transition:.15s;
-}
-
-.tf.on{
-  background:var(--mint);
-  color:#001a0d;
-  border-color:var(--mint);
-}
+.event-card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:10px}
+.event-card.surge{border-color:rgba(255,184,46,.3);background:rgba(255,184,46,.04)}
+.event-card.hot{border-color:rgba(255,77,115,.3);background:rgba(255,77,115,.04)}
+.ev-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.ev-icon{font-size:28px;flex-shrink:0}
+.ev-title{font-size:15px;font-weight:700;color:var(--text);line-height:1.2}
+.ev-venue{font-size:12px;color:var(--muted);margin-top:3px}
+.ev-time{font-family:var(--mono);font-size:11px;color:var(--purple);margin-top:4px}
+.ev-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.ev-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.surge-window{background:rgba(255,184,46,.08);border:1px solid rgba(255,184,46,.25);border-radius:16px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.sw-time{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--amber);flex-shrink:0}
+.sw-mul{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--red);margin-left:auto}
+.type-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tf{padding:7px 14px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;transition:.15s}
+.tf.on{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;border-color:transparent}
 </style>
 </head>
-
 <body>
-
+<div class="app">
 <div class="toast" id="toast"></div>
 
 <div class="page-header">
-  <a class="back-btn" href="/">← Home</a>
+  <a class="back-btn" href="index.html">← Home</a>
   <span class="badge-chip">🎵 EVENTS</span>
 </div>
 
 <div class="hero-eyebrow">LIVE INTELLIGENCE</div>
-
-<h1 style="margin-bottom:6px">
-  Events &<br>
-  <span style="color:var(--mint)">Surge Windows</span>
-</h1>
-
-<p style="margin-bottom:18px">
-  Concerts, sports, and events driving surge in Chicago right now.
-</p>
+<h1 style="margin-bottom:6px">Events &<br><em>Surge Windows</em></h1>
+<p style="margin-bottom:20px">Concerts, sports, and events driving surge near you right now.</p>
 
 <div class="sec-label">UPCOMING SURGE WINDOWS</div>
-<div id="surgeWindows">
-  <p>Loading...</p>
-</div>
+<div id="surgeWindows"><p style="color:var(--muted)">Loading...</p></div>
 
 <div class="type-filter">
   <div class="tf on" onclick="filterEvents('all',this)">All</div>
@@ -170,315 +49,94 @@
 </div>
 
 <div class="sec-label">EVENTS TODAY & TOMORROW</div>
-<div id="eventsList">
-  <p>Loading events...</p>
-</div>
+<div id="eventsList"><p style="color:var(--muted)">Loading events...</p></div>
 
-<nav class="nav nav-5">
-  <a href="/">Home</a>
-  <a class="on">🎵</a>
-  <a href="heatmap.html">🗺️</a>
-  <a href="ev.html">⚡</a>
-  <a href="brain.html">🧠</a>
+</div><!-- /app -->
+
+<nav class="nav">
+  <a href="index.html"><i>⌂</i>Home</a>
+  <a href="airports.html"><i>✈</i>Airports</a>
+  <a class="on" href="events.html"><i>🎵</i>Events</a>
+  <a href="ev.html"><i>ϟ</i>EV/Fuel</a>
+  <a href="brain.html"><i>🧠</i>Brain</a>
 </nav>
 
 <script src="config.js"></script>
 <script src="gps.js"></script>
-
 <script>
-const API = window.location.origin;
+const API = window.RS4_API || 'https://ride-smart-ai.onrender.com';
 let allEvents = [];
 
-function toast(msg){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show';
-
-  setTimeout(() => {
-    t.classList.remove('show');
-  }, 2200);
-}
-
-function nav(lat,lng){
-  window.location.href =
-    `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
-}
-
-function getLatLng(){
-  return {
-    lat: window.GPS?.lat || 41.8781,
-    lng: window.GPS?.lng || -87.6298
-  };
-}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show';setTimeout(()=>t.classList.remove('show'),2200)}
 
 async function load(){
-
   try{
-
-    const { lat, lng } = getLatLng();
-
+    const gpsQ = typeof GPS!=='undefined'&&GPS.lat ? `?lat=${GPS.lat}&lng=${GPS.lng}` : '';
     const [evR, surgeR] = await Promise.all([
-      fetch(`${API}/api/events?city=Chicago&lat=${lat}&lng=${lng}&t=${Date.now()}`)
-        .then(r => r.json()),
-
-      fetch(`${API}/api/surge?lat=${lat}&lng=${lng}&t=${Date.now()}`)
-        .then(r => r.json())
+      fetch(`${API}/api/events${gpsQ}`).then(r=>r.json()),
+      fetch(`${API}/api/surge`).then(r=>r.json()),
     ]);
-
-    console.log('EVENTS DATA:', evR);
-    console.log('SURGE DATA:', surgeR);
-
-    renderSurgeWindows(surgeR);
-
-    if(evR.success){
-
-      allEvents = (evR.events || []).filter(e => {
-        const hrs = Number(e.hoursAway ?? 0);
-        return hrs > -3 && hrs < 48;
-      });
-
-      renderEvents(allEvents);
-
-    }else{
-      throw new Error(evR.error || 'Events API error');
+    if(surgeR.success){
+      const ws=surgeR.surgeWindows||[];
+      document.getElementById('surgeWindows').innerHTML=ws.length
+        ? ws.map(w=>`<div class="surge-window">
+            <div class="sw-time">${w.label}</div>
+            <div><div style="font-size:13px;font-weight:700;color:var(--text)">${w.reason}</div></div>
+            <div class="sw-mul">${w.multiplier}x</div>
+          </div>`).join('')
+        : '<p style="color:var(--muted)">No surge windows in next 4 hours.</p>';
     }
-
+    if(evR.success){
+      allEvents=(evR.events||[]).filter(e=>e.hoursAway>-3&&e.hoursAway<24);
+      renderEvents(allEvents);
+    }
   }catch(e){
-
-    console.error('EVENTS PAGE ERROR:', e);
-
-    document.getElementById('surgeWindows').innerHTML =
-      '<div style="color:var(--fog);font-size:13px">Could not load surge windows.</div>';
-
-    document.getElementById('eventsList').innerHTML =
-      `<p style="color:var(--mist);font-size:13px">
-        Could not load events: ${e.message}
-      </p>`;
+    document.getElementById('eventsList').innerHTML='<p style="color:var(--muted)">Could not load events.</p>';
   }
-}
-
-function renderSurgeWindows(data){
-
-  const el = document.getElementById('surgeWindows');
-
-  if(!data || !data.success){
-
-    el.innerHTML =
-      '<div style="color:var(--fog);font-size:13px">No surge windows available.</div>';
-
-    return;
-  }
-
-  const ws =
-    data.surgeWindows ||
-    data.windows ||
-    [];
-
-  if(!ws.length){
-
-    el.innerHTML =
-      '<div style="color:var(--fog);font-size:13px">No surge windows in next 4 hours.</div>';
-
-    return;
-  }
-
-  el.innerHTML = ws.map(w => {
-
-    const label =
-      w.label ||
-      w.time ||
-      w.window ||
-      'Soon';
-
-    const reason =
-      w.reason ||
-      w.name ||
-      'Demand signal detected';
-
-    const multiplier =
-      w.multiplier ||
-      w.surgeMultiplier ||
-      '1.0';
-
-    return `
-      <div class="surge-window">
-        <div class="sw-time">${label}</div>
-
-        <div>
-          <div style="font-size:13px;font-weight:700;color:var(--white)">
-            ${reason}
-          </div>
-        </div>
-
-        <div class="sw-mul">${multiplier}x</div>
-      </div>
-    `;
-  }).join('');
 }
 
 function renderEvents(events){
-
-  const el = document.getElementById('eventsList');
-
-  if(!events.length){
-
-    el.innerHTML =
-      '<div style="color:var(--fog);font-size:13px">No events found for this filter.</div>';
-
-    return;
-  }
-
-  el.innerHTML = events.map(e => {
-
-    const hrs = Number(e.hoursAway ?? 0);
-
-    const timing =
-      hrs < -0.5
-        ? `Ended ${Math.abs(hrs).toFixed(1)}h ago`
-        : hrs < 0.5
-          ? '🔴 Happening NOW'
-          : hrs < 2
-            ? `⚡ In ${(hrs * 60).toFixed(0)} min`
-            : hrs < 24
-              ? `In ${hrs.toFixed(1)}h`
-              : 'Tomorrow';
-
-    const type = e.type || '';
-
-    const ico =
-      type === 'Sports'
-        ? '🏈'
-        : type.toLowerCase().includes('music')
-          ? '🎵'
-          : '🎭';
-
-    const cls =
-      e.surgeWindow
-        ? 'surge'
-        : hrs < 0 && hrs > -2
-          ? 'hot'
-          : '';
-
-    const lat =
-      e.venueLat ||
-      e.lat ||
-      e.latitude;
-
-    const lng =
-      e.venueLng ||
-      e.lng ||
-      e.longitude;
-
-    const name =
-      e.name ||
-      e.team ||
-      'Event';
-
-    const venue =
-      e.venueName ||
-      e.venue ||
-      e.zone ||
-      'Chicago';
-
-    const zone =
-      e.zone ||
-      e.city ||
-      'Chicago';
-
-    const capacity =
-      Number(e.capacity || e.attendees || 0);
-
-    const expectedRiders =
-      e.rideImpact?.expectedRiders ||
-      e.expectedRiders ||
-      null;
-
-    return `
-      <div class="event-full ${cls}">
-
-        <div class="ev-header">
-          <div class="ev-icon">${ico}</div>
-
-          <div style="flex:1">
-            <div class="ev-title">${name}</div>
-            <div class="ev-venue">${venue}</div>
-            <div class="ev-time">${timing}</div>
-          </div>
+  const el=document.getElementById('eventsList');
+  if(!events.length){el.innerHTML='<p style="color:var(--muted)">No events found.</p>';return}
+  el.innerHTML=events.map(e=>{
+    const hrs=e.hoursAway;
+    const timing=hrs<-0.5?`Ended ${Math.abs(hrs).toFixed(1)}h ago`:hrs<0.5?'🔴 NOW':hrs<2?`⚡ ${(hrs*60).toFixed(0)}min`:hrs<12?`${hrs.toFixed(1)}h`:'Tomorrow';
+    const ico=e.type==='Sports'?'🏈':e.type?.toLowerCase().includes('music')?'🎵':'🎭';
+    const cls=e.surgeWindow?'surge':hrs<0&&hrs>-2?'hot':'';
+    const attendees=e.attendees?`<div class="chip" style="background:rgba(72,176,247,.1);color:#48b0f7;border:1px solid rgba(72,176,247,.2)">👥 ~${e.attendees.toLocaleString()} attending</div>`:'';
+    return `<div class="event-card ${cls}">
+      <div class="ev-header">
+        <div class="ev-icon">${ico}</div>
+        <div style="flex:1">
+          <div class="ev-title">${e.name||'Event'}</div>
+          <div class="ev-venue">${e.venueName||e.city||''}</div>
+          <div class="ev-time">${timing}</div>
         </div>
-
-        <div class="ev-chips">
-
-          <div class="chip chip-fog">
-            ${zone}
-          </div>
-
-          ${
-            capacity > 0
-              ? `<div class="chip chip-red">🔥 ${capacity.toLocaleString()} cap</div>`
-              : ''
-          }
-
-          ${
-            expectedRiders
-              ? `<div class="chip chip-amber">🚗 ${expectedRiders} riders</div>`
-              : ''
-          }
-
-          ${
-            e.surgeWindow
-              ? '<div class="chip chip-amber">⚡ Surge Window</div>'
-              : ''
-          }
-
-          ${
-            type === 'Sports'
-              ? `<div class="chip chip-blue">🏆 ${e.team || 'Game'}</div>`
-              : ''
-          }
-
-        </div>
-
-        <div class="ev-actions">
-
-          ${
-            lat && lng
-              ? `<button class="btn btn-sec btn-sm" onclick="nav(${lat},${lng})">🧭 Go to Venue</button>`
-              : `<button class="btn btn-sec btn-sm" onclick="nav(41.8781,-87.6298)">🧭 Go Downtown</button>`
-          }
-
-          <button class="btn btn-ghost btn-sm" onclick="alert('Zone: ${zone}')">
-            📍 Zone Info
-          </button>
-
-        </div>
-
       </div>
-    `;
+      <div class="ev-chips">
+        <div class="chip" style="background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--line)">${e.city||'Nearby'}</div>
+        ${attendees}
+        ${e.surgeWindow?'<div class="chip" style="background:rgba(255,184,46,.1);color:var(--amber);border:1px solid rgba(255,184,46,.2)">⚡ Surge Window</div>':''}
+        ${e.rideImpact?.expectedRiders?`<div class="chip" style="background:rgba(124,92,255,.1);color:var(--purple);border:1px solid rgba(124,92,255,.2)">🚗 ~${e.rideImpact.expectedRiders} riders</div>`:''}
+      </div>
+      <div class="ev-actions">
+        ${e.venueLat?`<button class="btn btn-mint btn-sm" onclick="nav(${e.venueLat},${e.venueLng})">🧭 Go to Zone</button>`:'<div></div>'}
+        <button class="btn btn-ghost btn-sm">📍 ${e.city||'Zone'}</button>
+      </div>
+    </div>`;
   }).join('');
 }
 
 function filterEvents(type, el){
-
-  document.querySelectorAll('.tf').forEach(t => {
-    t.classList.remove('on');
-  });
-
+  document.querySelectorAll('.tf').forEach(t=>t.classList.remove('on'));
   el.classList.add('on');
-
-  const filtered =
-    type === 'all'
-      ? allEvents
-      : type === 'music'
-        ? allEvents.filter(e => e.type !== 'Sports')
-        : type === 'sports'
-          ? allEvents.filter(e => e.type === 'Sports')
-          : allEvents.filter(e => e.surgeWindow);
-
-  renderEvents(filtered);
+  const f=type==='all'?allEvents:type==='music'?allEvents.filter(e=>e.type!=='Sports'):type==='sports'?allEvents.filter(e=>e.type==='Sports'):allEvents.filter(e=>e.surgeWindow);
+  renderEvents(f);
 }
+
+function nav(lat,lng){window.location.href=`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`}
 
 load();
 </script>
-
 </body>
 </html>
