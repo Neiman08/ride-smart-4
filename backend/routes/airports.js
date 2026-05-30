@@ -106,101 +106,104 @@ router.get('/', async (req, res) => {
       });
     }
 
-    const enriched = await Promise.all(
-      airports.map(async (airport) => {
-        const iata = airport.iataCode;
-        const peakHour = (hour >= 7 && hour <= 9) || (hour >= 16 && hour <= 19);
+    // ── for...of (sequential) en vez de Promise.all ──────────
+    // Evita que AeroDataBox bloquee una llamada por dos requests simultáneos.
+    // ORD se procesa primero, MDW después — cada uno con su propia ventana.
+    const enriched = [];
 
-        let fd = {
-          flights: [],
-          arrivalsPerHour: 0,
-          passengerLoad: 0,
-          expectedRiders: 0,
-          delayedCount: 0,
-          isReal: false,
-          provider: 'No data',
-          dataNote: 'Sin vuelos reales en la ventana seleccionada'
-        };
+    for (const airport of airports) {
+      const iata = airport.iataCode;
+      const peakHour = (hour >= 7 && hour <= 9) || (hour >= 16 && hour <= 19);
 
-        try {
-          if (iata) {
-            fd = await fetchFlightsForAirport(iata, airport.lat, airport.lng);
-          }
-        } catch (e) {
-          console.error(`Flight fetch error for ${iata}:`, e.message);
+      let fd = {
+        flights: [],
+        arrivalsPerHour: 0,
+        passengerLoad: 0,
+        expectedRiders: 0,
+        delayedCount: 0,
+        isReal: false,
+        provider: 'No data',
+        dataNote: 'Sin vuelos reales en la ventana seleccionada'
+      };
+
+      try {
+        if (iata) {
+          fd = await fetchFlightsForAirport(iata, airport.lat, airport.lng);
         }
+      } catch (e) {
+        console.error(`Flight fetch error for ${iata}:`, e.message);
+      }
 
-        const hasReal = !!fd.isReal;
-        const flights = hasReal ? (fd.flights || []) : [];
-        const arrPhr = hasReal ? Number(fd.arrivalsPerHour || 0) : 0;
+      const hasReal = !!fd.isReal;
+      const flights = hasReal ? (fd.flights || []) : [];
+      const arrPhr = hasReal ? Number(fd.arrivalsPerHour || 0) : 0;
 
-        const queueLevel = Math.min(
-          90,
-          30 + (arrPhr * 2) + (peakHour ? 20 : 0) + ((airport.distMiles || 999) < 10 ? 10 : 0)
-        );
+      const queueLevel = Math.min(
+        90,
+        30 + (arrPhr * 2) + (peakHour ? 20 : 0) + ((airport.distMiles || 999) < 10 ? 10 : 0)
+      );
 
-        const demandScore = Math.min(
-          100,
-          50 + (arrPhr * 1.5) + (peakHour ? 20 : 0)
-        );
+      const demandScore = Math.min(
+        100,
+        50 + (arrPhr * 1.5) + (peakHour ? 20 : 0)
+      );
 
-        const estimatedHourly = (airport.distMiles || 999) < 15 ? 38 : 34;
+      const estimatedHourly = (airport.distMiles || 999) < 15 ? 38 : 34;
 
-        const safeFlights = flights.slice(0, 8).map(f => ({
-          flightNumber: f.flightNumber || '--',
-          airline: f.airline || '--',
-          origin: f.origin || '--',
-          originCity: f.originCity || f.origin || '--',
-          destination: f.destination || iata || '--',
-          status: f.status || 'Scheduled',
-          scheduledTime: f.scheduledTime || '--',
-          delayMinutes: Number(f.delayMinutes || 0),
-          aircraftType: f.aircraftType || '',
-          passengerCount: Number(f.passengerCount || 0),
-          passengerLabel: f.passengerLabel || 'Estimated passengers',
-          terminal: f.terminal || '',
-          gate: f.gate || '',
-          baggageBelt: f.baggageBelt || '',
-          isReal: !!f.isReal,
-          isEstimate: !!f.isEstimate,
-          provider: f.provider || fd.provider || 'No data'
-        }));
+      const safeFlights = flights.slice(0, 8).map(f => ({
+        flightNumber: f.flightNumber || '--',
+        airline: f.airline || '--',
+        origin: f.origin || '--',
+        originCity: f.originCity || f.origin || '--',
+        destination: f.destination || iata || '--',
+        status: f.status || 'Scheduled',
+        scheduledTime: f.scheduledTime || '--',
+        delayMinutes: Number(f.delayMinutes || 0),
+        aircraftType: f.aircraftType || '',
+        passengerCount: Number(f.passengerCount || 0),
+        passengerLabel: f.passengerLabel || 'Estimated passengers',
+        terminal: f.terminal || '',
+        gate: f.gate || '',
+        baggageBelt: f.baggageBelt || '',
+        isReal: !!f.isReal,
+        isEstimate: !!f.isEstimate,
+        provider: f.provider || fd.provider || 'No data'
+      }));
 
-        return {
-          code: iata || airport.name?.slice(0, 3).toUpperCase() || '???',
-          name: airport.name,
-          lat: airport.lat,
-          lng: airport.lng,
-          distMiles: Math.round((airport.distMiles || 0) * 10) / 10,
-          driveMinutes: airport.driveMinutes || null,
+      enriched.push({
+        code: iata || airport.name?.slice(0, 3).toUpperCase() || '???',
+        name: airport.name,
+        lat: airport.lat,
+        lng: airport.lng,
+        distMiles: Math.round((airport.distMiles || 0) * 10) / 10,
+        driveMinutes: airport.driveMinutes || null,
 
-          arrivalsPerHour: arrPhr,
-          queueLevel,
-          demandScore,
-          estimatedHourly,
+        arrivalsPerHour: arrPhr,
+        queueLevel,
+        demandScore,
+        estimatedHourly,
 
-          passengerLoad: hasReal ? Number(fd.passengerLoad || 0) : 0,
-          expectedRiders: hasReal ? Number(fd.expectedRiders || 0) : 0,
-          delayedCount: hasReal ? Number(fd.delayedCount || 0) : 0,
+        passengerLoad: hasReal ? Number(fd.passengerLoad || 0) : 0,
+        expectedRiders: hasReal ? Number(fd.expectedRiders || 0) : 0,
+        delayedCount: hasReal ? Number(fd.delayedCount || 0) : 0,
 
-          dataNote: hasReal
-            ? (fd.dataNote || '📡 Live flight data')
-            : 'Sin vuelos reales en la ventana seleccionada',
+        dataNote: hasReal
+          ? (fd.dataNote || '📡 Live flight data')
+          : 'Sin vuelos reales en la ventana seleccionada',
 
-          provider: hasReal
-            ? (fd.provider || 'AeroDataBox')
-            : 'No data',
+        provider: hasReal
+          ? (fd.provider || 'AeroDataBox')
+          : 'No data',
 
-          action:
-            queueLevel > 70 ? '⚠️ Queue Full'
-            : queueLevel > 40 ? '⚡ Moderate Queue'
-            : '✅ Go Now',
+        action:
+          queueLevel > 70 ? '⚠️ Queue Full'
+          : queueLevel > 40 ? '⚡ Moderate Queue'
+          : '✅ Go Now',
 
-          flights: safeFlights,
-          hasRealData: safeFlights.some(f => f.isReal && !f.isEstimate)
-        };
-      })
-    );
+        flights: safeFlights,
+        hasRealData: safeFlights.some(f => f.isReal && !f.isEstimate)
+      });
+    }
 
     // Sort: ORD first, MDW second, then by demand score
     const ORDER = ['ORD','MDW','JFK','LGA','EWR','LAX','MIA','FLL','IAH','HOU','DFW','DAL','ATL','LAS','MCO'];

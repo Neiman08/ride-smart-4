@@ -1,9 +1,10 @@
 /**
  * Ride Smart 4.0 — Flight Intelligence Service
  * Ventana: próximas 3 horas de vuelos reales
- * * Actualizaciones: 
+ * Actualizaciones: 
  * 1. Cache TTL extendido a 10 min.
- * 2. Logging detallado en errores de red/API.
+ * 2. Cache solo se guarda si datos son REALES (no estimados).
+ * 3. Logging detallado en errores de red/API.
  */
 
 import axios from 'axios';
@@ -98,7 +99,7 @@ function pax(aircraftText, capacityFromApi) {
 }
 
 const AIRLINE_AVG_PAX = {
-  WN: 143, NK: 186, F9: 186, B6: 150, G4: 155, SY: 143, AA: 145, 
+  WN: 143, NK: 186, F9: 186, B6: 150, G4: 155, SY: 143, AA: 145,
   UA: 145, DL: 145, AS: 143, MQ: 76, YV: 76, OO: 76, OH: 76, CP: 76,
 };
 
@@ -135,7 +136,7 @@ function minutesFromNowLocal(localTimeStr, iataCode) {
       return Math.round((new Date(localTimeStr).getTime() - Date.now()) / 60000);
     }
     const clean = localTimeStr.replace(/[TZ]?([+-]\d{2}:\d{2}|Z)$/, '');
-    const parsedAsUTC = new Date(clean + 'Z'); 
+    const parsedAsUTC = new Date(clean + 'Z');
     const airportOffsetMins = AIRPORT_TZ[iataCode] ?? -300;
     const trueFlightUTC = parsedAsUTC.getTime() - (airportOffsetMins * 60000);
     return Math.round((trueFlightUTC - Date.now()) / 60000);
@@ -169,26 +170,31 @@ async function fromAviationStack(iata) {
     if (!data?.data?.length) return null;
     return data.data.map(f => {
       const acType = f.aircraft?.iata || f.aircraft?.icao || '';
-      const airlineCode = f.airline?.iata || f.flight?.iata?.slice(0,2) || '';
+      const airlineCode = f.airline?.iata || f.flight?.iata?.slice(0, 2) || '';
       const timeStr = f.arrival?.estimated || f.arrival?.scheduled || '';
       return {
-        flightNumber: f.flight?.iata || '—',
-        airline: f.airline?.name || '',
-        origin: f.departure?.iata || '—',
-        originCity: f.departure?.airport || '',
-        destination: iata,
-        status: normalizeStatus(f.flight_status),
-        scheduledTime: formatTime(timeStr),
+        flightNumber:     f.flight?.iata || '—',
+        airline:          f.airline?.name || '',
+        origin:           f.departure?.iata || '—',
+        originCity:       f.departure?.airport || '',
+        destination:      iata,
+        status:           normalizeStatus(f.flight_status),
+        scheduledTime:    formatTime(timeStr),
         minutesToArrival: minutesFromNowLocal(timeStr, iata),
-        delayMinutes: Number(f.arrival?.delay || 0),
-        aircraftType: acType,
-        passengerCount: paxWithFallback(acType, 0, airlineCode),
-        passengerLabel: 'Estimated passengers',
-        terminal: f.arrival?.terminal || '',
-        gate: f.arrival?.gate || '',
+        delayMinutes:     Number(f.arrival?.delay || 0),
+        aircraftType:     acType,
+        passengerCount:   paxWithFallback(acType, 0, airlineCode),
+        passengerLabel:   'Estimated passengers',
+        terminal:         f.arrival?.terminal || '',
+        gate:             f.arrival?.gate || '',
         isReal: true, provider: 'AviationStack',
       };
-    }).filter(f => f.minutesToArrival !== null && f.minutesToArrival >= 0 && f.minutesToArrival <= 180 && f.status !== 'Cancelled');
+    }).filter(f =>
+      f.minutesToArrival !== null &&
+      f.minutesToArrival >= 0 &&
+      f.minutesToArrival <= 180 &&
+      f.status !== 'Cancelled'
+    );
   } catch (e) {
     console.warn('[Flight] AviationStack:', e.response?.status, e.message);
     return null;
@@ -199,34 +205,51 @@ async function fromAeroDataBox(iata) {
   const key = process.env.RAPIDAPI_KEY;
   if (!key) return null;
   try {
-    const { data } = await axios.get(`https://aerodatabox.p.rapidapi.com/flights/airports/iata/${iata}`, {
-      headers: { 'x-rapidapi-key': key, 'x-rapidapi-host': 'aerodatabox.p.rapidapi.com' },
-      params: { offsetMinutes: 0, durationMinutes: 180, withLeg: true, direction: 'Arrival', withCancelled: false },
-      timeout: 10000,
-    });
+    const { data } = await axios.get(
+      `https://aerodatabox.p.rapidapi.com/flights/airports/iata/${iata}`,
+      {
+        headers: {
+          'x-rapidapi-key':  key,
+          'x-rapidapi-host': 'aerodatabox.p.rapidapi.com',
+        },
+        params: {
+          offsetMinutes:   0,
+          durationMinutes: 180,
+          withLeg:         true,
+          direction:       'Arrival',
+          withCancelled:   false,
+        },
+        timeout: 10000,
+      }
+    );
     const arrivals = data.arrivals || [];
     return arrivals.map(f => {
       const timeStr = f.arrival?.revisedTime?.local || f.arrival?.scheduledTime?.local || '';
-      const mins = minutesFromNowLocal(timeStr, iata);
-      const acText = [f.aircraft?.model, f.aircraft?.modelCode, f.aircraft?.icao].filter(Boolean).join(' ');
+      const mins    = minutesFromNowLocal(timeStr, iata);
+      const acText  = [f.aircraft?.model, f.aircraft?.modelCode, f.aircraft?.icao].filter(Boolean).join(' ');
       return {
-        flightNumber: f.number || f.callSign || '—',
-        airline: f.airline?.name || '',
-        origin: f.departure?.airport?.iata || '—',
-        originCity: f.departure?.airport?.municipalityName || '',
-        destination: iata,
-        status: (mins !== null && mins <= 15 && mins >= 0) ? 'Arriving' : normalizeStatus(f.status),
-        scheduledTime: formatTime(timeStr),
+        flightNumber:     f.number || f.callSign || '—',
+        airline:          f.airline?.name || '',
+        origin:           f.departure?.airport?.iata || '—',
+        originCity:       f.departure?.airport?.municipalityName || '',
+        destination:      iata,
+        status:           (mins !== null && mins <= 15 && mins >= 0) ? 'Arriving' : normalizeStatus(f.status),
+        scheduledTime:    formatTime(timeStr),
         minutesToArrival: mins,
-        delayMinutes: Number(f.arrival?.delayMinutes || 0),
-        aircraftType: f.aircraft?.model || '',
-        passengerCount: paxWithFallback(acText, f.aircraft?.capacity || 0, f.airline?.iata || ''),
-        passengerLabel: 'Estimated passengers',
-        terminal: f.arrival?.terminal || '',
-        gate: f.arrival?.gate || '',
+        delayMinutes:     Number(f.arrival?.delayMinutes || 0),
+        aircraftType:     f.aircraft?.model || '',
+        passengerCount:   paxWithFallback(acText, f.aircraft?.capacity || 0, f.airline?.iata || ''),
+        passengerLabel:   'Estimated passengers',
+        terminal:         f.arrival?.terminal || '',
+        gate:             f.arrival?.gate || '',
         isReal: true, provider: 'AeroDataBox',
       };
-    }).filter(f => f.minutesToArrival !== null && f.minutesToArrival >= 0 && f.minutesToArrival <= 180 && f.status !== 'Landed');
+    }).filter(f =>
+      f.minutesToArrival !== null &&
+      f.minutesToArrival >= 0 &&
+      f.minutesToArrival <= 180 &&
+      f.status !== 'Landed'
+    );
   } catch (e) {
     console.warn('[Flight] AeroDataBox:', e.response?.status, e.message);
     return null;
@@ -234,29 +257,30 @@ async function fromAeroDataBox(iata) {
 }
 
 // ── SMART ESTIMATE (FALLBACK) ─────────────────────────────
-const PROFILES = { ATL:{h:110},ORD:{h:85},LAX:{h:80},DFW:{h:80},DEN:{h:65},JFK:{h:60},MDW:{h:28} };
-const AIRLINES_EST = [{c:'AA',n:'American'},{c:'UA',n:'United'},{c:'DL',n:'Delta'},{c:'WN',n:'Southwest'}];
-const ORIGINS_EST = [{i:'LAX',c:'Los Angeles'},{i:'JFK',c:'New York'},{i:'MIA',c:'Miami'}];
-const AC_TYPES_EST = [{name:'Boeing 737-800', seats:162},{name:'Airbus A320', seats:150}];
+const PROFILES      = { ATL:{h:110}, ORD:{h:85}, LAX:{h:80}, DFW:{h:80}, DEN:{h:65}, JFK:{h:60}, MDW:{h:28} };
+const AIRLINES_EST  = [{ c:'AA', n:'American' }, { c:'UA', n:'United' }, { c:'DL', n:'Delta' }, { c:'WN', n:'Southwest' }];
+const ORIGINS_EST   = [{ i:'LAX', c:'Los Angeles' }, { i:'JFK', c:'New York' }, { i:'MIA', c:'Miami' }];
+const AC_TYPES_EST  = [{ name:'Boeing 737-800', seats:162 }, { name:'Airbus A320', seats:150 }];
 
 function buildEstimate(iata) {
-  const h = new Date().getHours();
+  const h    = new Date().getHours();
   const base = PROFILES[iata]?.h || 12;
-  const tmul = h>=6&&h<=9?1.4 : h>=15&&h<=19?1.5 : 0.6;
+  const tmul = h >= 6 && h <= 9 ? 1.4 : h >= 15 && h <= 19 ? 1.5 : 0.6;
   const count = Math.min(Math.round(base * tmul * 3), 18);
-  return Array.from({length: count}, (_, i) => {
+  return Array.from({ length: count }, (_, i) => {
     const mo = Math.round((i / Math.max(count - 1, 1)) * 170) + 10;
     const ac = AC_TYPES_EST[i % AC_TYPES_EST.length];
     return {
-      flightNumber: AIRLINES_EST[i % 4].c + (1000 + i),
-      airline: AIRLINES_EST[i % 4].n,
-      origin: ORIGINS_EST[i % 3].i,
-      destination: iata,
-      status: mo <= 15 ? 'Arriving' : 'Scheduled',
-      scheduledTime: formatTime(new Date(Date.now() + mo * 60000).toISOString()),
+      flightNumber:     AIRLINES_EST[i % 4].c + (1000 + i),
+      airline:          AIRLINES_EST[i % 4].n,
+      origin:           ORIGINS_EST[i % 3].i,
+      originCity:       ORIGINS_EST[i % 3].c,
+      destination:      iata,
+      status:           mo <= 15 ? 'Arriving' : 'Scheduled',
+      scheduledTime:    formatTime(new Date(Date.now() + mo * 60000).toISOString()),
       minutesToArrival: mo,
-      aircraftType: ac.name,
-      passengerCount: Math.round(ac.seats * 0.84),
+      aircraftType:     ac.name,
+      passengerCount:   Math.round(ac.seats * 0.84),
       isReal: false, isEstimate: true, provider: 'Smart Estimate',
     };
   });
@@ -264,7 +288,7 @@ function buildEstimate(iata) {
 
 // ── MAIN EXPORT ───────────────────────────────────────────
 
-export async function fetchFlightsForAirport(iata, airportLat, airportLng) {
+export async function fetchFlightsForAirport(iata) {
   if (!iata) return {
     flights: [], arrivalsPerHour: 0, passengerLoad: 0, expectedRiders: 0,
     isReal: false, delayedCount: 0, provider: 'No data', dataNote: 'No IATA code',
@@ -274,8 +298,20 @@ export async function fetchFlightsForAirport(iata, airportLat, airportLng) {
   if (cached) return cached;
 
   let flights = await fromAeroDataBox(iata);
-  if (!flights || !flights.length) flights = await fromAviationStack(iata);
-  if (!flights || !flights.length) flights = buildEstimate(iata);
+
+  // Segundo intento si AeroDataBox devuelve vacío
+  if (!flights || !flights.length) {
+    console.log(`[Flights] ${iata} AeroDataBox empty, retrying...`);
+    flights = await fromAeroDataBox(iata);
+  }
+
+  if (!flights || !flights.length) {
+    flights = await fromAviationStack(iata);
+  }
+
+  if (!flights || !flights.length) {
+    flights = buildEstimate(iata);
+  }
 
   const isReal         = flights.some(f => f.isReal && !f.isEstimate);
   const passengerLoad  = flights.reduce((s, f) => s + Number(f.passengerCount || 0), 0);
@@ -285,20 +321,27 @@ export async function fetchFlightsForAirport(iata, airportLat, airportLng) {
 
   const result = {
     flights,
-    arrivalsPerHour: flights.length,
-    arrivingNext30: arrivingSoon.length,
+    arrivalsPerHour:  flights.length,
+    arrivingNext30:   arrivingSoon.length,
     passengerLoad,
     expectedRiders,
     isReal,
-    provider: flights[0]?.provider || 'Smart Estimate',
-    dataNote: isReal
+    provider:  flights[0]?.provider || 'Smart Estimate',
+    dataNote:  isReal
       ? `📡 Live: ${flights.length} vuelos próx. 3h · ~${passengerLoad} pasajeros · ~${expectedRiders} riders`
       : `📊 Estimado · API limit/fallback active`,
     delayedCount,
     fromCache: false,
   };
 
-  saveFlightsCache(iata, result);
+  // ── CAMBIO SOLICITADO ─────────────────────────────────
+  // Solo guardar en caché si los datos son REALES (no estimados).
+  // Si son estimados, se consultará el API de nuevo en el próximo request
+  // para intentar obtener datos reales.
+  if (result.isReal && result.flights.length > 0) {
+    saveFlightsCache(iata, result);
+  }
+
   return result;
 }
 
