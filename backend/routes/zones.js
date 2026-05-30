@@ -83,9 +83,24 @@ router.get('/', async (req, res) => {
         Math.abs(e.venueLat - zone.lat) < 0.1 &&
         Math.abs(e.venueLng - zone.lng) < 0.1
       );
-      const totalAttendees   = zoneEvents.reduce((s,e) => s + (e.attendees||0), 0);
-      const totalEventRiders = zoneEvents.reduce((s,e) => s + (e.rideImpact?.expectedRiders||0), 0);
-      const eventRideImpact  = zoneEvents.reduce((s,e) => s + (e.rideImpact?.score||0), 0);
+
+      // Límites de asistentes y riders
+      const totalAttendees = Math.min(
+        zoneEvents.reduce((s,e) => s + (e.attendees || 0), 0),
+        12000
+      );
+
+      const totalEventRiders = Math.min(
+        zoneEvents.reduce((s,e) => s + (e.rideImpact?.expectedRiders || 0), 0),
+        3500
+      );
+
+      // Límite de impacto de eventos (Score capped a 100)
+      const eventRideImpact = Math.min(
+        zoneEvents.reduce((s,e) => s + (e.rideImpact?.score || 0), 0),
+        100
+      );
+
       const eventSurgeActive = zoneEvents.some(e => e.surgeWindow);
 
       const baseHourly = zone.isAirport ? 36 : zone.type==='Stadium'?34:zone.type==='University'?28:zone.type==='Nightlife'?32:26;
@@ -108,7 +123,7 @@ router.get('/', async (req, res) => {
         airportQueue:    zone.isAirport ? Math.min(100, flightScore*0.8+peakHour*0.2) : 0,
         surgeMultiplier: peakHour>=80?1.3:peakHour>=65?1.15:1.0,
         evChargingNear:  zone.distMiles<=5,
-        // NEW: real passenger + event data
+        // Passenger + event data con caps aplicados
         passengerLoad:        fd.passengerLoad,
         expectedFlightRiders: fd.expectedRiders,
         delayedFlights:       fd.delayedCount || 0,
