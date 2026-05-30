@@ -4,365 +4,362 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
 <title>Ride Smart 4.0 · Brain</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="styles/rs4-pro.css"/>
-
 <style>
-.brain-hero{
-  background:linear-gradient(145deg,rgba(124,92,255,.14),rgba(25,246,162,.06)),var(--panel);
-  border:1px solid var(--line);
-  border-radius:28px;
-  padding:24px;
-  margin-bottom:18px;
-  text-align:center;
-  box-shadow:var(--shadow);
-}
-.brain-num{
-  font-family:var(--head);
-  font-size:68px;
-  font-weight:900;
-  color:var(--purple);
-  line-height:1;
-}
-.card{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:24px;
-  padding:18px;
-  margin-bottom:16px;
-  box-shadow:var(--shadow);
-}
-.card-glow{
-  background:linear-gradient(135deg,rgba(124,92,255,.12),rgba(25,246,162,.04)),var(--panel);
-}
-.stats2{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:10px;
-}
-.stat-box{
-  background:rgba(255,255,255,.045);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:12px;
-  text-align:center;
-}
-.stat-l{
-  font-family:var(--mono);
-  font-size:8px;
-  color:var(--soft);
-  letter-spacing:1px;
-  font-weight:800;
-}
-.stat-v{
-  font-family:var(--mono);
-  font-size:18px;
-  font-weight:900;
-  color:var(--text);
-  margin-top:6px;
-}
-.zone-rank{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:13px;
-  background:rgba(255,255,255,.045);
-  border:1px solid var(--line);
-  border-radius:16px;
-  margin-bottom:8px;
-}
-.ai-row{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:12px 0;
-  border-bottom:1px solid var(--line);
-  font-size:13px;
-  font-weight:700;
-  color:var(--text);
-}
-.ai-row:last-child{border:none}
-.ai-dot{
-  width:7px;
-  height:7px;
-  border-radius:50%;
-  flex-shrink:0;
-}
-.ai-dot.on{
-  background:var(--green);
-  box-shadow:0 0 8px var(--green);
-}
-.ai-dot.off{background:var(--red)}
-.ai-val{
-  margin-left:auto;
-  font-family:var(--mono);
-  font-size:11px;
-  letter-spacing:.5px;
-  white-space:nowrap;
-}
-.ord-item{
-  padding:13px;
-  background:rgba(255,255,255,.045);
-  border:1px solid var(--line);
-  border-radius:16px;
-  margin-bottom:8px;
-}
-@media(max-width:768px){
-  .stats2{grid-template-columns:repeat(2,1fr)}
-  .brain-num{font-size:54px}
-}
+.brain-hero{background:linear-gradient(145deg,rgba(124,92,255,.1),rgba(25,246,162,.05));border:1px solid rgba(124,92,255,.2);border-radius:22px;padding:20px;margin-bottom:12px;text-align:center;position:relative;overflow:hidden}
+.brain-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(124,92,255,.12),transparent 60%);pointer-events:none}
+.brain-num{font-family:var(--mono);font-size:52px;font-weight:700;color:var(--purple);line-height:1;position:relative}
+.signal-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.sig-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;align-items:center;gap:10px}
+.sig-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sig-dot.on{background:var(--green);box-shadow:0 0 8px var(--green)}
+.sig-dot.warn{background:var(--amber);box-shadow:0 0 8px var(--amber)}
+.sig-dot.off{background:var(--red)}
+.sig-label{font-size:12px;font-weight:600;color:var(--text);flex:1}
+.sig-val{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.zone-rank{display:flex;align-items:center;gap:10px;padding:11px 13px;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:14px;margin-bottom:6px;cursor:pointer;transition:.15s}
+.zone-rank:active{transform:scale(.98)}
+.zr-num{font-family:var(--mono);font-size:13px;color:var(--soft);width:22px}
+.zr-name{font-size:13px;font-weight:700;color:var(--text);flex:1}
+.zr-meta{font-size:11px;color:var(--muted);margin-top:1px}
+.zr-score{font-family:var(--mono);font-size:22px;font-weight:700}
+.pattern-card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:8px}
+.pattern-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.pattern-row:last-child{border:none}
+.pr-label{font-size:12px;color:var(--muted);font-weight:600}
+.pr-val{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text)}
+.rec-card{background:linear-gradient(135deg,rgba(124,92,255,.1),rgba(25,246,162,.06));border:1px solid rgba(124,92,255,.22);border-radius:20px;padding:16px;margin-bottom:10px}
+.rec-zone{font-size:24px;font-weight:800;color:var(--text);margin-bottom:4px}
+.rec-conf{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;font-family:var(--mono);font-size:9px;font-weight:700;margin-bottom:10px}
+.conf-high{background:rgba(25,246,162,.12);color:var(--green);border:1px solid rgba(25,246,162,.2)}
+.conf-med{background:rgba(255,184,46,.1);color:var(--amber);border:1px solid rgba(255,184,46,.2)}
+.conf-low{background:rgba(255,77,115,.1);color:var(--red);border:1px solid rgba(255,77,115,.2)}
+.hour-chart{display:flex;align-items:flex-end;gap:3px;height:60px;margin:10px 0}
+.hbar{flex:1;border-radius:3px 3px 0 0;min-height:3px;transition:height .4s}
+.day-chart{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:10px 0}
+.dbar{border-radius:8px;padding:8px 4px;text-align:center}
+.dbar-val{font-family:var(--mono);font-size:11px;font-weight:700}
+.dbar-lbl{font-size:9px;color:var(--muted);margin-top:3px}
 </style>
 </head>
-
 <body>
-
+<div class="app">
 <div class="toast" id="toast"></div>
 
 <div class="page-header">
   <a class="back-btn" href="index.html">← Home</a>
-  <span class="badge-chip">🧠 BRAIN</span>
+  <span class="badge-chip" style="background:linear-gradient(135deg,#7c5cff,#9b7cff)">🧠 BRAIN</span>
 </div>
 
-<div class="hero-eyebrow">AI INTELLIGENCE CORE</div>
+<div class="hero-eyebrow">AI PATTERN ENGINE</div>
+<h1 style="margin-bottom:6px">Brain<br><em style="color:var(--purple)">4.0</em></h1>
+<p style="margin-bottom:16px">Live analytics — all 17 signals, zone patterns, AI predictions.</p>
 
-<h1 style="margin-bottom:8px">
-  AI<br>
-  <em style="color:var(--purple);font-style:normal">Brain 4.0</em>
-</h1>
-
-<p style="margin-bottom:20px">
-  Live analytics — all 15 signals, order history, AI predictions.
-</p>
-
+<!-- BRAIN HERO -->
 <div class="brain-hero">
-  <div style="font-family:var(--mono);font-size:9px;color:var(--soft);letter-spacing:2px;margin-bottom:10px">
-    ORDERS ANALYZED TODAY
-  </div>
-
-  <div class="brain-num" id="totalOrders">0</div>
-
-  <div class="stats2" style="margin-top:18px">
-    <div class="stat-box">
-      <div class="stat-l">BEST $/HR</div>
-      <div class="stat-v" style="color:var(--green)" id="bestHr">--</div>
-    </div>
-
-    <div class="stat-box">
-      <div class="stat-l">BEST $/MI</div>
-      <div class="stat-v" style="color:var(--amber)" id="bestMi">--</div>
-    </div>
-
-    <div class="stat-box">
-      <div class="stat-l">ACCEPT</div>
-      <div class="stat-v" style="color:var(--green)" id="acceptCt">0</div>
-    </div>
-
-    <div class="stat-box">
-      <div class="stat-l">REJECT</div>
-      <div class="stat-v" style="color:var(--red)" id="rejectCt">0</div>
-    </div>
+  <div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--soft);margin-bottom:10px">AI INTELLIGENCE SCORE</div>
+  <div class="brain-num" id="brainScore">--</div>
+  <div style="font-size:13px;color:var(--muted);margin-top:8px" id="brainCity">Analyzing your area...</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px">
+    <div class="mod" style="background:rgba(0,0,0,.2)"><small>TOP ZONE</small><b id="brainTopZone" style="font-size:13px">--</b></div>
+    <div class="mod" style="background:rgba(0,0,0,.2)"><small>EST $/HR</small><b id="brainHr" style="color:var(--green)">--</b></div>
+    <div class="mod" style="background:rgba(0,0,0,.2)"><small>BEST TIME</small><b id="bestTime" style="font-size:11px">--</b></div>
+    <div class="mod" style="background:rgba(0,0,0,.2)"><small>SURGE</small><b id="brainSurge" style="color:var(--amber)">--</b></div>
   </div>
 </div>
 
-<div class="card card-glow">
-  <h2 style="margin-bottom:12px">💰 Today</h2>
+<!-- AI RECOMMENDATION -->
+<div class="rec-card" id="recCard" style="display:none">
+  <div style="font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--purple);margin-bottom:8px">🤖 AI RECOMMENDS NOW</div>
+  <div class="rec-zone" id="recZone">--</div>
+  <div class="rec-conf conf-high" id="recConf">HIGH CONFIDENCE</div>
+  <div style="font-size:13px;color:var(--muted);line-height:1.55" id="recReason">--</div>
+  <button class="btn btn-mint" style="margin-top:12px" id="recNavBtn">🧭 Navigate There</button>
+</div>
 
-  <div class="stats2">
-    <div class="stat-box">
-      <div class="stat-l">EARNED</div>
-      <div class="stat-v" id="todayEarn" style="color:var(--green)">$0.00</div>
-    </div>
+<!-- LIVE SIGNALS -->
+<div class="sec-label">LIVE SIGNALS — ALL 17</div>
+<div class="signal-grid" id="signalGrid">
+  <div class="sig-card"><div class="sig-dot off"></div><div class="sig-label">Loading signals...</div></div>
+</div>
 
-    <div class="stat-box">
-      <div class="stat-l">MILES</div>
-      <div class="stat-v" id="todayMi">0.0</div>
-    </div>
+<!-- BEST ZONES NOW -->
+<div class="sec-label">HOT ZONES RIGHT NOW</div>
+<div id="zoneList"><p style="color:var(--muted)">Loading zones...</p></div>
 
-    <div class="stat-box">
-      <div class="stat-l">HOURS</div>
-      <div class="stat-v" id="todayHrs">0h</div>
-    </div>
+<!-- PATTERN ANALYSIS -->
+<div class="sec-label" id="patternLabel" style="display:none">YOUR PATTERNS (from history)</div>
 
-    <div class="stat-box">
-      <div class="stat-l">NET $/HR</div>
-      <div class="stat-v" id="todayEff" style="color:var(--amber)">--</div>
-    </div>
+<!-- BEST HOURS CHART -->
+<div class="pattern-card" id="hoursCard" style="display:none">
+  <h2 style="margin-bottom:12px">📈 Best Hours</h2>
+  <div class="hour-chart" id="hourChart"></div>
+  <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:8px;color:var(--soft);padding:0 2px">
+    <span>12am</span><span>6am</span><span>12pm</span><span>6pm</span><span>11pm</span>
   </div>
 </div>
 
-<div class="card">
-  <h2 style="margin-bottom:12px">🔥 Best Zones Now</h2>
-  <div id="zoneRanks"><p>Loading...</p></div>
+<!-- BEST DAYS CHART -->
+<div class="pattern-card" id="daysCard" style="display:none">
+  <h2 style="margin-bottom:12px">📅 Best Days</h2>
+  <div class="day-chart" id="dayChart"></div>
 </div>
 
-<div class="card">
-  <h2 style="margin-bottom:12px">📡 Live Signals (15)</h2>
-  <div id="signalsAll"></div>
+<!-- SURGE IMPACT -->
+<div class="pattern-card" id="surgeCard" style="display:none">
+  <h2 style="margin-bottom:12px">⚡ Surge Impact</h2>
+  <div class="pattern-row"><span class="pr-label">During surge</span><span class="pr-val" id="surgeDph">--</span></div>
+  <div class="pattern-row"><span class="pr-label">Normal hours</span><span class="pr-val" id="normalDph">--</span></div>
+  <div class="pattern-row"><span class="pr-label">Surge boost</span><span class="pr-val" id="surgeBoost" style="color:var(--green)">--</span></div>
+  <div class="pattern-row"><span class="pr-label">Surge sessions</span><span class="pr-val" id="surgeSessions">--</span></div>
 </div>
 
-<div class="card">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-    <h2 style="margin-bottom:0">📋 Order History</h2>
-    <button class="btn btn-ghost btn-sm" onclick="clearHist()" style="width:auto">Clear</button>
-  </div>
-
-  <div id="orderHist"><p>No orders yet.</p></div>
+<!-- TODAY VS AVERAGE -->
+<div class="pattern-card" id="todayCard" style="display:none">
+  <h2 style="margin-bottom:12px">📊 Today vs Average</h2>
+  <div class="pattern-row"><span class="pr-label">Today avg $/hr</span><span class="pr-val" id="todayDph">--</span></div>
+  <div class="pattern-row"><span class="pr-label">Historic avg $/hr</span><span class="pr-val" id="histDph">--</span></div>
+  <div class="pattern-row"><span class="pr-label">Trending</span><span class="pr-val" id="todayTrend">--</span></div>
+  <div class="pattern-row"><span class="pr-label">Orders today</span><span class="pr-val" id="todayOrders">--</span></div>
 </div>
+
+<!-- ACCEPT RATE BY ZONE -->
+<div class="sec-label" id="acceptLabel" style="display:none">BEST ZONES (YOUR HISTORY)</div>
+<div id="acceptList"></div>
+
+</div><!-- /app -->
 
 <nav class="nav">
   <a href="index.html"><i>⌂</i>Home</a>
   <a href="airports.html"><i>✈</i>Airports</a>
-  <a href="heatmap.html"><i>🗺</i>Map</a>
+  <a href="/map"><i>🗺</i>Map</a>
   <a href="ev.html"><i>ϟ</i>EV/Fuel</a>
   <a class="on" href="brain.html"><i>🧠</i>Brain</a>
 </nav>
 
 <script src="config.js"></script>
 <script src="gps.js"></script>
-
 <script>
-const API = window.RS4_API || 'https://ride-smart-ai.onrender.com';
+const API = window.RS4_API || 'https://ride-smart-4.onrender.com';
 
-function safeUrl(url){
-  if(window.GPS && typeof GPS.url === 'function'){
-    return GPS.url(url);
-  }
-  return url;
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show';setTimeout(()=>t.classList.remove('show'),2200)}
+
+function scoreColor(s){
+  if(s>=75) return 'var(--green)';
+  if(s>=55) return 'var(--amber)';
+  return 'var(--red)';
 }
 
-function renderStats(){
-  const hist = JSON.parse(localStorage.getItem('rs4_order_history') || '[]');
-
-  document.getElementById('totalOrders').textContent = hist.length;
-
-  const today = new Date().toISOString().slice(0,10);
-  const earn = parseFloat(localStorage.getItem(`rs4_earn_${today}`) || '0');
-  const miles = JSON.parse(localStorage.getItem('ridesmart_miles') || '{}');
-  const hrs = (miles.activeSeconds || 0) / 3600;
-
-  document.getElementById('todayEarn').textContent = '$' + earn.toFixed(2);
-  document.getElementById('todayMi').textContent = (miles.totalMiles || 0).toFixed(1);
-  document.getElementById('todayHrs').textContent = Math.floor(hrs) + 'h ' + Math.round((hrs % 1) * 60) + 'm';
-  document.getElementById('todayEff').textContent = hrs > 0 ? '$' + (earn / hrs).toFixed(2) : '--';
-
-  const acc = hist.filter(o => o.verdict === 'green').length;
-  const rej = hist.filter(o => o.verdict === 'red').length;
-
-  document.getElementById('acceptCt').textContent = acc;
-  document.getElementById('rejectCt').textContent = rej;
-
-  const hrlys = hist.filter(o => o.hrly).map(o => Number(o.hrly));
-  const mis = hist.filter(o => o.dpm).map(o => Number(o.dpm));
-
-  document.getElementById('bestHr').textContent = hrlys.length ? '$' + Math.max(...hrlys).toFixed(0) : '--';
-  document.getElementById('bestMi').textContent = mis.length ? '$' + Math.max(...mis).toFixed(2) : '--';
-
-  const el = document.getElementById('orderHist');
-
-  if(!hist.length){
-    el.innerHTML = '<p>No orders analyzed yet.</p>';
-    return;
-  }
-
-  el.innerHTML = hist.slice(0,12).map(o => `
-    <div class="ord-item">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-        <div style="font-size:11px;font-weight:900;font-family:var(--mono);color:${o.verdict === 'green' ? 'var(--green)' : o.verdict === 'amber' ? 'var(--amber)' : 'var(--red)'}">
-          ${o.verdict === 'green' ? 'ACCEPT' : o.verdict === 'amber' ? 'WAIT' : 'REJECT'}
-        </div>
-
-        <div style="font-family:var(--mono);font-size:16px;font-weight:900">
-          $${parseFloat(o.pay || 0).toFixed(2)}
-        </div>
-      </div>
-
-      <div style="font-size:12px;color:var(--muted)">
-        ${o.dpm ? '$' + parseFloat(o.dpm).toFixed(2) + '/mi' : ''}
-        ${o.hrly ? ' · $' + parseFloat(o.hrly).toFixed(0) + '/hr' : ''}
-        · ${new Date(o.time).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}
-      </div>
-    </div>
-  `).join('');
-}
-
-async function loadSignals(){
+async function load(){
+  const gpsQ = typeof GPS!=='undefined'&&GPS.lat?`?lat=${GPS.lat}&lng=${GPS.lng}`:'';
   try{
-    const [zonesR, eventsR, surgeR] = await Promise.allSettled([
-      fetch(safeUrl(`${API}/api/zones`)).then(r => r.json()),
-      fetch(safeUrl(`${API}/api/events`)).then(r => r.json()),
-      fetch(`${API}/api/surge?t=${Date.now()}`).then(r => r.json())
+    // Load all live signals in parallel
+    const [zonesR, surgeR, eventsR, earningsR, recR] = await Promise.all([
+      fetch(`${API}/api/zones${gpsQ}`).then(r=>r.json()),
+      fetch(`${API}/api/surge`).then(r=>r.json()),
+      fetch(`${API}/api/events${gpsQ}`).then(r=>r.json()),
+      fetch(`${API}/api/earnings-prediction${gpsQ}`).then(r=>r.json()).catch(()=>({})),
+      fetch(`${API}/api/ai/recommendation${gpsQ}`).then(r=>r.json()).catch(()=>({})),
     ]);
 
-    const zones  = zonesR.status  === 'fulfilled' ? zonesR.value  : null;
-    const events = eventsR.status === 'fulfilled' ? eventsR.value : null;
-    const surge  = surgeR.status  === 'fulfilled' ? surgeR.value  : null;
+    const zones = zonesR.bestZones || [];
+    const top = zones[0];
 
-    const z = zones?.bestZones?.[0] || {};
-    const f = JSON.parse(localStorage.getItem('ridesmart_filters') || '{}');
-
-    const signals = [
-      {l:'✈️ Flights O’Hare', on:z.flights > 50, val:z.flights ? Math.round(z.flights) + '%' : '--'},
-      {l:'🎵 Concerts', on:events?.total > 0, val:events?.total ? events.total + ' events' : '--'},
-      {l:'🏈 Sports Events', on:events?.total > 0, val:'Active scan'},
-      {l:'🚦 Traffic Intelligence', on:z.traffic < 70, val:z.traffic ? z.traffic + '% congestion' : '--'},
-      {l:'📈 Demand Index', on:z.estimatedDemand > 60, val:z.estimatedDemand ? Math.round(z.estimatedDemand) + '%' : '--'},
-      {l:'⚡ EV Charging Strategy', on:true, val:'Active'},
-      {l:'🛬 Airport Queue', on:z.airportQueue > 30, val:z.airportQueue ? Math.round(z.airportQueue) + '%' : '--'},
-      {l:'🌤 Weather Boost', on:zones?.weatherData?.rain > 0, val:zones?.weatherData?.desc || '--'},
-      {l:'🔥 Surge Multiplier', on:surge?.isSurgeActive, val:surge?.current?.multiplier ? surge.current.multiplier + 'x' : '1.0x'},
-      {l:'💰 AI $/hr Prediction', on:true, val:'Active'},
-      {l:'🗺️ Heat Map Active', on:true, val:'24h forecast'},
-      {l:'📡 Radar Detection', on:true, val:'Scanning'},
-      {l:'🎯 Auto Accept Engine', on:f.enableAI !== false, val:f.testMode ? 'Test Mode' : 'LIVE'},
-      {l:'👥 Driver Saturation', on:true, val:z.driverSaturation ? Math.round(z.driverSaturation) + '%' : '--'},
-      {l:'📊 Tax Tracking', on:true, val:'Active'}
-    ];
-
-    document.getElementById('signalsAll').innerHTML = signals.map(s => `
-      <div class="ai-row">
-        <div class="ai-dot ${s.on ? 'on' : 'off'}"></div>
-        <div>${s.l}</div>
-        <div class="ai-val" style="color:${s.on ? 'var(--green)' : 'var(--red)'}">${s.val}</div>
-      </div>
-    `).join('');
-
-    if(zones?.bestZones){
-      document.getElementById('zoneRanks').innerHTML =
-        zones.bestZones.slice(0,6).map((z,i) => `
-          <div class="zone-rank">
-            <div style="font-family:var(--mono);font-size:15px;color:var(--muted);width:26px">#${i+1}</div>
-
-            <div style="flex:1">
-              <div style="font-size:14px;font-weight:900;color:var(--text)">${z.name}</div>
-              <div style="font-size:11px;color:var(--muted);margin-top:3px">
-                $${z.estimatedHourly}/hr · AI: $${z.predictedHourly}/hr · ${z.driveTime || '--'}
-              </div>
-            </div>
-
-            <div style="font-family:var(--mono);font-size:22px;font-weight:900;color:${z.score >= 70 ? 'var(--green)' : z.score >= 55 ? 'var(--amber)' : 'var(--red)'}">
-              ${z.score}
-            </div>
-          </div>
-        `).join('');
-    }else{
-      document.getElementById('zoneRanks').innerHTML = '<p>No zone data available.</p>';
+    // BRAIN HERO
+    if(top){
+      document.getElementById('brainScore').textContent = top.score;
+      document.getElementById('brainScore').style.color = scoreColor(top.score);
+      document.getElementById('brainTopZone').textContent = top.name?.split(' ')[0] || '--';
+      document.getElementById('brainHr').textContent = '$' + (top.estimatedHourly||'--');
+      document.getElementById('brainCity').textContent = zonesR.city || 'Your area';
     }
 
+    const surge = surgeR.current?.multiplier || 1.0;
+
+    // Earnings prediction
+    if(earningsR.success){
+      document.getElementById('bestTime').textContent = earningsR.bestTime || '--';
+      const shiftEl = document.getElementById('brainHr');
+      if(shiftEl) shiftEl.textContent = '$'+(earningsR.currentHourly||'--')+'/hr';
+    }
+
+    // AI recommendation override
+    if(recR.success && recR.recommendation){
+      const rec = recR.recommendation;
+      document.getElementById('recCard').style.display='block';
+      document.getElementById('recZone').textContent = rec.zone;
+      const conf = rec.confidence||'MEDIUM';
+      document.getElementById('recConf').className=`rec-conf conf-${conf.toLowerCase()}`;
+      document.getElementById('recConf').textContent = conf+' CONFIDENCE';
+      document.getElementById('recReason').textContent = (rec.reasons||[]).join(' · ')||rec.reasoning||'';
+      document.getElementById('recNavBtn').onclick=()=>nav(rec.lat,rec.lng);
+    }
+    document.getElementById('brainSurge').textContent = surge.toFixed(1) + 'x';
+
+    // LIVE SIGNALS — 17 signals from top zone
+    if(top){
+      const signals = [
+        {label:'Flights', val:top.flights>60?'High':'Moderate', on:top.flights>40, val2:top.flights>0?Math.round(top.flights)+'%':'--'},
+        {label:'Passenger Load', val:top.passengerLoad>0?top.passengerLoad+' pax':'--', on:top.passengerLoad>50},
+        {label:'Expected Riders', val:top.expectedFlightRiders>0?'~'+top.expectedFlightRiders:'--', on:top.expectedFlightRiders>10},
+        {label:'Event Attendees', val:top.eventAttendees>0?top.eventAttendees.toLocaleString():'--', on:top.eventAttendees>1000},
+        {label:'Event Riders', val:top.expectedEventRiders>0?'~'+top.expectedEventRiders:'--', on:top.expectedEventRiders>20},
+        {label:'Traffic', val:top.traffic>70?'Heavy':top.traffic>40?'Moderate':'Clear', on:top.traffic<65, warn:top.traffic>70},
+        {label:'Weather', val:zonesR.weather||'--', on:top.weather>50},
+        {label:'Surge', val:surge.toFixed(1)+'x', on:surge>1.1, warn:surge>1.5},
+        {label:'Peak Hour', val:top.peakHour>70?'Yes':'No', on:top.peakHour>60},
+        {label:'Demand Score', val:top.estimatedDemand?Math.round(top.estimatedDemand)+'%':'--', on:top.estimatedDemand>55},
+        {label:'Driver Saturation', val:top.driverSaturation?Math.round(top.driverSaturation)+'%':'--', on:top.driverSaturation<60, warn:top.driverSaturation>75},
+        {label:'Airport Queue', val:top.airportQueue?Math.round(top.airportQueue)+'%':'--', on:top.airportQueue>30},
+        {label:'Est $/hr', val:'$'+(top.estimatedHourly||'--'), on:top.estimatedHourly>=30},
+        {label:'Predicted $/hr', val:'$'+(top.predictedHourly||'--'), on:top.predictedHourly>=30},
+        {label:'Risk Level', val:top.risk||'LOW', on:top.risk==='LOW', warn:top.risk==='MEDIUM'},
+        {label:'Drive Time', val:top.driveTime||'--', on:true},
+        {label:'Action', val:top.action||'--', on:top.action==='GO NOW', warn:top.action==='WATCH'},
+      ];
+      document.getElementById('signalGrid').innerHTML = signals.map(s=>`
+        <div class="sig-card">
+          <div class="sig-dot ${s.on?'on':s.warn?'warn':'off'}"></div>
+          <div style="flex:1">
+            <div class="sig-label">${s.label}</div>
+          </div>
+          <div class="sig-val">${s.val2||s.val}</div>
+        </div>`).join('');
+    }
+
+    // HOT ZONES LIST
+    document.getElementById('zoneList').innerHTML = zones.slice(0,8).map((z,i)=>`
+      <div class="zone-rank" onclick="nav(${z.lat},${z.lng})">
+        <div class="zr-num">#${i+1}</div>
+        <div style="flex:1">
+          <div class="zr-name">${z.name}</div>
+          <div class="zr-meta">${z.action||''} · ${z.driveTime||'--'}</div>
+        </div>
+        <div class="zr-score" style="color:${scoreColor(z.score)}">${z.score}</div>
+      </div>`).join('');
+
+    // AI RECOMMENDATION
+    if(top){
+      document.getElementById('recCard').style.display='block';
+      document.getElementById('recZone').textContent=top.name;
+      const conf=top.score>=75?'HIGH':top.score>=55?'MEDIUM':'LOW';
+      document.getElementById('recConf').className=`rec-conf conf-${conf.toLowerCase()}`;
+      document.getElementById('recConf').textContent=conf+' CONFIDENCE';
+      document.getElementById('recReason').textContent=(top.insights||[]).slice(0,2).join(' · ')||'Strong earning signals detected.';
+      document.getElementById('recNavBtn').onclick=()=>nav(top.lat,top.lng);
+    }
+
+    // Brain pattern from history
+    loadPatterns(zones);
+
   }catch(e){
-    document.getElementById('signalsAll').innerHTML = '<p>Could not load signals.</p>';
+    console.error('[Brain]', e.message);
+    document.getElementById('zoneList').innerHTML='<p style="color:var(--muted)">Could not load brain data.</p>';
   }
 }
 
-function clearHist(){
-  if(!confirm('Clear order history?')) return;
-  localStorage.removeItem('rs4_order_history');
-  renderStats();
+async function loadPatterns(liveZones){
+  const history = JSON.parse(localStorage.getItem('rs3_shift_log')||'[]');
+  if(!history.length) return;
+
+  try{
+    const resp = await fetch(`${API}/api/brain/analyze`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        history: history.map(h=>({
+          timestamp: h.time||Date.now(),
+          payout: h.amount||0,
+          dollarsPerMile: h.dpm||0,
+          dollarsPerHour: h.dph||0,
+          quality: h.quality||'GOOD',
+          zone: h.zone||'Unknown',
+          surgeMultiplier: h.surge||1,
+        })),
+        currentHour: new Date().getHours(),
+        liveZones: liveZones?.slice(0,5).map(z=>({name:z.name,score:z.score,estimatedHourly:z.estimatedHourly})),
+      })
+    }).then(r=>r.json());
+
+    if(!resp.success||!resp.patterns) return;
+
+    const p = resp.patterns;
+    document.getElementById('patternLabel').style.display='block';
+
+    // Hours chart
+    if(p.bestHoursOfDay?.length){
+      document.getElementById('hoursCard').style.display='block';
+      const maxDph = Math.max(...p.bestHoursOfDay.map(h=>h.avgDph||0));
+      const allHours = Array.from({length:24},(_,i)=>i);
+      document.getElementById('hourChart').innerHTML = allHours.map(h=>{
+        const found = p.bestHoursOfDay.find(x=>x.hour===h);
+        const val = found?.avgDph||0;
+        const pct = maxDph>0 ? Math.max(5,Math.round(val/maxDph*100)) : 5;
+        const col = val>=35?'var(--green)':val>=25?'var(--amber)':'rgba(255,255,255,.1)';
+        const isNow = h===new Date().getHours();
+        return `<div class="hbar" style="height:${pct}%;background:${col};${isNow?'outline:2px solid var(--purple)':''}" title="${h}:00 — $${val.toFixed(0)}/hr"></div>`;
+      }).join('');
+    }
+
+    // Days chart
+    if(p.bestDaysOfWeek?.length){
+      document.getElementById('daysCard').style.display='block';
+      const maxDph = Math.max(...p.bestDaysOfWeek.map(d=>d.avgDph||0));
+      document.getElementById('dayChart').innerHTML = p.bestDaysOfWeek.map(d=>{
+        const pct = maxDph>0 ? Math.round(d.avgDph/maxDph*100) : 0;
+        const col = pct>=80?'rgba(25,246,162,.25)':pct>=50?'rgba(255,184,46,.2)':'rgba(255,255,255,.06)';
+        const textCol = pct>=80?'var(--green)':pct>=50?'var(--amber)':'var(--muted)';
+        return `<div class="dbar" style="background:${col}">
+          <div class="dbar-val" style="color:${textCol}">$${Math.round(d.avgDph)}</div>
+          <div class="dbar-lbl">${d.day}</div>
+        </div>`;
+      }).join('');
+    }
+
+    // Surge impact
+    if(p.surgeImpact){
+      document.getElementById('surgeCard').style.display='block';
+      document.getElementById('surgeDph').textContent='$'+(p.surgeImpact.avgDphDuringSurge||0).toFixed(0)+'/hr';
+      document.getElementById('normalDph').textContent='$'+(p.surgeImpact.avgDphNormal||0).toFixed(0)+'/hr';
+      document.getElementById('surgeBoost').textContent='+'+(p.surgeImpact.surgeBoost||0)+'%';
+      document.getElementById('surgeSessions').textContent=p.surgeImpact.surgeSessions||0;
+    }
+
+    // Today vs average
+    if(p.todayVsAverage){
+      document.getElementById('todayCard').style.display='block';
+      const tv = p.todayVsAverage;
+      document.getElementById('todayDph').textContent='$'+(tv.todayAvgDph||0).toFixed(0)+'/hr';
+      document.getElementById('histDph').textContent='$'+(tv.historicAvgDph||0).toFixed(0)+'/hr';
+      const t=tv.trending;
+      document.getElementById('todayTrend').textContent=t==='UP'?'📈 UP':t==='DOWN'?'📉 DOWN':'→ FLAT';
+      document.getElementById('todayTrend').style.color=t==='UP'?'var(--green)':t==='DOWN'?'var(--red)':'var(--muted)';
+      document.getElementById('todayOrders').textContent=tv.todayOrders||0;
+    }
+
+    // Accept rate by zone
+    if(p.acceptRateByZone?.length){
+      document.getElementById('acceptLabel').style.display='block';
+      document.getElementById('acceptList').innerHTML = p.acceptRateByZone.slice(0,5).map((z,i)=>`
+        <div class="zone-rank">
+          <div class="zr-num">#${i+1}</div>
+          <div style="flex:1">
+            <div class="zr-name">${z.zone}</div>
+            <div class="zr-meta">${z.totalOrders} orders · $${z.avgPay.toFixed(2)} avg</div>
+          </div>
+          <div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--green)">${z.acceptRate}%</div>
+        </div>`).join('');
+    }
+
+  }catch(e){ console.warn('[Brain] Pattern load:', e.message); }
 }
 
-renderStats();
-loadSignals();
-</script>
+function nav(lat,lng){
+  window.location.href=`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
+}
 
+load();
+</script>
 </body>
 </html>

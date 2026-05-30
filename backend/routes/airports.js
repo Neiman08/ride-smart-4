@@ -10,7 +10,92 @@ router.get('/', async (req, res) => {
     const lng = parseFloat(req.query.lng) || -87.6298;
     const hour = new Date().getHours();
 
-    const airports = await discoverAirports(lat, lng);
+    const allAirports = await discoverAirports(lat, lng);
+
+    // ── RIDESHARE FILTER ─────────────────────────────────────
+    // Only show commercial passenger airports that generate rideshare demand.
+    // Exclude private, executive, general aviation, municipal, cargo-only airports.
+    const EXCLUDED_KEYWORDS = [
+      'executive', 'municipal', 'private', 'general aviation',
+      'flight school', 'cargo', 'charter', 'corporate', 'base',
+      'heliport', 'seaplane', 'glider', 'soaring', 'ultralight',
+    ];
+    // Known rideshare-relevant IATA codes by metro
+    const RIDESHARE_IATA = new Set([
+      // Chicago
+      'ORD','MDW',
+      // NYC
+      'JFK','LGA','EWR',
+      // Los Angeles
+      'LAX','BUR','SNA','LGB','ONT',
+      // Miami
+      'MIA','FLL','PBI',
+      // Houston
+      'IAH','HOU',
+      // Dallas
+      'DFW','DAL',
+      // Atlanta
+      'ATL',
+      // Las Vegas
+      'LAS',
+      // Orlando
+      'MCO','SFB',
+      // San Francisco Bay
+      'SFO','OAK','SJC',
+      // Seattle
+      'SEA',
+      // Denver
+      'DEN',
+      // Phoenix
+      'PHX',
+      // Boston
+      'BOS',
+      // DC
+      'DCA','IAD','BWI',
+      // Philadelphia
+      'PHL',
+      // Minneapolis
+      'MSP',
+      // Detroit
+      'DTW',
+      // Charlotte
+      'CLT',
+      // Portland
+      'PDX',
+      // Salt Lake
+      'SLC',
+      // Nashville
+      'BNA',
+      // Austin
+      'AUS',
+      // San Antonio
+      'SAT',
+      // New Orleans
+      'MSY',
+      // Kansas City
+      'MCI',
+      // St Louis
+      'STL',
+      // Tampa
+      'TPA',
+      // San Diego
+      'SAN',
+      // Honolulu
+      'HNL',
+      // Anchorage
+      'ANC',
+    ]);
+
+    const airports = allAirports.filter(a => {
+      // Must have a known IATA rideshare code
+      if (a.iataCode && RIDESHARE_IATA.has(a.iataCode)) return true;
+      // If no IATA, exclude by name keywords
+      const nameLower = (a.name || '').toLowerCase();
+      if (EXCLUDED_KEYWORDS.some(kw => nameLower.includes(kw))) return false;
+      // If it has no IATA code and isn't a known major airport, exclude
+      if (!a.iataCode) return false;
+      return false;
+    });
 
     if (!airports.length) {
       return res.json({
@@ -117,7 +202,16 @@ router.get('/', async (req, res) => {
       })
     );
 
-    enriched.sort((a, b) => b.demandScore - a.demandScore);
+    // Sort: ORD first, MDW second, then by demand score
+    const ORDER = ['ORD','MDW','JFK','LGA','EWR','LAX','MIA','FLL','IAH','HOU','DFW','DAL','ATL','LAS','MCO'];
+    enriched.sort((a, b) => {
+      const ai = ORDER.indexOf(a.code);
+      const bi = ORDER.indexOf(b.code);
+      if (ai !== -1 && bi !== -1) return ai - bi;
+      if (ai !== -1) return -1;
+      if (bi !== -1) return 1;
+      return b.demandScore - a.demandScore;
+    });
 
     res.json({
       success: true,

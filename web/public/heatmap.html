@@ -2,31 +2,75 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
-<title>Ride Smart 4.0 · Heatmap</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>Ride Smart 4.0 · Heat Map & Predictions</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="styles/rs4-pro.css"/>
 <style>
-.zone-selector{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.zs-btn{padding:7px 13px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;transition:.15s;white-space:nowrap}
-.zs-btn.on{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;border-color:transparent}
-.pred-card{background:var(--panel);border:1px solid rgba(124,92,255,.2);border-radius:20px;padding:16px;margin-bottom:12px}
-.pred-zone-name{font-size:22px;font-weight:800;color:var(--text);margin-bottom:6px;letter-spacing:-.3px}
-.pred-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
-.pg-item{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
-.pg-item .l{font-family:var(--mono);font-size:8px;color:var(--muted);margin-bottom:5px;letter-spacing:.8px}
-.pg-item .v{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text)}
-.best-hour-badge{display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;background:rgba(25,246,162,.1);border:1px solid rgba(25,246,162,.2);font-size:11px;font-weight:700;color:var(--green);margin-top:4px}
-.bar-chart{display:flex;align-items:flex-end;gap:2px;height:100px;padding-bottom:4px}
-.bar{flex:1;border-radius:4px 4px 0 0;position:relative;min-height:4px;transition:height .4s}
-.bar-now{outline:2px solid var(--purple);outline-offset:2px}
-.bar-label{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:7px;color:var(--purple);white-space:nowrap}
-.heatmap-wrap{overflow-x:auto;margin-bottom:8px}
-.heatmap-grid{display:grid;grid-template-columns:70px repeat(24,1fr);gap:2px;min-width:560px}
-.hm-cell{height:34px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:8px;font-weight:600;cursor:default}
-.hm-label{background:transparent!important;font-size:9px;color:var(--muted);justify-content:flex-end;padding-right:5px}
-.hm-hour-label{background:transparent!important;font-size:7px;color:var(--muted);height:18px}
-.hm-now-marker{outline:2px solid rgba(124,92,255,.6);outline-offset:1px}
+body { padding: 0 0 140px; }
+
+/* ── ZONE FILTER PILLS ── */
+.zone-pills { display: flex; gap: 8px; overflow-x: auto; padding: 0 0 4px; scrollbar-width: none; margin-bottom: 14px; }
+.zone-pills::-webkit-scrollbar { display: none; }
+.zpill { flex-shrink: 0; padding: 8px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; cursor: pointer; transition: .15s; border: 1px solid var(--line); background: var(--panel); color: var(--muted); white-space: nowrap; }
+.zpill.active { background: linear-gradient(135deg, var(--purple), var(--purple2)); color: #fff; border-color: transparent; box-shadow: 0 4px 14px rgba(124,92,255,.35); }
+.zpill:active { transform: scale(.95); }
+
+/* ── AI PREDICTION CARD ── */
+.pred-card { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 16px; margin-bottom: 12px; }
+.pred-zone-name { font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.pred-trend { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+.pred-now-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.pred-now { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07); border-radius: 14px; padding: 12px; text-align: center; }
+.pred-now-lbl { font-family: var(--mono); font-size: 8px; color: var(--soft); letter-spacing: .8px; text-transform: uppercase; margin-bottom: 6px; }
+.pred-now-val { font-family: var(--mono); font-size: 26px; font-weight: 700; line-height: 1; }
+.pred-best { display: inline-flex; align-items: center; gap: 7px; background: rgba(25,246,162,.1); border: 1px solid rgba(25,246,162,.2); border-radius: 999px; padding: 7px 14px; font-size: 13px; font-weight: 600; color: var(--green); }
+
+/* ── 24H CHART ── */
+.chart-card { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 16px; margin-bottom: 12px; }
+.chart-title { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 14px; }
+.chart-bars { display: flex; align-items: flex-end; gap: 3px; height: 80px; margin-bottom: 8px; }
+.cbar { flex: 1; border-radius: 3px 3px 0 0; min-height: 4px; transition: height .4s, opacity .15s; position: relative; }
+.cbar.now { outline: 2px solid var(--purple); outline-offset: 1px; }
+.cbar:hover::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%); background: var(--panel2); border: 1px solid rgba(124,92,255,.3); border-radius: 7px; padding: 3px 7px; font-family: var(--mono); font-size: 9px; color: var(--green); white-space: nowrap; z-index: 5; pointer-events: none; }
+.chart-x { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 9px; color: var(--soft); padding: 0 2px; }
+
+/* ── ZONE RANKINGS ── */
+.rankings-card { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 16px; margin-bottom: 12px; }
+.rankings-title { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.rankings-sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+.rank-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
+.rank-row:last-child { border: none; }
+.rank-num { font-family: var(--mono); font-size: 12px; color: var(--soft); width: 24px; flex-shrink: 0; }
+.rank-info { flex: 1; }
+.rank-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.rank-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.rank-right { text-align: right; flex-shrink: 0; }
+.rank-hr { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--green); line-height: 1; }
+.rank-trend { font-family: var(--mono); font-size: 10px; margin-top: 2px; }
+
+/* ── ALL ZONES GRID ── */
+.grid-card { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 16px; margin-bottom: 12px; }
+.grid-title { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.grid-sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+.zone-grid { overflow-x: auto; }
+.zone-grid table { border-collapse: collapse; font-family: var(--mono); font-size: 10px; white-space: nowrap; }
+.zone-grid th { color: var(--soft); font-weight: 600; padding: 2px 5px; text-align: center; }
+.zone-grid td { padding: 3px 4px; text-align: center; border-radius: 5px; font-weight: 700; }
+.zone-grid .zone-label { text-align: right; color: var(--muted); font-size: 10px; padding-right: 8px; font-weight: 600; }
+.zone-grid .now-col { outline: 2px solid var(--purple); outline-offset: -1px; border-radius: 4px; }
+
+/* ── MAP SECTION ── */
+.map-section { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; margin-bottom: 12px; }
+.map-section-hdr { padding: 14px 16px 10px; display: flex; align-items: center; justify-content: space-between; }
+.map-section-title { font-size: 14px; font-weight: 700; color: var(--text); }
+#googleMap { width: 100%; height: 280px; }
+
+/* ── NAV ── */
+.bnav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; display: grid; grid-template-columns: repeat(5,1fr); background: rgba(5,7,13,.96); backdrop-filter: blur(28px); border-top: 1px solid var(--line); padding: 8px 6px 22px; }
+.bni { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 4px; border-radius: 14px; cursor: pointer; font-size: 10px; font-weight: 600; color: var(--soft); border: none; background: none; }
+.bni.on { background: linear-gradient(135deg,rgba(92,96,245,.18),rgba(155,124,255,.1)); color: var(--purple); border: 1px solid rgba(124,92,255,.2); }
+.bni-ic { font-size: 20px; line-height: 1; }
 </style>
 </head>
 <body>
@@ -35,162 +79,341 @@
 
 <div class="page-header">
   <a class="back-btn" href="index.html">← Home</a>
-  <span class="badge-chip">🗺️ HEATMAP</span>
+  <span class="badge-chip" style="background:linear-gradient(135deg,#7c5cff,#9b7cff)">🗺 HEATMAP</span>
 </div>
 
 <div class="hero-eyebrow">AI PREDICTIONS</div>
 <h1 style="margin-bottom:6px">Heat Map &<br><em>Predictions</em></h1>
-<p style="margin-bottom:18px">Best zones by hour — AI-predicted $/hr based on historic + live signals.</p>
+<p style="margin-bottom:16px">Best zones by hour — AI-predicted $/hr based on historic + live signals.</p>
 
-<div class="zone-selector" id="zoneSel"></div>
-
-<div class="pred-card" id="predCard">
-  <div style="font-family:var(--mono);font-size:9px;color:var(--purple);letter-spacing:2px;margin-bottom:8px">AI PREDICTION · SELECTED ZONE</div>
-  <div class="pred-zone-name" id="predZoneName">Loading...</div>
-  <div id="predTrend" style="font-size:12px;color:var(--muted)"></div>
-  <div class="pred-grid">
-    <div class="pg-item"><div class="l">NOW</div><div class="v" id="predNow">--</div></div>
-    <div class="pg-item"><div class="l">+30 MIN</div><div class="v" id="pred30" style="color:var(--green)">--</div></div>
-    <div class="pg-item"><div class="l">+60 MIN</div><div class="v" id="pred60">--</div></div>
-  </div>
-  <div id="bestHourBadge"></div>
+<!-- ZONE PILLS -->
+<div class="zone-pills" id="zonePills">
+  <div class="zpill active" onclick="selectZone(0)">Loading...</div>
 </div>
 
-<div class="air-card" style="margin-bottom:10px">
-  <h2 style="margin-bottom:14px">24h $/hr Forecast</h2>
-  <div class="bar-chart" id="barChart"></div>
-  <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:20px;padding:0 2px">
-    <span>12am</span><span>6am</span><span>12pm</span><span>6pm</span><span>11pm</span>
+<!-- AI PREDICTION CARD -->
+<div class="pred-card">
+  <div style="font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--purple);margin-bottom:8px">AI PREDICTION · SELECTED ZONE</div>
+  <div class="pred-zone-name" id="predZoneName">--</div>
+  <div class="pred-trend" id="predTrend">→ Loading...</div>
+  <div class="pred-now-grid">
+    <div class="pred-now">
+      <div class="pred-now-lbl">NOW</div>
+      <div class="pred-now-val" style="color:var(--green)" id="predNow">$--</div>
+    </div>
+    <div class="pred-now">
+      <div class="pred-now-lbl">+30 MIN</div>
+      <div class="pred-now-val" style="color:var(--green)" id="pred30">$--</div>
+    </div>
+    <div class="pred-now">
+      <div class="pred-now-lbl">+60 MIN</div>
+      <div class="pred-now-val" style="color:var(--green)" id="pred60">$--</div>
+    </div>
   </div>
+  <div class="pred-best" id="predBest">⭐ Loading best hour...</div>
 </div>
 
-<div class="air-card" style="margin-bottom:10px">
-  <h2 style="margin-bottom:14px">Zone Rankings · Next 30 Min</h2>
-  <div id="zoneTable"></div>
+<!-- 24H CHART -->
+<div class="chart-card">
+  <div class="chart-title">24h $/hr Forecast</div>
+  <div class="chart-bars" id="forecastBars"></div>
+  <div class="chart-x"><span>12am</span><span>6am</span><span>12pm</span><span>6pm</span><span>11pm</span></div>
 </div>
 
-<div class="air-card" style="margin-bottom:10px">
-  <h2 style="margin-bottom:4px">All Zones · All Hours</h2>
-  <p style="margin-bottom:12px">Color = predicted $/hr intensity</p>
-  <div class="heatmap-wrap">
-    <div class="heatmap-grid" id="heatmapGrid"></div>
+<!-- ZONE RANKINGS -->
+<div class="rankings-card">
+  <div class="rankings-title">Zone Rankings · Next 30 Min</div>
+  <div class="rankings-sub" id="rankingsSub">Loading zones...</div>
+  <div id="rankingsList"></div>
+</div>
+
+<!-- ALL ZONES GRID -->
+<div class="grid-card">
+  <div class="grid-title">All Zones · All Hours</div>
+  <div class="grid-sub">Color = predicted $/hr intensity</div>
+  <div class="zone-grid" id="zoneGrid"></div>
+</div>
+
+<!-- MAP SECTION -->
+<div class="map-section" id="mapSection" style="display:none">
+  <div class="map-section-hdr">
+    <div class="map-section-title">🗺 Live Map</div>
+    <a href="/map" style="font-size:12px;color:var(--purple);font-weight:600">Full Map ›</a>
   </div>
+  <div id="googleMap"></div>
 </div>
 
 </div><!-- /app -->
 
-<nav class="nav">
-  <a href="index.html"><i>⌂</i>Home</a>
-  <a href="airports.html"><i>✈</i>Airports</a>
-  <a class="on" href="heatmap.html"><i>🗺</i>Map</a>
-  <a href="ev.html"><i>ϟ</i>EV/Fuel</a>
-  <a href="brain.html"><i>🧠</i>Brain</a>
+<nav class="bnav">
+  <button class="bni" onclick="location.href='index.html'"><span class="bni-ic">🏠</span>Home</button>
+  <button class="bni" onclick="location.href='airports.html'"><span class="bni-ic">✈️</span>Airports</button>
+  <button class="bni on"><span class="bni-ic">🗺️</span>Map</button>
+  <button class="bni" onclick="location.href='ev.html'"><span class="bni-ic">⚡</span>EV/Fuel</button>
+  <button class="bni" onclick="location.href='brain.html'"><span class="bni-ic">🧠</span>Brain</button>
 </nav>
 
 <script src="config.js"></script>
 <script src="gps.js"></script>
 <script>
-const API = window.RS4_API || 'https://ride-smart-ai.onrender.com';
-let predictions=[], selectedZone='', currentHour=new Date().getHours();
+const API = 'http://localhost:3000';
+const DOW_MULT = [1.05, 0.92, 0.94, 0.98, 1.12, 1.35, 1.18]; // Sun–Sat
+const BASE_HOURLY = {
+  0:30,1:34,2:36,3:22,4:14,5:16,6:22,7:32,
+  8:36,9:30,10:24,11:22,12:24,13:22,14:22,15:26,
+  16:30,17:36,18:38,19:32,20:28,21:30,22:34,23:36
+};
 
-function colorForHourly(v){
-  if(v>=40) return '#19f6a2';
-  if(v>=35) return '#39e07a';
-  if(v>=30) return '#80cc55';
-  if(v>=26) return '#ffb82e';
-  if(v>=22) return '#ff7a00';
-  return '#ff4d73';
+const ZONE_DEFS = [
+  { name: "O'Hare Airport",    mult: 1.25, isAirport: true },
+  { name: "Midway Airport",    mult: 1.15, isAirport: true },
+  { name: "Rosemont",          mult: 1.10 },
+  { name: "Downtown Chicago",  mult: 1.00 },
+  { name: "Schaumburg",        mult: 0.95 },
+  { name: "Arlington Heights", mult: 0.92 },
+  { name: "Evanston",          mult: 0.90 },
+  { name: "Naperville",        mult: 0.90 },
+];
+
+let zonesData = [];
+let selectedZoneIdx = 0;
+let weatherMult = 1.0;
+let surgeMult = 1.0;
+let liveZones = [];
+
+function $id(id) { return document.getElementById(id); }
+function gps() { return typeof GPS !== 'undefined' && GPS.lat ? `?lat=${GPS.lat}&lng=${GPS.lng}` : ''; }
+
+function gpsParams() { 
+  return typeof GPS !== 'undefined' && GPS.lat 
+    ? `lat=${GPS.lat}&lng=${GPS.lng}` 
+    : 'lat=41.8781&lng=-87.6298'; 
 }
 
-async function load(){
-  try{
-    const url = typeof GPS!=='undefined' ? GPS.url(`${API}/api/predict`) : `${API}/api/predict`;
-    const r=await fetch(url);
-    const d=await r.json();
-    if(!d.success) throw new Error('API error');
-    predictions=d.predictions||[];
-    currentHour=d.currentHour||new Date().getHours();
-    renderZoneSelector();
-    if(predictions.length) selectZone(predictions[0].zone);
-    renderHeatmap();
-    renderZoneTable();
-  }catch(e){
-    document.getElementById('predCard').innerHTML='<p style="color:var(--muted)">Could not load predictions.</p>';
+function scoreColor(v) {
+  if (v >= 38) return '#19f6a2';
+  if (v >= 30) return '#ffb82e';
+  return '#f97316';
+}
+function cellBg(v) {
+  if (v >= 38) return 'rgba(25,246,162,.18)';
+  if (v >= 30) return 'rgba(255,184,46,.15)';
+  return 'rgba(249,115,22,.12)';
+}
+
+function predict(zoneMult, hour, dow) {
+  const base = BASE_HOURLY[hour] || 25;
+  const val = Math.round(base * zoneMult * DOW_MULT[dow] * weatherMult);
+  return Math.max(18, val);
+}
+
+async function loadData() {
+  try {
+    const [zonesR, surgeR, weatherR, earningsR, recommendationR] = await Promise.allSettled([
+      fetch(API + '/api/zones' + gps()).then(r => r.json()),
+      fetch(API + '/api/surge').then(r => r.json()),
+      fetch(API + '/api/weather' + gps()).then(r => r.json()),
+      fetch(API + '/api/earnings-prediction' + gps()).then(r => r.json()),
+      fetch(`${API}/api/ai/recommendation?${gpsParams()}`).then(r => r.json())
+    ]);
+
+    if (weatherR.status === 'fulfilled' && weatherR.value.success) {
+      weatherMult = parseFloat(weatherR.value.demandImpact?.multiplier || 1.0);
+    }
+    if (surgeR.status === 'fulfilled' && surgeR.value.success) {
+      surgeMult = surgeR.value.current?.multiplier || 1.0;
+    }
+    if (zonesR.status === 'fulfilled' && zonesR.value.success) {
+      liveZones = zonesR.value.bestZones || [];
+    }
+
+    buildZoneData();
+    renderPills();
+    renderPrediction(selectedZoneIdx);
+    renderForecastChart(selectedZoneIdx);
+    renderRankings();
+    renderAllZonesGrid();
+
+  } catch (e) {
+    console.warn('[heatmap]', e.message);
+    buildZoneData();
+    renderPills();
+    renderPrediction(selectedZoneIdx);
+    renderForecastChart(selectedZoneIdx);
+    renderRankings();
+    renderAllZonesGrid();
   }
 }
 
-function renderZoneSelector(){
-  document.getElementById('zoneSel').innerHTML=predictions.slice(0,6).map((p,i)=>
-    `<div class="zs-btn ${i===0?'on':''}" onclick="selectZoneBtn('${p.zone}',this)">${p.zone.replace(' Airport','✈️').replace('Downtown Chicago','Downtown')}</div>`
+function buildZoneData() {
+  const dow = new Date().getDay();
+  const nowH = new Date().getHours();
+  
+  zonesData = ZONE_DEFS.map(z => {
+    const live = liveZones.find(lz => {
+      const a = lz.name.toLowerCase();
+      const b = z.name.toLowerCase();
+
+      return (
+        (a.includes("o'hare") && b.includes("o'hare")) ||
+        (a.includes("midway") && b.includes("midway")) ||
+        (a.includes("rosemont") && b.includes("rosemont")) ||
+        (a.includes("schaumburg") && b.includes("schaumburg")) ||
+        (a.includes("arlington") && b.includes("arlington")) ||
+        (a.includes("evanston") && b.includes("evanston")) ||
+        (a.includes("naperville") && b.includes("naperville")) ||
+        (a.includes("chicago") && b.includes("downtown"))
+      );
+    });
+
+    const liveHourly = live?.estimatedHourly;
+    const eMult = z.isAirport ? z.mult * surgeMult : z.mult;
+    const nowVal = liveHourly || predict(eMult, nowH, dow);
+    
+    const val30 = predict(eMult, (nowH + 1) % 24, dow);
+    const val60 = predict(eMult, (nowH + 2) % 24, dow);
+
+    let bestH = 0, bestV = 0;
+    for (let h = 0; h < 24; h++) {
+      const v = predict(eMult, h, dow);
+      if (v > bestV) { bestV = v; bestH = h; }
+    }
+    const bestLabel = bestH === 0 ? '12am' : bestH < 12 ? bestH + 'am' : bestH === 12 ? '12pm' : (bestH - 12) + 'pm';
+    const hours = Array.from({ length: 24 }, (_, h) => predict(eMult, h, dow));
+    
+    return { ...z, nowVal, val30, val60, bestV, bestH, bestLabel, hours, eMult };
+  });
+}
+
+function renderPills() {
+  $id('zonePills').innerHTML = zonesData.map((z, i) =>
+    `<div class="zpill ${i === selectedZoneIdx ? 'active' : ''}" onclick="selectZone(${i})">${z.isAirport ? z.name.replace(' Airport','') + ' ✈️' : z.name.replace(' Chicago','').replace(' Heights','')}</div>`
   ).join('');
 }
 
-function selectZoneBtn(zone,el){
-  document.querySelectorAll('.zs-btn').forEach(b=>b.classList.remove('on'));
-  el.classList.add('on');
-  selectZone(zone);
+function selectZone(idx) {
+  selectedZoneIdx = idx;
+  renderPills();
+  renderPrediction(idx);
+  renderForecastChart(idx);
 }
 
-function selectZone(zone){
-  selectedZone=zone;
-  const p=predictions.find(x=>x.zone===zone);
-  if(!p) return;
-  document.getElementById('predZoneName').textContent=zone;
-  document.getElementById('predNow').textContent='$'+p.now;
-  document.getElementById('pred30').textContent='$'+p.in30min;
-  document.getElementById('pred60').textContent='$'+p.in60min;
-  const delta=p.in30min-p.now;
-  document.getElementById('predTrend').textContent=delta>0?`📈 Trending up $${delta.toFixed(0)}/hr in next 30 min`:delta<0?`📉 Trending down $${Math.abs(delta).toFixed(0)}/hr`:'→ Stable demand';
-  document.getElementById('predTrend').style.color=delta>1?'var(--green)':delta<-1?'var(--red)':'var(--muted)';
-  document.getElementById('bestHourBadge').innerHTML=p.bestHour?`<div class="best-hour-badge">⭐ Best hour: ${p.bestHour.label} · $${p.bestHour.hourly}/hr</div>`:'';
-  renderBarChart(p);
+function renderPrediction(idx) {
+  const z = zonesData[idx];
+  if (!z) return;
+  $id('predZoneName').textContent = z.name;
+  const trend = z.val30 > z.nowVal ? '↑ Demand rising' : z.val30 < z.nowVal ? '↓ Demand easing' : '→ Stable demand';
+  $id('predTrend').textContent = trend;
+  $id('predNow').textContent = '$' + z.nowVal;
+  $id('pred30').textContent  = '$' + z.val30;
+  $id('pred60').textContent  = '$' + z.val60;
+  
+  const colorNow = z.nowVal >= 35 ? 'var(--green)' : z.nowVal >= 28 ? 'var(--amber)' : 'var(--text)';
+  $id('predNow').style.color = colorNow;
+  $id('pred30').style.color  = z.val30 >= 35 ? 'var(--green)' : z.val30 >= 28 ? 'var(--amber)' : 'var(--text)';
+  $id('pred60').style.color  = z.val60 >= 35 ? 'var(--green)' : z.val60 >= 28 ? 'var(--amber)' : 'var(--text)';
+  $id('predBest').textContent = `⭐ Best hour: ${z.bestLabel} · $${z.bestV}/hr`;
 }
 
-function renderBarChart(p){
-  if(!p.heatmap) return;
-  const max=Math.max(...p.heatmap.map(h=>h.hourly));
-  document.getElementById('barChart').innerHTML=p.heatmap.map(h=>{
-    const pct=Math.max(8,Math.round((h.hourly/max)*100));
-    const isNow=h.hour===currentHour;
-    return `<div class="bar ${isNow?'bar-now':''}" style="height:${pct}%;background:${colorForHourly(h.hourly)}" title="${h.label}: $${h.hourly}/hr">${isNow?'<div class="bar-label">NOW</div>':''}</div>`;
+function renderForecastChart(idx) {
+  const z = zonesData[idx];
+  if (!z) return;
+  const maxV = Math.max(...z.hours, 1);
+  const nowH = new Date().getHours();
+  $id('forecastBars').innerHTML = z.hours.map((v, h) => {
+    const pct = Math.max(5, Math.round(v / maxV * 100));
+    const col = v >= 35 ? '#19f6a2' : v >= 28 ? '#ffb82e' : 'rgba(255,255,255,.15)';
+    const label = h === 0 ? '12am' : h < 12 ? h + 'am' : h === 12 ? '12pm' : (h-12) + 'pm';
+    return `<div class="cbar ${h === nowH ? 'now' : ''}" style="height:${pct}%;background:${col}" data-tip="${label} $${v}"></div>`;
   }).join('');
 }
 
-function renderHeatmap(){
-  const hours=Array.from({length:24},(_,i)=>i);
-  let html='<div class="hm-cell hm-label"></div>';
-  hours.forEach(h=>{html+=`<div class="hm-cell hm-hour-label">${h===0?'12a':h<12?h+'a':h===12?'12p':(h-12)+'p'}</div>`});
-  predictions.slice(0,8).forEach(p=>{
-    html+=`<div class="hm-cell hm-label">${p.zone.split(' ')[0]}</div>`;
-    const hm=p.heatmap||[];
-    hours.forEach(h=>{
-      const data=hm.find(x=>x.hour===h)||{hourly:25};
-      const c=colorForHourly(data.hourly);
-      html+=`<div class="hm-cell ${h===currentHour?'hm-now-marker':''}" style="background:${c}22;color:${c}" title="${p.zone} ${h}:00 — $${data.hourly}/hr">${data.hourly}</div>`;
-    });
-  });
-  document.getElementById('heatmapGrid').innerHTML=html;
-}
+function renderRankings() {
+  const now = new Date();
+  const nowH = now.getHours();
+  const m30 = (nowH + 1) % 24;
+  const subTxt = 'Based on current signals · ' + now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  $id('rankingsSub').textContent = subTxt;
 
-function renderZoneTable(){
-  document.getElementById('zoneTable').innerHTML=predictions.slice(0,8).map((p,i)=>{
-    const trend=p.trend==='UP'?'↑ UP':p.trend==='DOWN'?'↓ DOWN':'→ FLAT';
-    const tc=p.trend==='UP'?'var(--green)':p.trend==='DOWN'?'var(--red)':'var(--muted)';
-    return `<div style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)">
-      <div style="font-family:var(--mono);font-size:14px;color:var(--muted);width:20px">#${i+1}</div>
-      <div style="flex:1">
-        <div style="font-size:13px;font-weight:700;color:var(--text)">${p.zone}</div>
-        <div style="font-size:11px;color:var(--muted)">Now: $${p.now} · Best: ${p.bestHour?.label||'--'}</div>
+  const ranked = [...zonesData].sort((a, b) => b.nowVal - a.nowVal);
+  $id('rankingsList').innerHTML = ranked.map((z, i) => {
+    const trending = z.hours[m30] > z.nowVal ? '↑ UP' : z.hours[m30] < z.nowVal ? '↓ DOWN' : '→ FLAT';
+    const trendColor = trending.includes('UP') ? 'var(--green)' : trending.includes('DOWN') ? 'var(--red)' : 'var(--soft)';
+    return `<div class="rank-row">
+      <div class="rank-num">#${i + 1}</div>
+      <div class="rank-info">
+        <div class="rank-name">${z.name}</div>
+        <div class="rank-sub">Now: $${z.nowVal} · Best: ${z.bestLabel}</div>
       </div>
-      <div style="text-align:right">
-        <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--green)">$${p.in30min}</div>
-        <div style="font-family:var(--mono);font-size:10px;color:${tc}">${trend}</div>
+      <div class="rank-right">
+        <div class="rank-hr">$${z.nowVal}</div>
+        <div class="rank-trend" style="color:${trendColor}">${trending}</div>
       </div>
     </div>`;
   }).join('');
 }
 
-load();
+function renderAllZonesGrid() {
+  const now = new Date();
+  const nowH = now.getHours();
+  const startH = Math.max(0, nowH - 1);
+  const hours = Array.from({ length: 14 }, (_, i) => (startH + i) % 24);
+  const hourLabels = hours.map(h => h === 0 ? '12a' : h < 12 ? h + 'a' : h === 12 ? '12p' : (h-12) + 'p');
+
+  let html = '<table><thead><tr><th></th>';
+  hourLabels.forEach((lbl, i) => {
+    const isNow = hours[i] === nowH;
+    html += `<th style="${isNow ? 'color:var(--purple);font-weight:800' : ''}">${lbl}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  zonesData.forEach(z => {
+    html += `<tr><td class="zone-label">${z.name.replace(' Airport','').replace(' Chicago','').replace(' Heights','')}</td>`;
+    hours.forEach((h, i) => {
+      const v = z.hours[h];
+      const isNow = h === nowH;
+      html += `<td class="${isNow ? 'now-col' : ''}" style="background:${cellBg(v)};color:${scoreColor(v)}">${v}</td>`;
+    });
+    html += '</tr>';
+  });
+
+  html += '</tbody></table>';
+  $id('zoneGrid').innerHTML = html;
+}
+
+loadData();
+setInterval(loadData, 3 * 60 * 1000);
 </script>
+
+<script>
+function initMiniMap(){
+  const mapEl = document.getElementById('googleMap');
+  const section = document.getElementById('mapSection');
+
+  if (!mapEl || !window.google) return;
+
+  section.style.display = 'block';
+
+  const center = { lat: 41.8781, lng: -87.6298 };
+
+  const map = new google.maps.Map(mapEl, {
+    center,
+    zoom: 10,
+    disableDefaultUI: true,
+    styles: [
+      { elementType: 'geometry', stylers: [{ color: '#05070d' }] },
+      { elementType: 'labels.text.fill', stylers: [{ color: '#8ea0c8' }] },
+      { elementType: 'labels.text.stroke', stylers: [{ color: '#05070d' }] },
+      { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#172036' }] },
+      { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#030509' }] }
+    ]
+  });
+
+  new google.maps.TrafficLayer().setMap(map);
+}
+</script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBGO9iy_h7wAu_mS-nEY4wGNPD01wsAS-A&callback=initMiniMap"></script>
+
 </body>
 </html>

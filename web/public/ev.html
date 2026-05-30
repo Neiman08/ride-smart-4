@@ -92,7 +92,7 @@
 <nav class="nav">
   <a href="index.html"><i>⌂</i>Home</a>
   <a href="airports.html"><i>✈</i>Airports</a>
-  <a href="heatmap.html"><i>🗺</i>Map</a>
+  <a href="/map"><i>🗺</i>Map</a>
   <a class="on" href="ev.html"><i>ϟ</i>EV/Fuel</a>
   <a href="brain.html"><i>🧠</i>Brain</a>
 </nav>
@@ -100,7 +100,7 @@
 <script src="config.js"></script>
 <script src="gps.js"></script>
 <script>
-const API = window.RS4_API || 'https://ride-smart-ai.onrender.com';
+const API = window.RS4_API || 'https://ride-smart-4.onrender.com';
 let vehicleType = 'gas';
 
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show';setTimeout(()=>t.classList.remove('show'),2200)}
@@ -172,6 +172,42 @@ async function loadStations(){
 }
 
 function nav(lat,lng){window.location.href=`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`}
+
+// Also load fuel stations for gas panel
+async function loadFuelStations(){
+  try{
+    const url = typeof GPS!=='undefined'&&GPS.lat ? `${API}/api/fuel?lat=${GPS.lat}&lng=${GPS.lng}` : `${API}/api/fuel`;
+    const d = await fetch(url).then(r=>r.json());
+    if(!d.success) return;
+    const p = d.marketPrices;
+    // Show market prices
+    const priceEl = document.getElementById('marketPrices');
+    if(priceEl) priceEl.innerHTML = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">
+      <div class="stat-box"><div class="stat-l">REGULAR</div><div class="stat-v" style="color:var(--green)">$${p.regular}</div></div>
+      <div class="stat-box"><div class="stat-l">PREMIUM</div><div class="stat-v">$${p.premium}</div></div>
+      <div class="stat-box"><div class="stat-l">DIESEL</div><div class="stat-v">$${p.diesel}</div></div>
+    </div>`;
+    // Show nearest stations
+    const stEl = document.getElementById('fuelStations');
+    if(stEl && d.stations?.length){
+      stEl.innerHTML = d.stations.slice(0,5).map(s=>`
+        <div class="station-card" style="background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:13px;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <div style="font-size:22px">⛽</div>
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:700;color:var(--text)">${s.name}</div>
+              <div style="font-size:11px;color:var(--muted)">${s.address} · ${s.distanceMi} mi</div>
+            </div>
+            <div style="text-align:right;font-family:var(--mono);font-size:16px;font-weight:700;color:var(--green)">$${s.prices?.regular||p.regular}</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="nav(${s.lat},${s.lng})" style="border-radius:10px;width:100%">🧭 Navigate</button>
+        </div>`).join('');
+    }
+  }catch(e){}
+}
+
+// Initialize
+if(vehicleType==='gas') loadFuelStations();
 </script>
 </body>
 </html>

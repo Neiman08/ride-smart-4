@@ -5,126 +5,354 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
 <title>Ride Smart 4.0</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="styles/rs4-pro.css"/>
+
+<style>
+:root{
+  --purple:#7c5cff;
+  --purple2:#9b7cff;
+  --green:#19f6a2;
+  --amber:#ffb82e;
+  --red:#ff4d73;
+  --cyan:#48b0f7;
+  --bg:#05070d;
+  --panel:rgba(18,22,42,.92);
+  --line:rgba(255,255,255,.10);
+  --text:#f4f6ff;
+  --muted:#aeb8d2;
+  --soft:#7c86a5;
+  --mono:'Space Mono', monospace;
+}
+
+body { padding: 0 0 120px; }
+
+/* ── TOPBAR ── */
+.topbar { display:flex; align-items:center; justify-content:space-between; padding:12px 18px; position:sticky; top:0; z-index:100; background:rgba(5,7,13,.93); backdrop-filter:blur(24px); border-bottom:1px solid rgba(255,255,255,.06); }
+.brand { display:flex; align-items:center; gap:10px; }
+.logo { width:36px; height:36px; border-radius:50%; border:2px solid var(--purple); background:linear-gradient(135deg,rgba(124,92,255,.25),rgba(155,124,255,.1)); display:flex; align-items:center; justify-content:center; font-size:17px; }
+.brand h1 { font-size:13px; font-weight:800; color:var(--text); letter-spacing:.4px; line-height:1.2; margin:0; }
+.brand span { font-size:10px; color:var(--purple); font-weight:600; }
+.livebar { display:flex; align-items:center; gap:10px; }
+.live { display:flex; align-items:center; gap:5px; background:rgba(25,246,162,.1); border:1px solid rgba(25,246,162,.22); padding:5px 10px; border-radius:999px; font-family:var(--mono); font-size:10px; font-weight:700; color:var(--green); }
+.live b { animation:lp 2s ease infinite; font-size:8px; }
+@keyframes lp { 0%,100%{opacity:1} 60%{opacity:.3} }
+#clock { background:none; border:none; color:var(--muted); font-size:11px; padding:0; }
+.bell { width:32px; height:32px; border-radius:50%; background:var(--panel); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:14px; cursor:pointer; position:relative; }
+.bell::after { content:''; position:absolute; top:5px; right:5px; width:7px; height:7px; border-radius:50%; background:var(--purple); border:2px solid var(--bg); }
+
+/* ── HERO ── */
+.hero { display:flex; gap:10px; align-items:flex-start; padding:18px; background:linear-gradient(150deg,#0c0f24,#080b1c); border-radius:22px; border:1px solid rgba(124,92,255,.18); box-shadow:0 12px 60px rgba(0,0,0,.6); margin:14px; position:relative; overflow:hidden; }
+.hero::before { content:''; position:absolute; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle,rgba(92,96,245,.18),transparent 70%); top:-60px; right:-40px; pointer-events:none; }
+.hero-content { flex:1; min-width:0; }
+.eyebrow { font-family:var(--mono); font-size:9px; letter-spacing:2.5px; color:var(--purple); opacity:.75; text-transform:uppercase; margin-bottom:10px; }
+.hero-content h2 { font-size:26px; font-weight:800; line-height:1.05; letter-spacing:-.5px; color:var(--text); margin:0 0 10px; }
+.hero-content h2 em { font-style:normal; background:linear-gradient(135deg,var(--purple),var(--purple2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; display:block; }
+.conf { display:inline-flex; align-items:center; gap:6px; background:rgba(25,246,162,.08); border:1px solid rgba(25,246,162,.18); padding:5px 11px; border-radius:999px; font-family:var(--mono); font-size:10px; font-weight:700; color:var(--green); margin-bottom:10px; }
+.hero-content p { font-size:12px; color:var(--soft); line-height:1.6; margin:0 0 16px; max-width:195px; }
+.cta { display:inline-flex; align-items:center; gap:7px; background:linear-gradient(135deg,var(--purple),var(--purple2)); color:#fff; padding:11px 18px; border-radius:12px; font-size:13px; font-weight:700; text-decoration:none; box-shadow:0 6px 22px rgba(124,92,255,.38); border:none; cursor:pointer; }
+
+/* ── RADAR ── */
+.radar { width:120px; height:120px; flex-shrink:0; position:relative; cursor:pointer; }
+.radar .mapline { position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle,rgba(124,92,255,.08),transparent 70%); }
+.node { position:absolute; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-direction:column; font-family:var(--mono); font-weight:700; line-height:1.2; text-align:center; animation:pulse-node 3s ease infinite; }
+.node.ord { width:72px; height:72px; top:-8px; left:-8px; background:rgba(92,96,245,.18); border:2px solid rgba(124,92,255,.4); color:var(--purple2); font-size:12px; }
+.node.mdw { width:70px; height:70px; bottom:-6px; right:-6px; background:rgba(25,246,162,.1); border:2px solid rgba(25,246,162,.35); color:var(--green); font-size:11px; }
+@keyframes pulse-node { 0%,100%{box-shadow:0 0 0 0 rgba(124,92,255,.3)} 50%{box-shadow:0 0 0 12px transparent} }
+.node.mdw { animation-name:pulse-node-g; }
+@keyframes pulse-node-g { 0%,100%{box-shadow:0 0 0 0 rgba(25,246,162,.3)} 50%{box-shadow:0 0 0 12px transparent} }
+.city { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-family:var(--mono); font-size:9px; color:var(--muted); white-space:nowrap; }
+
+/* ── SIDE METRICS ── */
+.side-metric { display:flex; flex-direction:column; gap:10px; align-items:flex-end; flex-shrink:0; }
+.side-metric small { font-family:var(--mono); font-size:7px; letter-spacing:1px; color:var(--soft); display:block; text-align:right; line-height:1.5; text-transform:uppercase; }
+.side-metric b { font-family:var(--mono); font-size:22px; font-weight:700; color:var(--green); display:block; text-align:right; line-height:1; }
+.side-metric b.purple { color:var(--purple2); }
+
+/* ── GO HERE NOW ── */
+.go-card { background:linear-gradient(135deg,rgba(124,92,255,.1),rgba(25,246,162,.06)); border:1px solid rgba(124,92,255,.22); border-radius:20px; padding:14px 16px; display:flex; align-items:center; gap:12px; margin:0 14px; }
+.go-pulse { width:44px; height:44px; border-radius:12px; flex-shrink:0; background:linear-gradient(135deg,var(--purple),var(--purple2)); display:flex; align-items:center; justify-content:center; font-size:22px; animation:go-glow 2.5s ease infinite; }
+@keyframes go-glow { 0%,100%{box-shadow:0 0 0 0 rgba(124,92,255,.5)} 60%{box-shadow:0 0 0 12px transparent} }
+.go-cta { margin-left:auto; flex-shrink:0; padding:9px 14px; border-radius:12px; background:linear-gradient(135deg,var(--purple),var(--purple2)); color:#fff; font-size:12px; font-weight:700; border:none; cursor:pointer; box-shadow:0 4px 14px rgba(124,92,255,.3); }
+
+/* ── SECTION HEAD ── */
+.section-head { display:flex; align-items:center; justify-content:space-between; padding:4px 18px 8px; }
+.section-head h3 { font-size:12px; font-weight:700; color:var(--text); margin:0; letter-spacing:.3px; display:flex; align-items:center; gap:8px; }
+.section-head span { font-size:11px; color:var(--purple); font-weight:600; cursor:pointer; }
+.dot-live { display:inline-flex; align-items:center; gap:4px; background:rgba(25,246,162,.08); border:1px solid rgba(25,246,162,.16); padding:2px 8px; border-radius:999px; font-family:var(--mono); font-size:8px; color:var(--green); }
+.dot-live::before { content:''; width:4px; height:4px; border-radius:50%; background:var(--green); animation:lp 2s ease infinite; }
+
+/* ── AI GRID ── */
+.ai-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; padding:0 14px; }
+.ai-btn { display:flex; flex-direction:column; align-items:center; gap:6px; padding:14px 6px; background:var(--panel); border:1px solid var(--line); border-radius:18px; text-decoration:none; transition:.15s; box-shadow:0 6px 20px rgba(0,0,0,.2); }
+.ai-btn:active { transform:scale(.95); }
+.ai-btn i { font-size:22px; font-style:normal; }
+.ai-btn span { font-size:9px; font-weight:700; color:var(--muted); }
+
+/* ── AIRPORT CARDS ── */
+.airports { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 14px; }
+.air-card { background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:12px; }
+.air-card.ord { border-color:rgba(124,92,255,.2); }
+.air-card.mdw { border-color:rgba(25,246,162,.15); }
+.air-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.air-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:14px; }
+.air-card.ord .air-icon { background:rgba(124,92,255,.12); border:1px solid rgba(124,92,255,.2); }
+.air-card.mdw .air-icon { background:rgba(25,246,162,.08); border:1px solid rgba(25,246,162,.15); }
+.tag { font-family:var(--mono); font-size:7px; font-weight:700; padding:2px 7px; border-radius:999px; }
+.air-card.ord .tag { background:rgba(124,92,255,.15); color:var(--purple); border:1px solid rgba(124,92,255,.2); }
+.air-card.mdw .tag { background:rgba(25,246,162,.08); color:var(--green); border:1px solid rgba(25,246,162,.15); }
+.air-code { font-size:20px; font-weight:800; letter-spacing:.5px; }
+.air-card.ord .air-code { color:var(--purple); }
+.air-card.mdw .air-code { color:var(--green); }
+.air-sub { font-family:var(--mono); font-size:8px; color:var(--muted); margin-bottom:8px; }
+.air-metrics { display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:8px; }
+.metric small { font-family:var(--mono); font-size:7px; color:var(--soft); letter-spacing:.5px; text-transform:uppercase; display:block; margin-bottom:3px; }
+.metric b { font-family:var(--mono); font-size:15px; font-weight:700; color:var(--text); display:block; line-height:1; }
+.metric b em { font-style:normal; font-size:9px; color:var(--green); margin-left:2px; }
+.bar { background:rgba(255,255,255,.06); border-radius:999px; height:3px; margin-top:4px; overflow:hidden; }
+.bar i { display:block; height:100%; border-radius:999px; background:linear-gradient(90deg,var(--purple),var(--purple2)); transition:width .6s ease; font-style:normal; }
+.air-card.mdw .bar i { background:linear-gradient(90deg,var(--green),#0ba55a); }
+.arrivals-title { font-family:var(--mono); font-size:7px; color:var(--soft); letter-spacing:.8px; margin:8px 0 5px; text-transform:uppercase; }
+.flight { display:flex; align-items:center; gap:6px; padding:3px 0; border-bottom:1px solid rgba(255,255,255,.04); font-size:9px; }
+.flight:last-child { border:none; }
+.flight b { font-family:var(--mono); font-weight:700; color:var(--text); width:40px; flex-shrink:0; }
+.flight span:nth-child(2) { color:var(--muted); flex:1; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.flight span:last-child { font-family:var(--mono); color:var(--soft); flex-shrink:0; }
+.riders-note { font-family:var(--mono); font-size:8px; color:var(--muted); margin:5px 0 2px; }
+.details { display:flex; align-items:center; justify-content:center; margin-top:8px; padding:8px; border-radius:9px; font-size:10px; font-weight:700; text-decoration:none; }
+.air-card.ord .details { background:rgba(124,92,255,.12); color:var(--purple); border:1px solid rgba(124,92,255,.18); }
+.air-card.mdw .details { background:rgba(25,246,162,.07); color:var(--green); border:1px solid rgba(25,246,162,.14); }
+
+/* ── AI POWER MODULES ── */
+.modules { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; padding:0 14px; }
+.mod { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:10px 8px; }
+.mi { font-size:16px; margin-bottom:4px; }
+.mod small { font-family:var(--mono); font-size:7px; letter-spacing:.6px; color:var(--soft); text-transform:uppercase; display:block; margin-bottom:4px; }
+.mod b { font-size:13px; font-weight:700; color:var(--text); display:block; line-height:1.2; margin-bottom:2px; }
+.mod span { font-size:9px; color:var(--muted); display:block; margin-bottom:6px; }
+.spark { width:100%; height:22px; }
+
+/* ── CHART CARD ── */
+.chart-card { display:flex; gap:12px; align-items:flex-start; padding:14px; background:var(--panel); border:1px solid var(--line); border-radius:18px; margin:0 14px; }
+.chart { flex:1; min-width:0; }
+.chart-title { font-family:var(--mono); font-size:8px; letter-spacing:1.5px; color:var(--soft); text-transform:uppercase; margin-bottom:10px; }
+.dyn-bars { display:flex; align-items:flex-end; gap:2px; height:100px; }
+.dyn-bar { flex:1; border-radius:2px 2px 0 0; min-height:3px; transition:height .4s; position:relative; }
+.dyn-bar.now { outline:2px solid var(--purple); outline-offset:1px; }
+.chart-xlbls { display:flex; justify-content:space-between; font-family:var(--mono); font-size:8px; color:var(--soft); margin-top:4px; padding:0 2px; }
+.drivebox { flex-shrink:0; text-align:center; }
+.drivebox small { font-family:var(--mono); font-size:7px; letter-spacing:1px; color:var(--soft); text-transform:uppercase; display:block; margin-bottom:4px; }
+.drivebox b { font-size:14px; font-weight:800; color:var(--green); display:block; margin-bottom:10px; }
+.ring { position:relative; width:60px; height:60px; margin:0 auto; }
+.ring svg { width:60px; height:60px; }
+#ringVal { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:12px; font-weight:700; color:var(--green); }
+
+/* ── INSIGHT ── */
+.insight { display:flex; align-items:flex-start; gap:12px; padding:14px; background:var(--panel); border:1px solid var(--line); border-radius:18px; margin:0 14px; }
+.bot { width:40px; height:40px; border-radius:12px; background:linear-gradient(135deg,rgba(124,92,255,.18),rgba(155,124,255,.08)); border:1px solid rgba(124,92,255,.2); display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+.insight h4 { font-size:10px; font-weight:700; color:var(--soft); letter-spacing:1.5px; text-transform:uppercase; margin:0 0 6px; }
+.insight p { font-size:12px; color:var(--muted); line-height:1.6; margin:0; }
+.orbit { width:36px; height:36px; border-radius:50%; background:rgba(124,92,255,.1); border:1px solid rgba(124,92,255,.2); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; margin-top:2px; }
+
+/* ── LIVE UPDATES ── */
+.live-updates { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:0 14px; }
+.update { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:10px 8px; text-align:center; }
+.update b { display:block; font-family:var(--mono); font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px; }
+.update span { font-size:10px; color:var(--muted); }
+
+/* ── TICKER ── */
+.ticker { position:fixed; bottom:56px; left:0; right:0; z-index:150; background:rgba(5,7,13,.93); backdrop-filter:blur(16px); border-top:1px solid var(--line); height:32px; overflow:hidden; display:flex; align-items:center; }
+.tick-track { display:flex; align-items:center; gap:16px; animation:tick 26s linear infinite; white-space:nowrap; padding:0 14px; }
+@keyframes tick { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+.ti { display:flex; align-items:center; gap:4px; font-size:10px; }
+.ti-code { font-family:var(--mono); font-weight:700; color:var(--text); font-size:9px; }
+.ti-st { font-weight:600; font-size:9px; }
+.t-g{color:var(--green)}.t-a{color:var(--amber)}.t-v{color:var(--purple)}.t-b{color:var(--cyan)}
+.tsep { color:var(--soft); font-size:9px; }
+
+.spacer { height: 14px; }
+</style>
 </head>
 
 <body>
 <div class="app">
 
 <header class="topbar">
-  <div class="brand"><div class="logo"></div><div><h1>RIDE SMART</h1><span>AI 4.0</span></div></div>
-  <div class="livebar"><div class="live"><b>●</b> LIVE</div><div class="live" id="clock">--:--</div><div class="bell">⌁</div></div>
+  <div class="brand">
+    <div class="logo">🚗</div>
+    <div><h1>RIDE SMART</h1><span>AI 4.0</span></div>
+  </div>
+  <div class="livebar">
+    <div class="live"><b>●</b>&nbsp;LIVE</div>
+    <div class="live" id="clock">--:--</div>
+    <div class="bell" onclick="location.href='voice.html'">🎙️</div>
+  </div>
 </header>
 
 <section class="hero">
   <div class="hero-content">
     <div class="eyebrow">AI SHIFT INTELLIGENCE</div>
-    <h2>HIGH DEMAND <em>CHICAGO AREA</em></h2>
-    <div class="conf">AI CONFIDENCE <b id="aiConfidence">91%</b></div>
+    <h2>HIGH DEMAND <em id="heroCity">CHICAGO AREA</em></h2>
+    <div class="conf">AI CONFIDENCE &nbsp;<b id="aiConfidence">91%</b></div>
     <p id="heroReason">Strong airport activity + events driving high earnings potential.</p>
-    <a href="airports.html" class="cta">VIEW FULL ANALYSIS ›</a>
+    <button class="cta" onclick="location.href='/map'">VIEW LIVE MAP &nbsp;›</button>
   </div>
-  <div class="radar"><div class="mapline"></div><div class="node ord">ORD<br>✈</div><div class="city">Chicago ○</div><div class="node mdw">MDW<br>✈</div></div>
-  <div class="side-metric"><div><small>EST. EARNINGS<br>THIS SHIFT</small><b id="heroEarn">$186+</b></div><div><small>SURGE MULTIPLIER</small><b class="purple" id="heroSurge">1.6x</b></div></div>
+
+  <div class="radar" onclick="location.href='/map'">
+    <div class="mapline"></div>
+    <div class="node ord" id="ordNode">ORD<br>✈</div>
+    <div class="city" id="mapCity">Chicago ○</div>
+    <div class="node mdw" id="mdwNode">MDW<br>✈</div>
+  </div>
+
+  <div class="side-metric">
+    <div>
+      <small>EST. EARNINGS<br>THIS SHIFT</small>
+      <b id="heroEarn">$186+</b>
+    </div>
+    <div>
+      <small>SURGE<br>MULTIPLIER</small>
+      <b class="purple" id="heroSurge">1.0x</b>
+    </div>
+  </div>
 </section>
 
-<div class="section-head">
-  <h3>AI COMMAND CENTER</h3>
-  <span>8 Modules</span>
+<div class="go-card" id="goCard" style="display:none;margin-top:10px">
+  <div class="go-pulse">🎯</div>
+  <div style="flex:1;min-width:0">
+    <div style="font-family:var(--mono);font-size:8px;letter-spacing:1.5px;color:var(--soft);margin-bottom:3px">🤖 AI RECOMMENDS NOW</div>
+    <div style="font-size:14px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="aiRecZone">--</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:2px" id="aiRecReason">--</div>
+    <div style="font-family:var(--mono);font-size:8px;color:var(--soft);margin-top:2px" id="aiCountdown"></div>
+  </div>
+  <div style="text-align:center;flex-shrink:0">
+    <div style="font-family:var(--mono);font-size:24px;font-weight:700;color:var(--green)" id="aiRecScore">--</div>
+    <button class="go-cta" id="aiRecBtn">GO →</button>
+  </div>
 </div>
 
+<div class="section-head" style="margin-top:14px"><h3>AI COMMAND CENTER</h3><span>8 Modules</span></div>
 <section class="ai-grid">
-
-  <a class="ai-btn" href="airports.html">
-    <i>✈️</i>
-    <span>Airports</span>
-  </a>
-
-  <a class="ai-btn" href="events.html">
-    <i>🎵</i>
-    <span>Events</span>
-  </a>
-
-  <a class="ai-btn" href="heatmap.html">
-    <i>🗺️</i>
-    <span>Heatmap</span>
-  </a>
-
-  <a class="ai-btn" href="ev.html">
-    <i>⚡</i>
-    <span>EV/Fuel</span>
-  </a>
-
-  <a class="ai-btn" href="filters.html">
-    <i>⚙️</i>
-    <span>Filters</span>
-  </a>
-
-  <a class="ai-btn" href="shift.html">
-    <i>⏱️</i>
-    <span>Shift</span>
-  </a>
-
-  <a class="ai-btn" href="brain.html">
-    <i>🧠</i>
-    <span>Brain</span>
-  </a>
-
-  <a class="ai-btn" href="tax.html">
-    <i>📊</i>
-    <span>Tax</span>
-  </a>
-
+  <a class="ai-btn" href="airports.html"><i>✈️</i><span>Airports</span></a>
+  <a class="ai-btn" href="events.html"><i>🎵</i><span>Events</span></a>
+  <a class="ai-btn" href="/map"><i>🗺️</i><span>Heatmap</span></a>
+  <a class="ai-btn" href="ev.html"><i>⚡</i><span>EV/Fuel</span></a>
+  <a class="ai-btn" href="filters.html"><i>⚙️</i><span>Filters</span></a>
+  <a class="ai-btn" href="shift.html"><i>⏱️</i><span>Shift</span></a>
+  <a class="ai-btn" href="brain.html"><i>🧠</i><span>Brain</span></a>
+  <a class="ai-btn" href="voice.html"><i>🎙️</i><span>Voice AI</span></a>
 </section>
 
-<div class="section-head"><h3>LIVE AIRPORT INTELLIGENCE <span class="dot-live">LIVE</span></h3><span>View All Airports ›</span></div>
+<div class="section-head" style="margin-top:14px">
+  <h3>LIVE AIRPORT INTELLIGENCE <span class="dot-live">LIVE</span></h3>
+  <span onclick="location.href='airports.html'">View All ›</span>
+</div>
 
 <section class="airports">
   <article class="air-card ord">
-    <div class="air-top"><div class="air-icon">✈</div><span class="tag">HIGH ACTIVITY</span></div>
-    <div class="air-code">ORD</div><div class="air-sub">O'HARE INTL.</div>
-    <div class="air-metrics"><div class="metric"><small>ARRIVALS (3H)</small><b id="ordArrivals">--<em>↑</em></b></div><div class="metric"><small>QUEUE LEVEL</small><b id="ordQueue">--</b><div class="bar"><i id="ordBar"></i></div></div></div>
-    <div class="arrivals-title">TOP ARRIVALS</div><div id="ordFlights"></div>
+    <div class="air-top">
+      <div class="air-icon">✈</div>
+      <span class="tag" id="ordTag">HIGH ACTIVITY</span>
+    </div>
+    <div class="air-code">ORD</div>
+    <div class="air-sub">O'HARE INTL.</div>
+    <div class="air-metrics">
+      <div class="metric"><small>ARRIVALS/HR</small><b id="ordArrivals">--<em>↑</em></b></div>
+      <div class="metric"><small>QUEUE LEVEL</small><b id="ordQueue">--%</b><div class="bar"><i id="ordBar" style="width:0%"></i></div></div>
+    </div>
+    <div class="riders-note">~<span id="ordRiders" style="color:var(--purple)">--</span> riders expected</div>
+    <div class="arrivals-title">TOP ARRIVALS</div>
+    <div id="ordFlights"><div class="flight"><b>--</b><span>Loading...</span><span>--</span></div></div>
     <a href="airports.html" class="details">VIEW ORD DETAILS ›</a>
   </article>
 
   <article class="air-card mdw">
-    <div class="air-top"><div class="air-icon">✈</div><span class="tag">MODERATE</span></div>
-    <div class="air-code">MDW</div><div class="air-sub">MIDWAY INTL.</div>
-    <div class="air-metrics"><div class="metric"><small>ARRIVALS (3H)</small><b id="mdwArrivals">--<em>↑</em></b></div><div class="metric"><small>QUEUE LEVEL</small><b id="mdwQueue">--</b><div class="bar"><i id="mdwBar"></i></div></div></div>
-    <div class="arrivals-title">TOP ARRIVALS</div><div id="mdwFlights"></div>
+    <div class="air-top">
+      <div class="air-icon">✈</div>
+      <span class="tag" id="mdwTag">MODERATE</span>
+    </div>
+    <div class="air-code">MDW</div>
+    <div class="air-sub">MIDWAY INTL.</div>
+    <div class="air-metrics">
+      <div class="metric"><small>ARRIVALS/HR</small><b id="mdwArrivals">--<em>↑</em></b></div>
+      <div class="metric"><small>QUEUE LEVEL</small><b id="mdwQueue">--%</b><div class="bar"><i id="mdwBar" style="width:0%"></i></div></div>
+    </div>
+    <div class="riders-note">~<span id="mdwRiders" style="color:var(--green)">--</span> riders expected</div>
+    <div class="arrivals-title">TOP ARRIVALS</div>
+    <div id="mdwFlights"><div class="flight"><b>--</b><span>Loading...</span><span>--</span></div></div>
     <a href="airports.html" class="details">VIEW MDW DETAILS ›</a>
   </article>
 </section>
 
-<div class="section-head"><h3>AI POWER MODULES</h3></div>
+<div class="section-head" style="margin-top:14px"><h3>AI POWER MODULES</h3></div>
 <section class="modules">
-  <div class="mod"><div class="mi">▱</div><small>TRAFFIC</small><b id="mTraffic">Moderate</b><span>23 min delay</span><svg class="spark" viewBox="0 0 100 30"><path d="M0 25 C20 20,20 8,40 16 S70 28,100 8" fill="none" stroke="var(--amber)" stroke-width="3"/></svg></div>
-  <div class="mod"><div class="mi">▣</div><small>EVENTS</small><b id="mEvents">-- Active</b><span>High impact</span><svg class="spark" viewBox="0 0 100 30"><path d="M5 28 V20 M25 28 V10 M45 28 V18 M65 28 V6 M85 28 V14" stroke="var(--cyan)" stroke-width="5"/></svg></div>
-  <div class="mod"><div class="mi">☁</div><small>WEATHER</small><b id="mWeather">Clear</b><span>Light rain</span><svg class="spark" viewBox="0 0 100 30"><path d="M0 24 C15 15,25 20,35 10 S60 26,75 12 S90 18,100 8" fill="none" stroke="var(--cyan)" stroke-width="3"/></svg></div>
-  <div class="mod"><div class="mi">ϟ</div><small>SURGE</small><b id="mSurge">1.6x</b><span>High Surge</span><svg class="spark" viewBox="0 0 100 30"><path d="M0 22 C15 12,25 25,38 14 S64 20,75 8 S90 22,100 12" fill="none" stroke="var(--purple)" stroke-width="3"/></svg></div>
+  <div class="mod"><div class="mi">▱</div><small>TRAFFIC</small><b id="mTraffic">--</b><span id="mTrafficSub">--</span><svg class="spark" viewBox="0 0 100 30" fill="none"><path d="M0 25 C20 20,20 8,40 16 S70 28,100 8" fill="none" stroke="var(--amber)" stroke-width="3"/></svg></div>
+  <div class="mod"><div class="mi">▣</div><small>EVENTS</small><b id="mEvents">--</b><span id="mEventsSub">--</span><svg class="spark" viewBox="0 0 100 30" fill="none"><path d="M5 28 V20 M25 28 V10 M45 28 V18 M65 28 V6 M85 28 V14" stroke="var(--cyan)" stroke-width="5"/></svg></div>
+  <div class="mod"><div class="mi">☁</div><small>WEATHER</small><b id="mWeather">--</b><span id="mWeatherSub">--</span><svg class="spark" viewBox="0 0 100 30" fill="none"><path d="M0 24 C15 15,25 20,35 10 S60 26,75 12 S90 18,100 8" fill="none" stroke="var(--cyan)" stroke-width="3"/></svg></div>
+  <div class="mod"><div class="mi">ϟ</div><small>SURGE</small><b id="mSurge">--x</b><span id="mSurgeSub">Normal</span><svg class="spark" viewBox="0 0 100 30" fill="none"><path d="M0 22 C15 12,25 25,38 14 S64 20,75 8 S90 22,100 12" fill="none" stroke="var(--purple)" stroke-width="3"/></svg></div>
 </section>
 
+<div class="section-head" style="margin-top:14px"><h3>AI EARNINGS PREDICTION</h3></div>
 <section class="chart-card">
-  <div class="chart"><div class="chart-title">AI EARNINGS PREDICTION</div><svg viewBox="0 0 260 155"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop stop-color="var(--green)" stop-opacity=".45"/><stop offset="1" stop-color="var(--green)" stop-opacity="0"/></linearGradient></defs><path d="M0 135 L0 105 L20 85 L40 102 L62 70 L82 78 L105 55 L128 62 L150 35 L172 72 L195 84 L215 112 L238 95 L260 110 L260 135 Z" fill="url(#g)"/><path d="M0 105 L20 85 L40 102 L62 70 L82 78 L105 55 L128 62 L150 35 L172 72 L195 84 L215 112 L238 95 L260 110" fill="none" stroke="var(--green)" stroke-width="4"/><text x="152" y="24" fill="var(--text)" font-size="15" font-weight="800">$186</text></svg></div>
-  <div class="drivebox"><small>BEST TIME TO DRIVE</small><b id="bestTime">11 PM - 2 AM</b><small>CONFIDENCE</small><div class="ring"><div id="ringVal">91%</div></div></div>
+  <div class="chart">
+    <div class="dyn-bars" id="dynBars"></div>
+    <div class="chart-xlbls"><span>12am</span><span>6am</span><span>12pm</span><span>6pm</span><span>11pm</span></div>
+  </div>
+  <div class="drivebox">
+    <small>BEST TIME</small>
+    <b id="bestTime">-- PM</b>
+    <small>CONFIDENCE</small>
+    <div class="ring">
+      <svg viewBox="0 0 60 60">
+        <circle cx="30" cy="30" r="24" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="6"/>
+        <circle cx="30" cy="30" r="24" fill="none" stroke="#19f6a2" stroke-width="6" id="confArc" stroke-dasharray="151" stroke-dashoffset="22" stroke-linecap="round" transform="rotate(-90 30 30)"/>
+      </svg>
+      <div id="ringVal">85%</div>
+    </div>
+  </div>
 </section>
 
+<div class="section-head" style="margin-top:14px"><h3>AI INSIGHTS FOR YOU</h3></div>
 <section class="insight">
-  <div class="bot">🤖</div><div><h4>AI INSIGHTS FOR YOU</h4><p id="aiInsight">High demand expected at O'Hare between 11 PM - 2 AM. Focus on airport rides to maximize earnings.</p></div><div class="orbit"><b>✈</b></div>
+  <div class="bot">🤖</div>
+  <div style="flex:1">
+    <h4>LIVE INTELLIGENCE</h4>
+    <p id="aiInsight">Analyzing your area in real-time...</p>
+    <div id="extraInsights"></div>
+  </div>
+  <div class="orbit">✈</div>
 </section>
 
-<div class="section-head"><h3><span class="dot-live">LIVE UPDATES</span></h3></div>
-<section class="live-updates"><div class="update"><b>ORD</b><span id="uOrd">High Activity</span></div><div class="update"><b>MDW</b><span id="uMdw">Moderate</span></div><div class="update"><b>Traffic</b><span id="uTraffic">Moderate</span></div></section>
+<div class="section-head" style="margin-top:14px"><h3><span class="dot-live">LIVE UPDATES</span></h3></div>
+<section class="live-updates">
+  <div class="update"><b>ORD</b><span id="uOrd">--</span></div>
+  <div class="update"><b>MDW</b><span id="uMdw">--</span></div>
+  <div class="update"><b>Surge</b><span id="uSurge">--</span></div>
+</section>
 
+<div class="spacer"></div>
+</div>
+
+<div class="ticker">
+  <div class="tick-track" id="tickerTrack">
+    <div class="ti"><span>✈️</span><span class="ti-code">ORD</span>&nbsp;<span class="ti-st t-g" id="tickORD">--</span></div>
+    <span class="tsep">·</span>
+    <div class="ti"><span>✈️</span><span class="ti-code">MDW</span>&nbsp;<span class="ti-st t-a" id="tickMDW">--</span></div>
+    <span class="tsep">·</span>
+    <div class="ti"><span>⚡</span><span class="ti-code">SURGE</span>&nbsp;<span class="ti-st t-v" id="tickSurge">--</span></div>
+    <span class="tsep">·</span>
+    <div class="ti"><span>🌤</span><span class="ti-code">WEATHER</span>&nbsp;<span class="ti-st t-b" id="tickWeather">--</span></div>
+    <span class="tsep">·</span>
+    <div class="ti"><span>✈️</span><span class="ti-code">ORD</span>&nbsp;<span class="ti-st t-g" id="tickORD2">--</span></div>
+    <span class="tsep">·</span>
+    <div class="ti"><span>⚡</span><span class="ti-code">SURGE</span>&nbsp;<span class="ti-st t-v" id="tickSurge2">--</span></div>
+  </div>
 </div>
 
 <nav class="nav">
   <a class="on" href="index.html"><i>⌂</i>Home</a>
   <a href="airports.html"><i>✈</i>Airports</a>
-  <a href="heatmap.html"><i>🗺</i>Map</a>
+  <a href="/map"><i>🗺</i>Map</a>
   <a href="ev.html"><i>ϟ</i>EV/Fuel</a>
   <a href="brain.html"><i>🧠</i>Brain</a>
 </nav>
@@ -133,77 +361,230 @@
 <script src="gps.js"></script>
 <script>
 const API = window.RS4_API || 'http://localhost:3000';
-const hour = new Date().getHours();
-// document.body.classList.toggle('day', hour >= 7 && hour < 19);
 
-setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});},1000);
+setInterval(() => {
+  document.getElementById('clock').textContent =
+    new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+}, 1000);
 
-function renderFlightList(id, flights){
-  const el=document.getElementById(id);
-  const list=(flights||[]).slice(0,3);
-  if(!list.length){el.innerHTML='<div class="flight"><b>--</b><span>No live arrivals</span><span>--</span></div>';return;}
-  el.innerHTML=list.map(f=>`<div class="flight"><b>${f.flightNumber||'--'}</b><span>${f.originCity||f.origin||'--'}</span><span>${f.scheduledTime||'--'}</span></div>`).join('');
+function $id(id) { return document.getElementById(id); }
+function gps() { return typeof GPS !== 'undefined' && GPS.lat ? `?lat=${GPS.lat}&lng=${GPS.lng}` : ''; }
+
+function renderFlightList(id, flights) {
+  const el = $id(id);
+  if (!el) return;
+  const list = (flights || []).slice(0, 3);
+  if (!list.length) {
+    el.innerHTML = '<div class="flight"><b>--</b><span>No live arrivals</span><span>--</span></div>';
+    return;
+  }
+  el.innerHTML = list.map(f =>
+    `<div class="flight"><b>${f.flightNumber || '--'}</b><span>${f.originCity || f.origin || '--'}</span><span>${f.scheduledTime || '--'}</span></div>`
+  ).join('');
 }
 
-async function loadAirports(){
-  try{
-    let lat=41.8781,lng=-87.6298;
-    if(window.GPS && GPS.getOnce){
-      await new Promise(resolve=>{
-        GPS.getOnce((a,b)=>{lat=a;lng=b;resolve();});
-        setTimeout(resolve,1200);
-      });
+async function loadZones() {
+  try {
+    const d = await fetch(API + '/api/zones' + gps()).then(r => r.json());
+    if (!d.success) return;
+    if (d.city) {
+      $id('heroCity').textContent = d.city.toUpperCase() + ' AREA';
+      $id('mapCity').textContent  = d.city + ' ○';
+    }
+    const z = d.bestZones?.[0];
+    if (z) {
+      $id('aiConfidence').textContent = Math.min(99, Math.round(z.score + 6)) + '%';
+      $id('heroSurge').textContent    = (z.surgeMultiplier || 1).toFixed(1) + 'x';
+      $id('mSurge').textContent       = (z.surgeMultiplier || 1).toFixed(1) + 'x';
+      const s = z.surgeMultiplier || 1;
+      $id('mSurgeSub').textContent    = s >= 1.5 ? 'High Surge' : s >= 1.2 ? 'Moderate' : 'Normal';
     }
 
-    const r=await fetch(`${API}/api/airports?lat=${lat}&lng=${lng}&t=${Date.now()}`);
-    const d=await r.json();
-    const airports=d.airports||[];
-    const ord=airports.find(a=>a.code==='ORD')||{};
-    const mdw=airports.find(a=>a.code==='MDW')||{};
-
-    document.getElementById('ordArrivals').innerHTML=`${ord.arrivalsPerHour??'--'}<em>↑</em>`;
-    document.getElementById('mdwArrivals').innerHTML=`${mdw.arrivalsPerHour??'--'}<em>↑</em>`;
-
-    const oq=Math.round(ord.queueLevel||72), mq=Math.round(mdw.queueLevel||48);
-    document.getElementById('ordQueue').textContent=oq+'%';
-    document.getElementById('mdwQueue').textContent=mq+'%';
-    document.getElementById('ordBar').style.width=oq+'%';
-    document.getElementById('mdwBar').style.width=mq+'%';
-
-    renderFlightList('ordFlights',ord.flights);
-    renderFlightList('mdwFlights',mdw.flights);
-
-    const totalPax=(ord.passengerLoad||0)+(mdw.passengerLoad||0);
-    const riders=(ord.expectedRiders||0)+(mdw.expectedRiders||0);
-
-    document.getElementById('heroReason').textContent =
-      totalPax ? `~${totalPax} passengers arriving · ~${riders} possible riders near Chicago airports.` :
-      'Strong airport activity + events driving high earnings potential.';
-
-    document.getElementById('uOrd').textContent=ord.arrivalsPerHour>10?'High Activity':'Moderate';
-    document.getElementById('uMdw').textContent=mdw.arrivalsPerHour>8?'High Activity':'Moderate';
-  }catch(e){console.error('Airport load error',e);}
-}
-
-async function loadExtras(){
-  try{
-    const [events,surge]=await Promise.allSettled([
-      fetch(`${API}/api/events`).then(r=>r.json()),
-      fetch(`${API}/api/surge`).then(r=>r.json())
-    ]);
-    const ev=events.status==='fulfilled'?events.value:null;
-    const su=surge.status==='fulfilled'?surge.value:null;
-    if(ev?.total) document.getElementById('mEvents').textContent=ev.total+' Active';
-    if(su?.current?.multiplier){
-      document.getElementById('heroSurge').textContent=su.current.multiplier+'x';
-      document.getElementById('mSurge').textContent=su.current.multiplier+'x';
+    const insights = [];
+    (d.bestZones || []).slice(0, 3).forEach(z =>
+      (z.insights || []).slice(0, 1).forEach(ins => insights.push({ zone: z.name, text: ins }))
+    );
+    if (insights.length) {
+      $id('aiInsight').textContent = insights[0].text;
+      $id('extraInsights').innerHTML = insights.slice(1).map(i =>
+        `<p style="font-size:11px;color:var(--muted);margin:6px 0 0;line-height:1.5"><strong style="color:var(--text)">${i.zone}:</strong> ${i.text}</p>`
+      ).join('');
     }
-  }catch(e){}
+  } catch(e) { console.warn('[zones]', e.message); }
 }
 
-loadAirports();
-loadExtras();
-setInterval(loadAirports,120000);
+async function loadAirports() {
+  try {
+    const d = await fetch(API + '/api/airports' + gps()).then(r => r.json());
+    if (!d.success || !d.airports?.length) return;
+
+    const ord = d.airports.find(a => a.code === 'ORD');
+    const mdw = d.airports.find(a => a.code === 'MDW');
+
+    [[ord, 'ord'], [mdw, 'mdw']].forEach(([ap, prefix]) => {
+      if (!ap) return;
+      const q  = ap.queueLevel || 50;
+      const qc = q > 72 ? 'var(--red)' : q > 45 ? 'var(--amber)' : 'var(--green)';
+
+      const tagEl = $id(prefix + 'Tag');
+      if (tagEl) tagEl.textContent = q > 70 ? 'BUSY' : q > 40 ? 'MODERATE' : 'OPEN';
+
+      const arrEl = $id(prefix + 'Arrivals');
+      if (arrEl) arrEl.innerHTML = (ap.arrivalsPerHour || '--') + '<em>↑</em>';
+
+      const qEl = $id(prefix + 'Queue');
+      if (qEl) { qEl.textContent = q + '%'; qEl.style.color = qc; }
+
+      const barEl = $id(prefix + 'Bar');
+      if (barEl) barEl.style.width = q + '%';
+
+      const ridEl = $id(prefix + 'Riders');
+      if (ridEl) ridEl.textContent = ap.expectedRiders || 0;
+
+      renderFlightList(prefix + 'Flights', ap.flights);
+
+      const tickTxt = q > 70 ? 'Busy 🔴' : 'Open 🟢';
+      if (prefix === 'ord') {
+        $id('tickORD').textContent  = tickTxt;
+        $id('tickORD2').textContent = tickTxt;
+        $id('uOrd').textContent     = q > 70 ? 'High Activity' : 'Moderate';
+      } else {
+        $id('tickMDW').textContent = tickTxt;
+        $id('uMdw').textContent    = q > 70 ? 'High Activity' : 'Moderate';
+      }
+    });
+
+    const totalPax    = (ord?.passengerLoad || 0) + (mdw?.passengerLoad || 0);
+    const totalRiders = (ord?.expectedRiders || 0) + (mdw?.expectedRiders || 0);
+    if (totalPax > 0) {
+      $id('heroReason').textContent =
+        `~${totalPax} passengers arriving · ~${totalRiders} possible riders near Chicago airports.`;
+    }
+  } catch(e) { console.warn('[airports]', e.message); }
+}
+
+async function loadWeather() {
+  try {
+    const d = await fetch(API + '/api/weather' + gps()).then(r => r.json());
+    if (!d.success) return;
+    const w = d.weather;
+    $id('mWeather').textContent    = w.temp + '°F';
+    $id('mWeatherSub').textContent = w.condition || w.desc;
+    $id('tickWeather').textContent = w.temp + '°F ' + (w.condition || '');
+  } catch(e) {}
+}
+
+async function loadEvents() {
+  try {
+    const d = await fetch(API + '/api/events' + gps()).then(r => r.json());
+    $id('mEvents').textContent    = (d.total || 0) > 0 ? d.total + ' Active' : 'None';
+    $id('mEventsSub').textContent = d.surgeActive ? '⚡ Surge active' : 'Low impact';
+  } catch(e) {}
+}
+
+async function loadTraffic() {
+  try {
+    const d = await fetch(API + '/api/traffic' + gps()).then(r => r.json());
+    if (!d.success) return;
+    const dt = (d.zones || []).find(z => z.name.includes('Downtown')) || (d.zones || [])[0];
+    if (dt) {
+      $id('mTraffic').textContent    = dt.congestion === 'heavy' ? 'Heavy' : dt.congestion === 'moderate' ? 'Moderate' : 'Light';
+      $id('mTrafficSub').textContent = dt.driveTime || dt.driveMinutes + ' min';
+    }
+  } catch(e) {}
+}
+
+async function loadSurge() {
+  try {
+    const d = await fetch(API + '/api/surge').then(r => r.json());
+    if (!d.success) return;
+    const mul = (d.current?.multiplier || 1).toFixed(1);
+    $id('mSurge').textContent    = mul + 'x';
+    $id('mSurgeSub').textContent = d.isSurgeActive ? 'Active now' : 'Normal';
+    $id('heroSurge').textContent = mul + 'x';
+    $id('tickSurge').textContent  = mul + 'x';
+    $id('tickSurge2').textContent = mul + 'x';
+    $id('uSurge').textContent     = d.isSurgeActive ? mul + 'x Active ⚡' : 'Normal';
+  } catch(e) {}
+}
+
+async function loadEarnings() {
+  try {
+    const d = await fetch(API + '/api/earnings-prediction' + gps()).then(r => r.json());
+    if (!d.success) return;
+
+    $id('heroEarn').textContent = '$' + d.estimatedShift8h + '+';
+    $id('bestTime').textContent = d.bestTime || '--';
+
+    const conf = d.confidence || 85;
+    $id('ringVal').textContent = conf + '%';
+    $id('confArc').setAttribute('stroke-dashoffset', Math.round(151 * (1 - conf / 100)));
+
+    const pts   = d.chartPoints || [];
+    const maxH  = Math.max(...pts.map(p => p.hourly), 1);
+    const nowH  = new Date().getHours();
+
+    $id('dynBars').innerHTML = pts.map(p => {
+      const pct = Math.max(4, Math.round(p.hourly / maxH * 100));
+      const col = p.hourly >= 35 ? '#19f6a2' : p.hourly >= 25 ? '#ffb82e' : 'rgba(255,255,255,.12)';
+      return `<div class="dyn-bar ${p.hour === nowH ? 'now' : ''}" style="height:${pct}%;background:${col}" title="${p.label} $${p.hourly}/hr"></div>`;
+    }).join('');
+  } catch(e) { console.warn('[earnings]', e.message); }
+}
+
+let goSecsLeft = 180, goTimer = null;
+
+async function loadRec() {
+  try {
+    const d = await fetch(API + '/api/ai/recommendation' + gps()).then(r => r.json());
+    if (!d.success || !d.recommendation) return;
+
+    const rec = d.recommendation;
+    $id('goCard').style.display    = 'flex';
+    $id('aiRecZone').textContent   = rec.zone;
+    $id('aiRecReason').textContent = (rec.reasons || []).slice(0, 2).join(' · ') || rec.reasoning || '';
+
+    const sc = rec.score >= 75 ? 'var(--green)' : rec.score >= 55 ? 'var(--amber)' : 'var(--red)';
+    $id('aiRecScore').textContent = rec.score;
+    $id('aiRecScore').style.color = sc;
+
+    $id('aiRecBtn').onclick = () =>
+      location.href = `https://www.google.com/maps/dir/?api=1&destination=${rec.lat},${rec.lng}&travelmode=driving`;
+
+    goSecsLeft = 180;
+  } catch(e) { console.warn('[rec]', e.message); }
+}
+
+function startRecClock() {
+  clearInterval(goTimer);
+  goTimer = setInterval(() => {
+    goSecsLeft--;
+    if (goSecsLeft <= 0) { goSecsLeft = 180; loadRec(); }
+
+    const m = Math.floor(goSecsLeft / 60), s = goSecsLeft % 60;
+    const el = $id('aiCountdown');
+    if (el) el.textContent = `Refreshes in ${m}:${String(s).padStart(2, '0')}`;
+  }, 1000);
+}
+
+async function init() {
+  await Promise.allSettled([
+    loadZones(), loadAirports(), loadWeather(),
+    loadEvents(), loadTraffic(), loadSurge(),
+    loadEarnings(), loadRec(),
+  ]);
+  startRecClock();
+}
+
+init();
+setInterval(loadZones,   2 * 60 * 1000);
+setInterval(loadAirports,3 * 60 * 1000);
+setInterval(loadWeather, 5 * 60 * 1000);
+setInterval(loadEvents,  3 * 60 * 1000);
+setInterval(loadTraffic, 3 * 60 * 1000);
+setInterval(loadSurge,   2 * 60 * 1000);
+setInterval(loadEarnings,5 * 60 * 1000);
+setInterval(loadRec,     3 * 60 * 1000);
 </script>
 </body>
 </html>

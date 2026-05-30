@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>Ride Smart 4.0 · Voice AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles/rs4-pro.css"/>
+<style>
+.orb{width:156px;height:156px;border-radius:50%;margin:24px auto;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(124,92,255,.2),rgba(25,246,162,.1));border:2px solid rgba(124,92,255,.35);position:relative;cursor:pointer;transition:all .2s;box-shadow:0 0 40px rgba(124,92,255,.14)}
+.orb.listening{border-color:rgba(25,246,162,.6);box-shadow:0 0 60px rgba(25,246,162,.3);animation:op 1.2s ease infinite}
+.orb.thinking{border-color:rgba(124,92,255,.6);box-shadow:0 0 60px rgba(124,92,255,.4);animation:ot 1.5s ease infinite}
+.orb.speaking{border-color:rgba(32,217,255,.6);box-shadow:0 0 60px rgba(32,217,255,.3);animation:op .7s ease infinite}
+@keyframes op{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes ot{0%,100%{box-shadow:0 0 60px rgba(124,92,255,.4)}50%{box-shadow:0 0 90px rgba(124,92,255,.7)}}
+.orb-rings{position:absolute;inset:0;border-radius:50%}
+.orb-ring{position:absolute;border-radius:50%;border:1px solid;animation:re 2.5s ease-out infinite}
+.orb-ring:nth-child(1){inset:-14px;border-color:rgba(124,92,255,.3);animation-delay:0s}
+.orb-ring:nth-child(2){inset:-28px;border-color:rgba(124,92,255,.18);animation-delay:.5s}
+.orb-ring:nth-child(3){inset:-42px;border-color:rgba(124,92,255,.08);animation-delay:1s}
+@keyframes re{0%{transform:scale(.8);opacity:.8}100%{transform:scale(1.25);opacity:0}}
+.orb-icon{font-size:54px;position:relative;z-index:1;user-select:none}
+.orb-status{text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--muted);margin-bottom:20px;height:18px}
+.orb-status.on{color:var(--green)}.orb-status.thinking{color:var(--purple)}.orb-status.speaking{color:var(--cyan)}
+.ai-bar{background:rgba(124,92,255,.06);border:1px solid rgba(124,92,255,.15);border-radius:12px;padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)}
+.ai-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);flex-shrink:0}
+.ai-dot.off{background:rgba(255,255,255,.2);box-shadow:none}
+.mic-btn{width:100%;padding:15px;border-radius:16px;background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 7px 22px rgba(124,92,255,.3);display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:7px;transition:.2s}
+.mic-btn:active{transform:scale(.97)}
+.mic-btn.active{background:linear-gradient(135deg,var(--green),#0ba55a);box-shadow:0 7px 22px rgba(25,246,162,.3)}
+.mic-btn.disabled{opacity:.45;pointer-events:none}
+.stop-btn{width:100%;padding:10px;border-radius:13px;background:rgba(255,77,115,.07);border:1px solid rgba(255,77,115,.18);color:var(--red);font-weight:700;font-size:13px;cursor:pointer;margin-bottom:14px}
+.transcript{background:rgba(124,92,255,.07);border:1px solid rgba(124,92,255,.16);border-radius:11px;padding:9px 13px;margin-bottom:9px;font-size:13px;color:var(--purple);font-style:italic;display:none}
+.qgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+.qb{padding:10px;border-radius:13px;background:var(--panel);border:1px solid var(--line);font-size:12px;font-weight:600;color:var(--text);cursor:pointer;text-align:left;display:flex;align-items:center;gap:7px;transition:.15s}
+.qb:active{background:rgba(124,92,255,.1);border-color:rgba(124,92,255,.28);transform:scale(.97)}
+.ctx-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px}
+.ctx-s{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:9px}
+.ctx-l{font-family:var(--mono);font-size:7px;color:var(--soft);letter-spacing:.7px;text-transform:uppercase;margin-bottom:3px}
+.ctx-v{font-size:12px;font-weight:700;color:var(--text)}
+.chat{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px;min-height:100px;max-height:300px;overflow-y:auto;scroll-behavior:smooth}
+.msg{margin-bottom:9px}
+.msg-user{text-align:right}
+.msg-bubble{display:inline-block;padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.55;max-width:87%}
+.msg-user .msg-bubble{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;border-radius:14px 14px 3px 14px}
+.msg-ai .msg-bubble{background:rgba(255,255,255,.05);color:var(--text);border:1px solid var(--line);border-radius:3px 14px 14px 14px}
+.msg-meta{font-family:var(--mono);font-size:8px;color:var(--soft);margin-top:3px}
+.typing{display:inline-flex;gap:4px;padding:9px 13px;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:3px 14px 14px 14px}
+.tdot{width:7px;height:7px;border-radius:50%;background:var(--purple);animation:tb .8s ease infinite}
+.tdot:nth-child(2){animation-delay:.2s}.tdot:nth-child(3){animation-delay:.4s}
+@keyframes tb{0%,80%,100%{transform:scale(.7);opacity:.4}40%{transform:scale(1);opacity:1}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="toast" id="toast"></div>
+
+<div class="page-header">
+  <a class="back-btn" href="index.html">← Home</a>
+  <span class="badge-chip" style="background:linear-gradient(135deg,#7c5cff,#20d9ff)">🎙 VOICE AI</span>
+</div>
+
+<div class="hero-eyebrow">VOICE INTELLIGENCE</div>
+<h1 style="margin-bottom:5px">Driver<br><em style="color:var(--purple)">Assistant</em></h1>
+<p style="margin-bottom:14px;font-size:13px;color:var(--muted)">Ask anything — zones, flights, events, earnings. Hands-free.</p>
+
+<div class="ai-bar"><div class="ai-dot" id="aiDot"></div><span id="aiStatus">Connecting...</span></div>
+
+<div class="orb" id="orb" onclick="toggleListen()">
+  <div class="orb-rings"><div class="orb-ring"></div><div class="orb-ring"></div><div class="orb-ring"></div></div>
+  <div class="orb-icon" id="orbIcon">🎙️</div>
+</div>
+<div class="orb-status" id="orbStatus">TAP TO SPEAK</div>
+
+<div class="transcript" id="transcript"></div>
+
+<button class="mic-btn" id="micBtn" onclick="toggleListen()">
+  <span id="micBtnIcon">🎙️</span><span id="micBtnText">Tap to Speak</span>
+</button>
+<button class="stop-btn" onclick="stopAll()">⏹ Stop Everything</button>
+
+<div class="sec-label">QUICK QUESTIONS</div>
+<div class="qgrid">
+  <div class="qb" onclick="ask('Where should I go right now?')"><span style="font-size:17px">🎯</span>Where to go?</div>
+  <div class="qb" onclick="ask('How many flights arriving at ORD in the next hour?')"><span style="font-size:17px">✈️</span>ORD flights now</div>
+  <div class="qb" onclick="ask('Are there events tonight with surge?')"><span style="font-size:17px">🎵</span>Events & surge</div>
+  <div class="qb" onclick="ask('What are my estimated earnings for the next 2 hours?')"><span style="font-size:17px">💰</span>Earnings forecast</div>
+  <div class="qb" onclick="ask('Should I go to the airport or stay downtown?')"><span style="font-size:17px">🛫</span>Airport vs downtown</div>
+  <div class="qb" onclick="ask('How is the weather affecting demand right now?')"><span style="font-size:17px">🌤</span>Weather impact</div>
+</div>
+
+<div class="sec-label">LIVE CONTEXT (AI sees this)</div>
+<div class="ctx-grid">
+  <div class="ctx-s"><div class="ctx-l">TOP ZONE</div><div class="ctx-v" id="ctxZone">--</div></div>
+  <div class="ctx-s"><div class="ctx-l">EST $/HR</div><div class="ctx-v" style="color:var(--green)" id="ctxHr">--</div></div>
+  <div class="ctx-s"><div class="ctx-l">FLIGHT RIDERS</div><div class="ctx-v" id="ctxPax">--</div></div>
+  <div class="ctx-s"><div class="ctx-l">EVENTS</div><div class="ctx-v" id="ctxEvents">--</div></div>
+  <div class="ctx-s"><div class="ctx-l">SURGE</div><div class="ctx-v" style="color:var(--amber)" id="ctxSurge">--</div></div>
+  <div class="ctx-s"><div class="ctx-l">WEATHER</div><div class="ctx-v" id="ctxWx">--</div></div>
+</div>
+
+<div class="sec-label">CONVERSATION</div>
+<div class="chat" id="chat">
+  <div class="msg msg-ai">
+    <div class="msg-bubble">👋 Hi! I'm your Ride Smart AI co-pilot. Ask me anything — where to go, airport vs downtown, earnings forecast, weather impact. Tap the mic or a quick question.</div>
+    <div class="msg-meta">Now</div>
+  </div>
+</div>
+
+</div>
+
+<nav class="nav">
+  <a href="index.html"><i>⌂</i>Home</a>
+  <a href="airports.html"><i>✈</i>Airports</a>
+  <a href="/map"><i>🗺</i>Map</a>
+  <a href="ev.html"><i>ϟ</i>EV/Fuel</a>
+  <a href="brain.html"><i>🧠</i>Brain</a>
+</nav>
+
+<script src="config.js"></script>
+<script src="gps.js"></script>
+<script>
+const API = window.RS4_API || 'https://ride-smart-4.onrender.com';
+let recog = null, isListening = false, synth = window.speechSynthesis;
+let ctx = {}, backendUp = false;
+
+function $id(id){return document.getElementById(id)}
+function toast(msg){const t=$id('toast');t.textContent=msg;t.className='toast show';setTimeout(()=>t.classList.remove('show'),2500)}
+function gps(){return typeof GPS!=='undefined'&&GPS.lat?`?lat=${GPS.lat}&lng=${GPS.lng}`:''}
+
+// ── STATUS CHECK ─────────────────────────────────────────
+async function checkBackend(){
+  try{
+    const r=await fetch(API+'/api/voice/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:'ping',context:{}})});
+    const d=await r.json();
+    backendUp=true;
+    $id('aiDot').className='ai-dot';
+    $id('aiStatus').textContent=d.source==='claude'?'🤖 Claude AI connected':'⚡ AI active (add ANTHROPIC_API_KEY for Claude)';
+  }catch{
+    $id('aiDot').className='ai-dot off';
+    $id('aiStatus').textContent='⚠️ Backend offline — using local answers';
+  }
+}
+
+// ── CONTEXT ───────────────────────────────────────────────
+async function loadCtx(){
+  try{
+    const q=gps();
+    const [zR,eR,sR,wR]=await Promise.allSettled([
+      fetch(API+'/api/zones'+q).then(r=>r.json()),
+      fetch(API+'/api/events'+q).then(r=>r.json()),
+      fetch(API+'/api/surge').then(r=>r.json()),
+      fetch(API+'/api/weather'+q).then(r=>r.json()),
+    ]);
+    const top=zR.value?.bestZones?.[0];
+    const surge=sR.value?.current?.multiplier||1;
+    const wx=wR.value?.weather;
+    ctx={
+      city:zR.value?.city||'your area',
+      topZone:top?.name||'Unknown',
+      zoneScore:top?.score||0,
+      estimatedHourly:top?.estimatedHourly||0,
+      expectedFlightRiders:top?.expectedFlightRiders||0,
+      expectedEventRiders:top?.expectedEventRiders||0,
+      eventsTotal:eR.value?.total||0,
+      eventsSurge:eR.value?.surgeActive||false,
+      surgeMultiplier:surge,
+      surgeActive:sR.value?.isSurgeActive||false,
+      weather:wx?`${wx.desc} ${wx.temp}°F`:(zR.value?.weather||'Clear'),
+      weatherBoost:wR.value?.demandImpact?.label||'Normal',
+      allZones:(zR.value?.bestZones||[]).slice(0,5).map(z=>({name:z.name,score:z.score,hourly:z.estimatedHourly,action:z.action})),
+      insights:top?.insights||[],
+    };
+    $id('ctxZone').textContent=ctx.topZone;
+    $id('ctxHr').textContent='$'+ctx.estimatedHourly+'/hr';
+    $id('ctxPax').textContent='~'+(ctx.expectedFlightRiders+ctx.expectedEventRiders)||'--';
+    $id('ctxEvents').textContent=ctx.eventsTotal+(ctx.eventsSurge?' ⚡':'');
+    $id('ctxSurge').textContent=surge.toFixed(1)+'x';
+    $id('ctxWx').textContent=ctx.weather;
+  }catch(e){console.warn('[ctx]',e.message)}
+}
+
+// ── SPEECH REC ────────────────────────────────────────────
+function initRec(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){
+    $id('micBtn').classList.add('disabled');
+    $id('micBtnText').textContent='Voice not supported — use quick questions';
+    return false;
+  }
+  recog=new SR();
+  recog.continuous=false;recog.interimResults=true;recog.lang='en-US';
+  recog.onresult=e=>{
+    const txt=Array.from(e.results).map(r=>r[0].transcript).join('');
+    const t=$id('transcript');t.textContent='🎙️ '+txt;
+    if(e.results[e.results.length-1].isFinal){stopListening();if(txt.trim())ask(txt.trim());}
+  };
+  recog.onerror=e=>{stopListening();toast('⚠️ Mic: '+e.error)};
+  recog.onend=()=>{if(isListening)stopListening()};
+  return true;
+}
+
+function toggleListen(){
+  if(isListening){stopListening();return;}
+  if(!recog&&!initRec()){toast('⚠️ Voice not supported');return;}
+  try{
+    recog.start();isListening=true;
+    setOrb('listening');
+    $id('micBtn').className='mic-btn active';
+    $id('micBtnText').textContent='Listening... tap to stop';
+    $id('transcript').style.display='block';
+    $id('transcript').textContent='🎙️ Speak now...';
+  }catch(e){toast('⚠️ '+e.message)}
+}
+
+function stopListening(){
+  isListening=false;
+  if(recog){try{recog.stop()}catch{}}
+  setOrb('idle');
+  $id('micBtn').className='mic-btn';$id('micBtnText').textContent='Tap to Speak';
+  $id('transcript').style.display='none';
+}
+
+function stopAll(){
+  stopListening();
+  if(synth)synth.cancel();
+  removeTyping();
+  setOrb('idle');
+}
+
+// ── ASK ───────────────────────────────────────────────────
+async function ask(q){
+  addMsg(q,'user');
+  setOrb('thinking');
+  showTyping();
+  try{
+    const r=await fetch(API+'/api/voice/ask',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({question:q,context:ctx})
+    });
+    if(!r.ok)throw new Error('Status '+r.status);
+    const d=await r.json();
+    const ans=d.answer||localAns(q);
+    removeTyping();setOrb('idle');
+    addMsg(ans,'ai',d.source);
+    speak(ans);
+  }catch(e){
+    removeTyping();setOrb('idle');
+    const a=localAns(q);addMsg(a,'ai','local');speak(a);
+  }
+}
+
+// ── LOCAL FALLBACK ────────────────────────────────────────
+function localAns(q){
+  const ql=q.toLowerCase(), c=ctx;
+  if(!c.topZone||c.topZone==='Unknown') return "Backend is offline. Start the server and try again.";
+  if(ql.includes('where')||ql.includes('go')||ql.includes('best'))
+    return `Head to ${c.topZone} — score ${c.zoneScore}, est $${c.estimatedHourly}/hr. ${c.insights?.[0]||''}`;
+  if(ql.includes('airport')||ql.includes('ord')||ql.includes('flight'))
+    return `~${c.expectedFlightRiders||0} riders expected from flights. ${c.zoneScore>65?'Airport zone is active.':'Moderate activity.'}`;
+  if(ql.includes('event')||ql.includes('concert'))
+    return `${c.eventsTotal} events in your area. ${c.eventsSurge?'⚡ Surge active near venues!':'No surge yet — check back closer to showtime.'}`;
+  if(ql.includes('surge'))
+    return `Surge is ${c.surgeMultiplier.toFixed(1)}x. ${c.surgeActive?'Active now — good time to drive!':'Normal demand.'}`;
+  if(ql.includes('weather')||ql.includes('rain'))
+    return `${c.weather}. ${c.weatherBoost!=='Normal'?c.weatherBoost+' — riders avoiding walking.':'Good driving conditions.'}`;
+  if(ql.includes('earn')||ql.includes('money'))
+    return `Top zone ${c.topZone}: ~$${c.estimatedHourly}/hr. ${c.surgeActive?'Surge is adding bonus earnings!':'Best window is typically 5–7 PM and 10 PM–1 AM.'}`;
+  return `Go to ${c.topZone}. Score ${c.zoneScore}, ~$${c.estimatedHourly}/hr. ${c.insights?.[0]||''}`;
+}
+
+// ── TTS ───────────────────────────────────────────────────
+function speak(text){
+  if(!synth)return;
+  synth.cancel();
+  const clean=text.replace(/[\u{1F300}-\u{1FAFF}]/gu,'').replace(/[~*]/g,'').trim();
+  const u=new SpeechSynthesisUtterance(clean);
+  u.rate=1.05;u.pitch=1;
+  const vlist=synth.getVoices();
+  for(const name of['Google US English','Samantha','Alex','Karen']){
+    const v=vlist.find(v=>v.name.includes(name));if(v){u.voice=v;break;}
+  }
+  u.onstart=()=>setOrb('speaking');
+  u.onend=()=>setOrb('idle');
+  u.onerror=()=>setOrb('idle');
+  synth.speak(u);
+}
+
+// ── UI HELPERS ────────────────────────────────────────────
+function setOrb(state){
+  const orb=$id('orb'),icon=$id('orbIcon'),status=$id('orbStatus');
+  orb.className='orb'+(state!=='idle'?' '+state:'');
+  const map={listening:{i:'🔴',s:'LISTENING...',c:'on'},thinking:{i:'🤔',s:'THINKING...',c:'thinking'},speaking:{i:'🔊',s:'SPEAKING...',c:'speaking'},idle:{i:'🎙️',s:'TAP TO SPEAK',c:''}};
+  const m=map[state]||map.idle;
+  icon.textContent=m.i;status.textContent=m.s;status.className='orb-status'+(m.c?' '+m.c:'');
+}
+
+let typingEl=null;
+function showTyping(){
+  removeTyping();
+  const el=$id('chat');
+  const d=document.createElement('div');
+  d.className='msg msg-ai';d.id='typing';
+  d.innerHTML='<div class="typing"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>';
+  el.appendChild(d);el.scrollTop=el.scrollHeight;typingEl=d;
+}
+function removeTyping(){
+  if(typingEl){typingEl.remove();typingEl=null;}
+  const o=$id('typing');if(o)o.remove();
+}
+
+function addMsg(text,from,src){
+  const el=$id('chat');
+  const t=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  const srcLbl=from==='ai'?(src==='claude'?'🤖 Claude AI':src==='local'?'⚡ Local AI':'🔧 AI'):'';
+  const d=document.createElement('div');
+  d.className='msg msg-'+from;
+  d.innerHTML=`<div class="msg-bubble">${text}</div><div class="msg-meta">${t}${srcLbl?' · '+srcLbl:''}</div>`;
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+}
+
+// ── INIT ──────────────────────────────────────────────────
+checkBackend();
+loadCtx();
+setInterval(loadCtx,3*60*1000);
+initRec();
+if(synth){synth.onvoiceschanged=()=>synth.getVoices();synth.getVoices();}
+</script>
+</body>
+</html>

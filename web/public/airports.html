@@ -4,303 +4,339 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
 <title>Ride Smart 4.0 · Airport Intelligence</title>
-
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="styles/rs4-pro.css"/>
+<style>
+/* ── AIRPORT HERO CARD ── */
+.ap-hero{border-radius:22px;padding:18px;margin-bottom:12px;border:1px solid;position:relative;overflow:hidden}
+.ap-hero.ord{background:linear-gradient(135deg,rgba(124,92,255,.1),rgba(25,246,162,.04));border-color:rgba(124,92,255,.22)}
+.ap-hero.mdw{background:linear-gradient(135deg,rgba(255,184,46,.1),rgba(124,92,255,.04));border-color:rgba(255,184,46,.22)}
+.ap-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(124,92,255,.08),transparent 50%);pointer-events:none}
+
+.ap-code{font-family:var(--mono);font-size:32px;font-weight:700;letter-spacing:2px;position:relative;line-height:1}
+.ap-name{font-size:13px;color:var(--muted);margin:4px 0 12px;font-weight:600;position:relative}
+
+/* 4-column stats grid */
+.ap-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;position:relative}
+.ap-stat{background:rgba(0,0,0,.25);border-radius:12px;padding:10px;text-align:center;border:1px solid rgba(255,255,255,.05)}
+.ap-stat .l{font-size:7px;color:var(--soft);letter-spacing:.8px;font-family:var(--mono);text-transform:uppercase;margin-bottom:4px}
+.ap-stat .v{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text)}
+
+/* Queue bar */
+.queue-wrap{position:relative;margin:12px 0 4px}
+.queue-bar{background:rgba(255,255,255,.07);border-radius:999px;height:6px;overflow:hidden}
+.queue-fill{height:100%;border-radius:999px;transition:width .6s ease}
+.queue-meta{display:flex;align-items:center;justify-content:space-between;margin-top:5px}
+.queue-lbl{font-family:var(--mono);font-size:9px;color:var(--muted)}
+.queue-action{font-family:var(--mono);font-size:9px;font-weight:700}
+
+/* Passenger banner */
+.pax-banner{border-radius:12px;padding:10px 13px;margin:8px 0;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px}
+.pax-banner.hot{background:rgba(25,246,162,.07);border:1px solid rgba(25,246,162,.18);color:var(--green)}
+.pax-banner.warm{background:rgba(255,184,46,.07);border:1px solid rgba(255,184,46,.18);color:var(--amber)}
+
+/* Action buttons */
+.action-btns{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px}
+
+/* Data note */
+.data-note{font-family:var(--mono);font-size:9px;color:var(--soft);text-align:center;padding:6px 0}
+
+/* ── FLIGHT LIST ── */
+.flights-section{margin-bottom:20px}
+.flights-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.flights-title{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;color:var(--soft);text-transform:uppercase}
+.flights-badge{font-family:var(--mono);font-size:8px;font-weight:700;padding:3px 8px;border-radius:999px}
+.fb-live{background:rgba(25,246,162,.1);color:var(--green);border:1px solid rgba(25,246,162,.2)}
+.fb-est{background:rgba(255,255,255,.05);color:var(--soft);border:1px solid rgba(255,255,255,.08)}
+
+.flight-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.flight-row:last-child{border:none}
+.fn{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);width:70px;flex-shrink:0}
+.fc{font-size:12px;color:var(--text);flex:1;min-width:0}
+.fc-origin{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc-meta{font-size:10px;color:var(--muted);margin-top:1px}
+.ft{font-family:var(--mono);font-size:12px;color:var(--muted);flex-shrink:0;text-align:right}
+.ft-min{font-family:var(--mono);font-size:10px;color:var(--soft);margin-top:1px;text-align:right}
+
+.fs{display:inline-block;font-family:var(--mono);font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;margin-top:2px}
+.fs-arriving{background:rgba(25,246,162,.12);color:var(--green)}
+.fs-landed{background:rgba(124,92,255,.12);color:var(--purple)}
+.fs-scheduled{background:rgba(255,255,255,.06);color:var(--soft)}
+.fs-delayed{background:rgba(255,77,115,.12);color:var(--red)}
+
+.pax-badge{display:inline-flex;align-items:center;gap:3px;font-family:var(--mono);font-size:9px;margin-top:2px}
+
+/* Total riders banner */
+.total-banner{background:linear-gradient(135deg,rgba(124,92,255,.1),rgba(25,246,162,.06));border:1px solid rgba(124,92,255,.2);border-radius:16px;padding:12px 14px;margin-bottom:14px;display:none;align-items:center;gap:10px}
+.total-banner-num{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--green);line-height:1}
+</style>
 </head>
-
-<body class="day">
-
+<body>
+<div class="app">
 <div class="toast" id="toast"></div>
 
 <div class="page-header">
-  <a class="back-btn" href="/">← Home</a>
+  <a class="back-btn" href="index.html">← Home</a>
   <span class="badge-chip">✈️ AIRPORTS</span>
 </div>
 
 <div class="hero-eyebrow">AIRPORT INTELLIGENCE</div>
+<h1 style="margin-bottom:6px">Live<br><em>Flight Data</em></h1>
+<p style="margin-bottom:16px">Arrivals, passenger counts, and rideshare demand at nearby airports.</p>
 
-<h1 style="margin-bottom:6px">
-  Live<br>
-  <em style="color:var(--mint);font-style:normal">Flight Data</em>
-</h1>
-
-<p style="margin-bottom:16px">
-  Arrivals, queues, and demand at nearby airports.
-</p>
-
-<div class="airport-hero ohare">
-  <div class="a-code" id="airport1Code">ORD</div>
-  <div class="a-name" id="airport1Name">O'Hare International Airport</div>
-
-  <div class="a-stats">
-    <div class="a-stat"><div class="l">ARRIVALS/HR</div><div class="v" id="ordArrivals">--</div></div>
-    <div class="a-stat"><div class="l">QUEUE</div><div class="v" id="ordQueue">--</div></div>
-    <div class="a-stat"><div class="l">DEMAND</div><div class="v" id="ordDemand">--</div></div>
-    <div class="a-stat"><div class="l">EST $/HR</div><div class="v" id="ordHrly" style="color:var(--mint)">--</div></div>
+<!-- TOTAL RIDERS BANNER -->
+<div class="total-banner" id="totalBanner">
+  <div>
+    <div style="font-family:var(--mono);font-size:8px;letter-spacing:1.5px;color:var(--soft);margin-bottom:4px">TOTAL RIDERS EXPECTED</div>
+    <div class="total-banner-num" id="totalRidersNum">--</div>
   </div>
+  <div style="flex:1;font-size:12px;color:var(--muted);line-height:1.5" id="totalRidersDesc">passengers need rides from nearby airports right now</div>
+</div>
 
-  <div style="margin-top:12px">
-    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--fog);margin-bottom:4px">
-      <span>Driver Queue</span>
-      <span id="ordQueuePct">--</span>
+<!-- ORD CARD -->
+<div id="ordCard" style="display:none">
+  <div class="ap-hero ord">
+    <div class="ap-code" style="color:var(--purple)">ORD</div>
+    <div class="ap-name" id="ordName">Chicago O'Hare International Airport</div>
+    <div class="ap-stats">
+      <div class="ap-stat"><div class="l">ARRIVALS/HR</div><div class="v" id="ordArrPhr">--</div></div>
+      <div class="ap-stat"><div class="l">QUEUE</div><div class="v" id="ordQueue" style="color:var(--amber)">--%</div></div>
+      <div class="ap-stat"><div class="l">DEMAND</div><div class="v" id="ordDemand">--%</div></div>
+      <div class="ap-stat"><div class="l">EST $/HR</div><div class="v" style="color:var(--purple)" id="ordHourly">$--</div></div>
     </div>
-    <div class="queue-meter">
-      <div class="queue-fill" id="ordQueueBar"></div>
+    <div class="queue-wrap">
+      <div class="queue-bar"><div class="queue-fill" id="ordQBar" style="background:linear-gradient(90deg,var(--purple),var(--purple2));width:0%"></div></div>
+      <div class="queue-meta">
+        <span class="queue-lbl">Driver Queue</span>
+        <span class="queue-action" id="ordAction" style="color:var(--green)">--</span>
+      </div>
     </div>
+    <div class="pax-banner hot" id="ordPaxBanner" style="display:none">
+      <span>✈️</span><span id="ordPaxMsg">--</span>
+    </div>
+    <div class="action-btns">
+      <button class="btn btn-mint btn-sm" id="ordNavBtn" style="border-radius:12px;padding:12px">🧭 Navigate ORD</button>
+      <button class="btn btn-ghost btn-sm" id="ordActionBtn" style="border-radius:12px;padding:12px;color:var(--green)">--</button>
+    </div>
+    <div class="data-note" id="ordNote"></div>
   </div>
-
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px">
-    <button class="btn btn-mint btn-sm" id="ordNavBtn">🧭 Navigate Airport</button>
-    <button class="btn btn-ghost btn-sm" id="ordAction">Loading...</button>
+  <!-- ORD FLIGHTS -->
+  <div class="flights-section">
+    <div class="flights-header">
+      <div class="flights-title" id="ordFlightsTitle">LIVE ARRIVALS — ORD</div>
+      <div class="flights-badge fb-est" id="ordFlightsBadge">EST.</div>
+    </div>
+    <div id="ordFlights"><p style="color:var(--muted);font-size:12px">Loading flights...</p></div>
   </div>
 </div>
 
-<div class="airport-hero midway">
-  <div class="a-code" id="airport2Code" style="color:var(--amber)">MDW</div>
-  <div class="a-name" id="airport2Name">Chicago Midway International Airport</div>
-
-  <div class="a-stats">
-    <div class="a-stat"><div class="l">ARRIVALS/HR</div><div class="v" id="mdwArrivals">--</div></div>
-    <div class="a-stat"><div class="l">QUEUE</div><div class="v" id="mdwQueue">--</div></div>
-    <div class="a-stat"><div class="l">DEMAND</div><div class="v" id="mdwDemand">--</div></div>
-    <div class="a-stat"><div class="l">EST $/HR</div><div class="v" id="mdwHrly" style="color:var(--amber)">--</div></div>
+<!-- MDW CARD -->
+<div id="mdwCard" style="display:none">
+  <div class="ap-hero mdw">
+    <div class="ap-code" style="color:var(--amber)">MDW</div>
+    <div class="ap-name" id="mdwName">Chicago Midway International Airport</div>
+    <div class="ap-stats">
+      <div class="ap-stat"><div class="l">ARRIVALS/HR</div><div class="v" id="mdwArrPhr">--</div></div>
+      <div class="ap-stat"><div class="l">QUEUE</div><div class="v" id="mdwQueue" style="color:var(--green)">--%</div></div>
+      <div class="ap-stat"><div class="l">DEMAND</div><div class="v" id="mdwDemand">--%</div></div>
+      <div class="ap-stat"><div class="l">EST $/HR</div><div class="v" style="color:var(--amber)" id="mdwHourly">$--</div></div>
+    </div>
+    <div class="queue-wrap">
+      <div class="queue-bar"><div class="queue-fill" id="mdwQBar" style="background:linear-gradient(90deg,var(--amber),#f97316);width:0%"></div></div>
+      <div class="queue-meta">
+        <span class="queue-lbl">Driver Queue</span>
+        <span class="queue-action" id="mdwAction" style="color:var(--green)">--</span>
+      </div>
+    </div>
+    <div class="pax-banner warm" id="mdwPaxBanner" style="display:none">
+      <span>✈️</span><span id="mdwPaxMsg">--</span>
+    </div>
+    <div class="action-btns">
+      <button class="btn btn-mint btn-sm" id="mdwNavBtn" style="border-radius:12px;padding:12px">🧭 Navigate MDW</button>
+      <button class="btn btn-ghost btn-sm" id="mdwActionBtn" style="border-radius:12px;padding:12px;color:var(--amber)">--</button>
+    </div>
+    <div class="data-note" id="mdwNote"></div>
   </div>
-
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px">
-    <button class="btn btn-amber btn-sm" id="mdwNavBtn">🧭 Navigate Airport</button>
-    <button class="btn btn-ghost btn-sm">📊 Zone Score</button>
+  <!-- MDW FLIGHTS -->
+  <div class="flights-section">
+    <div class="flights-header">
+      <div class="flights-title" id="mdwFlightsTitle">LIVE ARRIVALS — MDW</div>
+      <div class="flights-badge fb-est" id="mdwFlightsBadge">EST.</div>
+    </div>
+    <div id="mdwFlights"><p style="color:var(--muted);font-size:12px">Loading flights...</p></div>
   </div>
 </div>
 
-<div class="sec-label" id="ordFlightsTitle">LIVE ARRIVALS — AIRPORT 1</div>
-<div id="ordFlightsList"><p>Loading flights...</p></div>
+<!-- EMPTY STATE (no airports found) -->
+<div id="emptyState" style="display:none;text-align:center;padding:30px;color:var(--muted)">
+  <div style="font-size:32px;margin-bottom:12px">📡</div>
+  <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">No airports found nearby</div>
+  <div style="font-size:12px">Major commercial airports not detected within 60 miles.</div>
+</div>
 
-<div class="sec-label" id="mdwFlightsTitle">LIVE ARRIVALS — AIRPORT 2</div>
-<div id="mdwFlightsList"><p>Loading flights...</p></div>
+<!-- LOADING STATE -->
+<div id="loadingState" style="text-align:center;padding:30px;color:var(--muted)">
+  <div style="font-size:28px;margin-bottom:10px">📡</div>
+  Loading airport intelligence...
+</div>
 
-<nav class="nav nav-5">
-  <a href="/">Home</a>
-  <a href="events.html">🎵</a>
-  <a href="heatmap.html">🗺️</a>
-  <a href="ev.html">⚡</a>
-  <a href="brain.html">🧠</a>
+</div><!-- /app -->
+
+<nav class="nav">
+  <a href="index.html"><i>⌂</i>Home</a>
+  <a class="on" href="airports.html"><i>✈</i>Airports</a>
+  <a href="/map"><i>🗺</i>Map</a>
+  <a href="ev.html"><i>ϟ</i>EV/Fuel</a>
+  <a href="brain.html"><i>🧠</i>Brain</a>
 </nav>
 
 <script src="config.js"></script>
-
+<script src="gps.js"></script>
 <script>
-const API = 'https://ride-smart-4.onrender.com';
-const hour = new Date().getHours();
-// document.body.classList.toggle('day'
+const API = window.RS4_API || 'https://ride-smart-4.onrender.com';
 
-function nav(lat,lng){
-  window.location.href =
-    `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
-}
+function $id(id){ return document.getElementById(id); }
+function nav(lat, lng){ window.location.href = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`; }
+function qColor(q){ return q>72?'var(--red)':q>45?'var(--amber)':'var(--green)'; }
 
-function setText(id,value){
-  const el = document.getElementById(id);
-  if(el) el.textContent = value;
-}
-
-async function getLocation(){
-  return new Promise(resolve => {
-    if(!navigator.geolocation){
-      return resolve({ lat:41.8781, lng:-87.6298 });
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      pos => resolve({
-        lat:pos.coords.latitude,
-        lng:pos.coords.longitude
-      }),
-      () => resolve({ lat:41.8781, lng:-87.6298 }),
-      { enableHighAccuracy:true, timeout:8000, maximumAge:30000 }
-    );
-  });
-}
-
-function updateAirportCard(prefix, airport){
-  if(!airport) return;
-
-  const q = Number(airport.queueLevel || 0);
-
-  setText(`${prefix}Arrivals`, airport.arrivalsPerHour ?? '--');
-  setText(`${prefix}Queue`, q ? `${q}%` : '--');
-  setText(`${prefix}Demand`, airport.demandScore ? `${airport.demandScore}%` : '--');
-  setText(`${prefix}Hrly`, airport.estimatedHourly ? `$${airport.estimatedHourly}` : '--');
-
-  if(prefix === 'ord'){
-    setText('airport1Code', airport.code || '---');
-    setText('airport1Name', airport.name || 'Airport');
-    setText('ordQueuePct', q ? `${q}%` : '--');
-    setText('ordAction', airport.action || 'Monitor');
-
-    const qBar = document.getElementById('ordQueueBar');
-    if(qBar){
-      qBar.style.width = q ? `${q}%` : '0%';
-      qBar.style.background =
-        q > 70 ? 'var(--red)' :
-        q > 40 ? 'var(--amber)' :
-        'var(--mint)';
-    }
-
-    const navBtn = document.getElementById('ordNavBtn');
-    if(navBtn){
-      navBtn.textContent = `🧭 Navigate ${airport.code || ''}`;
-      navBtn.onclick = () => nav(airport.lat, airport.lng);
-    }
-
-    setText('ordFlightsTitle', `LIVE ARRIVALS — ${airport.code || 'AIRPORT 1'}`);
-  }
-
-  if(prefix === 'mdw'){
-    setText('airport2Code', airport.code || '---');
-    setText('airport2Name', airport.name || 'Airport');
-
-    const navBtn = document.getElementById('mdwNavBtn');
-    if(navBtn){
-      navBtn.textContent = `🧭 Navigate ${airport.code || ''}`;
-      navBtn.onclick = () => nav(airport.lat, airport.lng);
-    }
-
-    setText('mdwFlightsTitle', `LIVE ARRIVALS — ${airport.code || 'AIRPORT 2'}`);
-  }
-}
-
-function renderFlights(containerId, flights=[]){
-  const el = document.getElementById(containerId);
-  if(!el) return;
-
-  const cleanFlights = flights.filter(f =>
-    f &&
-    (
-      f.flightNumber ||
-      f.airline ||
-      f.origin ||
-      f.originCity
-    )
-  );
-
-  if(!cleanFlights.length){
-    el.innerHTML = '<p style="color:var(--mist);font-size:13px">No recent arrivals.</p>';
+function renderFlights(flights, containerId, titleId, badgeId, airportCode) {
+  const titleEl = $id(titleId);
+  const badgeEl = $id(badgeId);
+  const listEl  = $id(containerId);
+  if (!flights || !flights.length) {
+    listEl.innerHTML = '<p style="color:var(--muted);font-size:12px">No arrivals in next 3 hours.</p>';
     return;
   }
+  const hasReal = flights.some(f => f.isReal && !f.isEstimate);
+  titleEl.textContent = (hasReal ? '📡 LIVE' : '📊 EST.') + ' ARRIVALS — ' + airportCode;
+  badgeEl.textContent = hasReal ? '● LIVE' : 'EST.';
+  badgeEl.className   = 'flights-badge ' + (hasReal ? 'fb-live' : 'fb-est');
 
-  el.innerHTML = cleanFlights.slice(0,10).map(f => {
-    const s = String(f.status || '').toLowerCase();
-
-    const cls =
-      s.includes('land') ? 'fs-landed' :
-      s.includes('arr') ? 'fs-arriving' :
-      'fs-scheduled';
-
-    const label =
-      s.includes('land') ? 'LANDED' :
-      s.includes('arr') ? 'ARRIVING' :
-      'SCHEDULED';
-
-    const origin =
-      f.originCity ||
-      f.origin ||
-      f.airline ||
-      '--';
-
+  listEl.innerHTML = flights.slice(0, 15).map(f => {
+    const s   = (f.status || '').toLowerCase();
+    const cls = s.includes('land') ? 'fs-landed'
+              : s.includes('arriv') ? 'fs-arriving'
+              : s.includes('delay') ? 'fs-delayed'
+              : 'fs-scheduled';
+    const lbl = s.includes('land') ? 'LANDED'
+              : s.includes('arriv') ? 'ARRIVING'
+              : s.includes('delay') ? 'DELAYED'
+              : 'SCHED';
+    const mins = f.minutesToArrival;
+    const timeMain = mins !== undefined
+      ? (mins <= 0 ? 'NOW' : mins + 'm')
+      : (f.scheduledTime || '--');
+    const delay = f.delayMinutes > 15
+      ? `<span style="font-family:var(--mono);font-size:9px;color:var(--red);margin-left:4px">+${f.delayMinutes}m</span>`
+      : '';
+    const paxColor  = (f.isReal && !f.isEstimate) ? 'var(--purple)' : 'var(--soft)';
+    const paxPrefix = (f.isReal && !f.isEstimate) ? '👥' : '~👥';
     return `
-      <div class="flight-card">
-        <div class="flight-num">${f.flightNumber || '--'}</div>
-
-        <div style="flex:1">
-          <div style="font-size:12px;font-weight:700;color:var(--white)">
-            ${origin}
-          </div>
-
-          <div class="flight-status ${cls}">
-            ${label}
-          </div>
-
-          <div style="font-size:11px;color:var(--mist);margin-top:3px">
-            👥 Estimated passengers: ${f.passengerCount || '--'}
-          </div>
+    <div class="flight-row">
+      <div class="fn">${f.flightNumber || '—'}</div>
+      <div class="fc">
+        <div class="fc-origin">${f.originCity || f.origin || '—'} <span style="color:var(--soft);font-size:10px">${f.origin ? '('+f.origin+')' : ''}</span></div>
+        <div style="display:flex;align-items:center;gap:4px">
+          <span class="fs ${cls}">${lbl}</span>${delay}
         </div>
-
-        <div class="flight-time">${f.scheduledTime || '--'}</div>
+        ${f.aircraftType ? `<div class="fc-meta">${f.airline ? f.airline+' · ' : ''}${f.aircraftType}</div>` : ''}
+        ${f.passengerCount > 0 ? `<div class="pax-badge" style="color:${paxColor}">${paxPrefix} ${f.passengerCount} pax</div>` : ''}
       </div>
-    `;
+      <div>
+        <div class="ft">${timeMain}</div>
+        ${f.terminal ? `<div class="ft-min">T${f.terminal}</div>` : ''}
+      </div>
+    </div>`;
   }).join('');
 }
 
-async function load(){
-  try{
-    const loc = await getLocation();
+function renderAirportCard(ap, prefix) {
+  const q  = ap.queueLevel || 50;
+  const qc = qColor(q);
+  $id(prefix+'Card').style.display = 'block';
+  $id(prefix+'Name').textContent    = ap.name;
+  $id(prefix+'ArrPhr').textContent  = ap.arrivalsPerHour || '--';
+  $id(prefix+'Queue').textContent   = q + '%';
+  $id(prefix+'Queue').style.color   = qc;
+  $id(prefix+'Demand').textContent  = (ap.demandScore || '--') + '%';
+  $id(prefix+'Hourly').textContent  = '$' + (ap.estimatedHourly || '--');
+  $id(prefix+'QBar').style.width    = q + '%';
+  $id(prefix+'Action').textContent  = ap.action || '--';
+  $id(prefix+'Action').style.color  = q > 70 ? 'var(--red)' : q > 40 ? 'var(--amber)' : 'var(--green)';
+  $id(prefix+'ActionBtn').textContent = ap.action || '--';
+  $id(prefix+'ActionBtn').style.color = qc;
 
-    const url =
-      `${API}/api/airports?lat=${loc.lat}&lng=${loc.lng}&t=${Date.now()}`;
+  // Navigate button
+  $id(prefix+'NavBtn').onclick = () => nav(ap.lat, ap.lng);
 
-    console.log('FETCH URL:', url);
+  // Passenger banner
+  if (ap.expectedRiders > 0) {
+    const msg = `~${ap.passengerLoad} passengers arriving → ~${ap.expectedRiders} need a ride`
+      + (ap.delayedCount > 0 ? ` · ⏰ ${ap.delayedCount} delays` : '');
+    $id(prefix+'PaxBanner').style.display = 'flex';
+    $id(prefix+'PaxMsg').textContent = msg;
+  }
 
-    const r = await fetch(url);
+  // Data note
+  if (ap.dataNote) $id(prefix+'Note').textContent = ap.dataNote;
 
-    if(!r.ok){
-      throw new Error(`HTTP ${r.status}`);
-    }
+  // Flights
+  renderFlights(ap.flights, prefix+'Flights', prefix+'FlightsTitle', prefix+'FlightsBadge', ap.code);
+}
 
-    const d = await r.json();
+async function load() {
+  try {
+    const q = typeof GPS !== 'undefined' && GPS.lat
+      ? `?lat=${GPS.lat}&lng=${GPS.lng}` : '';
+    const d = await fetch(API + '/api/airports' + q).then(r => r.json());
 
-    console.log('AIRPORT DATA:', d);
+    $id('loadingState').style.display = 'none';
 
-    if(!d.success){
-      throw new Error(d.error || 'API error');
-    }
+    if (!d.success) throw new Error(d.error || 'API error');
 
-    const airports = d.airports || [];
+    // Find ORD and MDW specifically — never show others for Chicago
+    const ord = (d.airports || []).find(a => a.code === 'ORD');
+    const mdw = (d.airports || []).find(a => a.code === 'MDW');
 
-    if(!airports.length){
-      renderFlights('ordFlightsList', []);
-      renderFlights('mdwFlightsList', []);
+    // For other cities, show up to 2 major commercial airports
+    const shown = [ord, mdw].filter(Boolean);
+
+    // If neither ORD nor MDW found, show top 2 rideshare airports
+    if (!shown.length) {
+      const top2 = (d.airports || []).slice(0, 2);
+      top2.forEach((ap, i) => {
+        const prefix = i === 0 ? 'ord' : 'mdw';
+        // Patch elements to show generic airport
+        renderAirportCard(ap, prefix);
+      });
+      if (!top2.length) {
+        $id('emptyState').style.display = 'block';
+        return;
+      }
       return;
     }
 
-    const ord =
-      airports.find(a =>
-        a.code === 'ORD' ||
-        String(a.name || '').toLowerCase().includes("o'hare")
-      ) || airports[0];
+    // Render ORD
+    if (ord) renderAirportCard(ord, 'ord');
+    // Render MDW
+    if (mdw) renderAirportCard(mdw, 'mdw');
 
-    const mdw =
-      airports.find(a =>
-        a.code === 'MDW' ||
-        String(a.name || '').toLowerCase().includes('midway')
-      ) || airports.find(a => a.code !== ord.code) || airports[1];
+    // Total riders banner
+    const totalRiders = (ord?.expectedRiders || 0) + (mdw?.expectedRiders || 0);
+    if (totalRiders > 0) {
+      $id('totalBanner').style.display = 'flex';
+      $id('totalRidersNum').textContent = '~' + totalRiders;
+    }
 
-    updateAirportCard('ord', ord);
-    updateAirportCard('mdw', mdw);
-
-    renderFlights('ordFlightsList', ord?.flights || []);
-    renderFlights('mdwFlightsList', mdw?.flights || []);
-
-  }catch(e){
-    console.error('AIRPORT PAGE ERROR:', e);
-
-    const msg = `
-      <p style="color:var(--mist);font-size:13px">
-        ⚠️ ${e.message}. Check backend connection.
-      </p>
-    `;
-
-    const ordEl = document.getElementById('ordFlightsList');
-    const mdwEl = document.getElementById('mdwFlightsList');
-
-    if(ordEl) ordEl.innerHTML = msg;
-    if(mdwEl) mdwEl.innerHTML = '';
+  } catch(e) {
+    console.error('[Airports]', e.message);
+    $id('loadingState').style.display = 'none';
+    $id('emptyState').style.display = 'block';
   }
 }
 
 load();
+setInterval(load, 5 * 60 * 1000);
 </script>
-
 </body>
 </html>

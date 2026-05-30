@@ -116,54 +116,54 @@ function normalizeStatus(raw) {
   return 'Scheduled';
 }
 
-// Airport IATA → UTC offset in minutes (standard time + DST where applicable)
-// Updated for CDT/EDT/MDT/PDT summer offsets (Mar-Nov)
-const AIRPORT_UTC_OFFSET = {
-  // UTC-4 EDT (Eastern Daylight)
+// Airport timezone offsets (minutes from UTC) — covers DST periods (Mar-Nov)
+const AIRPORT_TZ = {
+  // Eastern Daylight (UTC-4)
   JFK:-240,LGA:-240,EWR:-240,BOS:-240,MIA:-240,FLL:-240,MCO:-240,
   TPA:-240,PHL:-240,DCA:-240,BWI:-240,CLT:-240,ATL:-240,DTW:-240,
   MSP:-240,MSY:-240,BNA:-240,RDU:-240,PIT:-240,BUF:-240,
-  // UTC-5 CDT (Central Daylight) — Chicago area
-  ORD:-300,MDW:-300,MCI:-300,STL:-300,MSN:-300,MKE:-300,
+  // Central Daylight (UTC-5)
+  ORD:-300,MDW:-300,MCI:-300,STL:-300,MKE:-300,
   IAH:-300,HOU:-300,DFW:-300,DAL:-300,AUS:-300,SAT:-300,
-  // UTC-6 MDT (Mountain Daylight)
+  // Mountain Daylight (UTC-6)
   DEN:-360,SLC:-360,ABQ:-360,ELP:-360,BOI:-360,
-  // UTC-7 PDT (Pacific Daylight)
+  // Pacific Daylight (UTC-7)
   LAX:-420,SFO:-420,SAN:-420,SEA:-420,PDX:-420,LAS:-420,PHX:-420,
-  // UTC-10 HST (Hawaii — no DST)
+  // Hawaii (UTC-10, no DST)
   HNL:-600,
 };
 
 /**
- * KEY FIX: AeroDataBox returns LOCAL airport time without timezone offset
- * e.g. "2025-05-27T22:20:00" = 10:20pm Chicago time (CDT = UTC-5)
+ * AeroDataBox returns LOCAL airport time with NO UTC offset.
+ * e.g. "2025-05-27T22:20:00" means 10:20pm Chicago time.
  *
- * Server runs UTC. We know the airport's local offset, so we can
- * convert airport local time → UTC → compare with now (UTC).
+ * The server on Render runs in UTC (offset = 0).
+ * new Date("2025-05-27T22:20:00") on a UTC server = 22:20 UTC
+ * But the real UTC time of that flight = 22:20 + 5h = 03:20 UTC next day.
+ * So we must ADD the airport's UTC offset to get correct UTC.
+ *
+ * Formula: flightUTC = parsedAsUTC + abs(airportOffset) * 60000
  */
 function minutesFromNowLocal(localTimeStr, iataCode) {
   if (!localTimeStr) return null;
   try {
-    // If string already has explicit UTC offset (+HH:MM or Z), parse directly
+    // If already has UTC offset, parse directly — no correction needed
     if (/([+-]\d{2}:\d{2}|Z)$/.test(localTimeStr)) {
       return Math.round((new Date(localTimeStr).getTime() - Date.now()) / 60000);
     }
 
-    // No offset — treat as airport local time
-    // Get airport UTC offset (default to CDT -300 for US airports)
-    const offsetMins = AIRPORT_UTC_OFFSET[iataCode] ?? -300;
+    // Strip any accidental suffix and parse as UTC (server is UTC)
+    const clean = localTimeStr.replace(/[TZ]?([+-]\d{2}:\d{2}|Z)$/, '');
+    const parsedAsUTC = new Date(clean + 'Z'); // force UTC interpretation
 
-    // Parse the local time string as-is (JS treats no-offset as local server time)
-    // We correct for the difference between server UTC offset and airport UTC offset
-    const serverOffsetMins = -new Date().getTimezoneOffset(); // server's UTC offset in min
-    const correctionMins   = offsetMins - serverOffsetMins;   // how much to shift
+    // Airport local offset, e.g. CDT = -300 min
+    const airportOffsetMins = AIRPORT_TZ[iataCode] ?? -300;
 
-    // Strip any trailing offset just in case, parse raw
-    const clean = localTimeStr.replace(/([+-]\d{2}:\d{2}|Z)$/, '');
-    const parsed = new Date(clean); // parsed as server local time
-    // Apply correction to get true UTC equivalent
-    const trueUTC = parsed.getTime() - (correctionMins * 60000);
-    return Math.round((trueUTC - Date.now()) / 60000);
+    // Convert airport local → true UTC
+    // If airport is UTC-5 (CDT), local 22:20 = UTC 03:20 (+5h)
+    const trueFlightUTC = parsedAsUTC.getTime() - (airportOffsetMins * 60000);
+
+    return Math.round((trueFlightUTC - Date.now()) / 60000);
   } catch {
     return null;
   }
@@ -228,8 +228,6 @@ async function fromAviationStack(iata) {
       f.minutesToArrival >= 0 &&
       f.minutesToArrival <= 180 &&
       f.status !== 'Cancelled'
-      && f.origin !== '—' &&
-      f.originCity !== 'Unknown'
     )
     .sort((a, b) => a.minutesToArrival - b.minutesToArrival)
     .slice(0, 20);
@@ -403,7 +401,7 @@ export async function fetchFlightsForAirport(iata, airportLat, airportLng) {
   // Try real providers first, fall back to estimate
   let flights = await fromAeroDataBox(iata);
   if (!flights || !flights.length) flights = await fromAviationStack(iata);
-  if (!flights || !flights.length) flights = [];
+  if (!flights || !flights.length) flights = buildEstimate(iata);
 
   const isReal         = flights.some(f => f.isReal && !f.isEstimate);
   const passengerLoad  = flights.reduce((s, f) => s + Number(f.passengerCount || 0), 0);
@@ -412,16 +410,16 @@ export async function fetchFlightsForAirport(iata, airportLat, airportLng) {
   const delayedCount   = flights.filter(f => f.delayMinutes > 15).length;
 
   return {
-  flights,
-  arrivalsPerHour:  flights.length,
-  arrivingNext30:   arrivingSoon.length,
-  passengerLoad,
-  expectedRiders,
-  isReal,
-  provider:   flights[0]?.provider || 'No data',
+    flights,
+    arrivalsPerHour:  flights.length,
+    arrivingNext30:   arrivingSoon.length,
+    passengerLoad,
+    expectedRiders,
+    isReal,
+    provider:   flights[0]?.provider || 'Smart Estimate',
     dataNote:   isReal
       ? `📡 Live: ${flights.length} vuelos próx. 3h · ~${passengerLoad} pasajeros · ~${expectedRiders} riders`
-      : `Sin vuelos reales en la ventana seleccionada`,
+      : `📊 Estimado · Agrega AVIATIONSTACK_KEY o RAPIDAPI_KEY para datos reales`,
     delayedCount,
   };
 }
