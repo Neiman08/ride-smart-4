@@ -127,6 +127,10 @@ function estimateCapacity(venueName, type, subtype = '') {
   if (v.includes('allstate arena')) return 18500;
   if (v.includes('rosemont theatre')) return 4400;
 
+  // Fix: "The Fields Studios" is NOT a stadium
+  if (v.includes('the fields studios')) return 2500;
+  if (v.includes('fields studios')) return 2500;
+
   if (v.includes('stadium') || v.includes('field')) return 45000;
   if (v.includes('arena')) return 18000;
   if (v.includes('theatre') || v.includes('theater')) return 2500;
@@ -189,6 +193,8 @@ router.get('/', async (req, res) => {
     }
 
     const now = Date.now();
+    const seen = new Set();
+
     const cleanEvents = events
       .map(e => {
         const hoursAway = e.date ? (new Date(e.date) - now) / 3600000 : 99;
@@ -218,17 +224,28 @@ router.get('/', async (req, res) => {
         // Ajuste: Permitir coordenadas 0 pero rechazar null/undefined
         if (!e.venueName || e.venueLat === null || e.venueLng === null) return false;
 
+        // Rango de tiempo: solo hoy y mañana
         if (!(e.hoursAway > -3 && e.hoursAway < 48)) return false;
 
+        // De-duplicación por nombre, venue y día
+        const key = `${e.name}|${e.venueName}|${new Date(e.date).toDateString()}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+
         const venue = (e.venueName || '').toLowerCase();
+        
+        // Fix: Validar si es realmente un venue grande, excluyendo excepciones
         const isBigVenue =
-          venue.includes('stadium') ||
-          venue.includes('arena') ||
-          venue.includes('field') ||
-          venue.includes('center') ||
-          venue.includes('theatre') ||
-          venue.includes('theater') ||
-          venue.includes('amphitheater');
+          !venue.includes('fields studios') &&
+          (
+            venue.includes('stadium') ||
+            venue.includes('arena') ||
+            venue.includes('field') ||
+            venue.includes('center') ||
+            venue.includes('theatre') ||
+            venue.includes('theater') ||
+            venue.includes('amphitheater')
+          );
 
         if (e.attendees > 30000 && !isBigVenue) return false;
 
